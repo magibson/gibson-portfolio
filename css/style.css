@@ -229,7 +229,13 @@ main {
 
 .hero-name {
     position: relative;
-    z-index: 100;
+    z-index: 50;
+}
+
+@media (max-width: 768px) {
+    .hero-content {
+        top: max(35vh, 150px);
+    }
 }
 
 .hero-fade {

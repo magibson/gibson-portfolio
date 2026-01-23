@@ -618,3 +618,22 @@ document.querySelectorAll('nav a').forEach(btn => {
         isHovering = false;
     });
 });
+
+// ===================
+// MOBILE BURGER MENU
+// ===================
+const burgerMenu = document.querySelector('.burger-menu');
+const navLinks = document.querySelector('.nav-links');
+
+burgerMenu.addEventListener('click', () => {
+    burgerMenu.classList.toggle('active');
+    navLinks.classList.toggle('active');
+});
+
+// Close menu when a nav link is clicked
+navLinks.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+        burgerMenu.classList.remove('active');
+        navLinks.classList.remove('active');
+    });
+});

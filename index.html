@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Matthew Gibson - Portfolio</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=20">
     <script>
         // Force scroll to top immediately before page renders
         if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
@@ -15,7 +15,7 @@
 </head>
 <body class="no-scroll">
     <!-- Fixed Background Image -->
-    <div class="background-image blurred"></div>
+    <div class="background-image blurred" style="background-image: url('https://res.cloudinary.com/deihjpq8s/image/upload/f_auto,q_auto/v1768430959/sorrento_20.jpg');"></div>
 
     <!-- Splash Screen -->
     <div id="splash">
@@ -25,8 +25,13 @@
 
     <header>
         <nav>
-            <a href="#" class="logo">MG</a>
-            <ul>
+            <a href="#" class="logo"><img src="https://res.cloudinary.com/deihjpq8s/image/upload/v1768598031/e4a758b4-d0fe-4812-8bc1-4373b737abbd.png" alt="Matthew Gibson Logo"></a>
+            <button class="burger-menu" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-links">
                 <li><a href="#about-me">About Me</a></li>
                 <li><a href="#galleries">Galleries</a></li>
                 <li><a href="#contact">Contact</a></li>

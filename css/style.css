@@ -18,13 +18,16 @@
 
 html {
     scroll-behavior: smooth;
+    background-color: rgba(10, 10, 10, 0.95);
 }
 
 body {
     font-family: var(--font-main);
-    background-color: var(--color-bg);
+    background-color: transparent;
     color: var(--color-text);
     line-height: 1.6;
+    min-height: 100vh;
+    min-height: 100dvh;
 }
 
 body.no-scroll {
@@ -34,10 +37,12 @@ body.no-scroll {
 /* Fixed background image */
 .background-image {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: -100px;
+    left: -100px;
+    right: -100px;
+    bottom: -100px;
+    width: calc(100% + 200px);
+    height: calc(100% + 200px);
     background-image: url('https://res.cloudinary.com/deihjpq8s/image/upload/f_auto,q_auto/v1768430959/sorrento_20.jpg');
     background-size: cover;
     background-position: center;
@@ -53,7 +58,8 @@ body.no-scroll {
 header {
     position: fixed;
     top: 0;
-    width: 100%;
+    left: 0;
+    right: 0;
     padding: 1rem 2rem;
     z-index: 100;
     background: rgba(10, 10, 10, 0.8);
@@ -61,6 +67,7 @@ header {
     opacity: 0;
     transform: translateY(-100%);
 }
+
 
 nav {
     display: flex;
@@ -71,10 +78,15 @@ nav {
 }
 
 .logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: var(--color-accent);
+    display: flex;
+    align-items: center;
     text-decoration: none;
+}
+
+.logo img {
+    height: 100px;
+    width: auto;
+    margin: -25px 0 -25px -25px;
 }
 
 nav ul {
@@ -97,6 +109,79 @@ nav a {
 nav a:hover {
     background: rgba(10, 10, 10, 0.7);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Burger Menu */
+.burger-menu {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 28px;
+    height: 20px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 110;
+}
+
+.burger-menu span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background: var(--color-text);
+    transition: all 0.3s ease;
+}
+
+.burger-menu.active span:nth-child(1) {
+    transform: rotate(45deg) translate(6px, 6px);
+}
+
+.burger-menu.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.burger-menu.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(6px, -6px);
+}
+
+/* Mobile Navigation */
+@media (max-width: 768px) {
+    .burger-menu {
+        display: flex;
+    }
+
+    .nav-links {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        background: rgba(10, 10, 10, 0.95);
+        padding: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease, padding 0.3s ease;
+    }
+
+    .nav-links.active {
+        max-height: 300px;
+        padding: 1rem 0;
+    }
+
+    .nav-links li {
+        width: 100%;
+        text-align: center;
+    }
+
+    .nav-links a {
+        display: block;
+        padding: 0.8rem 1rem;
+    }
+
+    header {
+        padding: 0.8rem 1rem;
+    }
 }
 
 .social-link {
@@ -359,6 +444,19 @@ main {
     }
 }
 
+@media (max-width: 768px) {
+    #galleries {
+        padding: 2rem 1.5rem;
+        margin-left: 1rem;
+        margin-right: 1rem;
+    }
+
+    .tagline {
+        font-size: 0.8rem;
+        letter-spacing: 0.2em;
+    }
+}
+
 .gallery-card:hover {
     z-index: 10;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
@@ -477,7 +575,7 @@ main {
 .gallery-view-title {
     text-align: center;
     margin-bottom: 2rem;
-    color: var(--color-accent);
+    color: var(--color-text);
 }
 
 .gallery-view-grid {
@@ -516,6 +614,7 @@ main {
     -webkit-user-select: none;
     user-select: none;
     -webkit-user-drag: none;
+    -webkit-touch-callout: none;
     pointer-events: auto;
 }
 
@@ -560,6 +659,7 @@ main {
     -webkit-user-select: none;
     user-select: none;
     -webkit-user-drag: none;
+    -webkit-touch-callout: none;
 }
 
 .lightbox-close,

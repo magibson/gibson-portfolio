@@ -5,44 +5,147 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Matthew Gibson - Portfolio</title>
     <link rel="stylesheet" href="css/style.css">
+    <script>
+        // Force scroll to top immediately before page renders
+        if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+        window.scrollTo(0, 0);
+        // Also scroll to top before page unloads so browser doesn't remember position
+        window.onbeforeunload = function() { window.scrollTo(0, 0); };
+    </script>
 </head>
-<body>
+<body class="no-scroll">
+    <!-- Fixed Background Image -->
+    <div class="background-image blurred"></div>
+
+    <!-- Splash Screen -->
+    <div id="splash">
+        <h1>Welcome</h1>
+        <p>Thanks For Stopping By</p>
+    </div>
+
     <header>
         <nav>
             <a href="#" class="logo">MG</a>
             <ul>
-                <li><a href="#about">About</a></li>
-                <li><a href="#projects">Projects</a></li>
+                <li><a href="#about-me">About Me</a></li>
+                <li><a href="#galleries">Galleries</a></li>
                 <li><a href="#contact">Contact</a></li>
+                <li>
+                    <a href="https://www.instagram.com/mattgibsonpics/" target="_blank" rel="noopener" class="social-link" aria-label="Instagram">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                        </svg>
+                    </a>
+                </li>
             </ul>
         </nav>
     </header>
 
     <main>
         <section id="hero">
-            <h1>Matthew Gibson</h1>
-            <p class="tagline">Your tagline here</p>
+            <div class="hero-content">
+                <div class="hero-name">
+                    <h1>Matthew Gibson</h1>
+                </div>
+                <div class="hero-fade">
+                    <p class="tagline">Photographer</p>
+                    <div class="scroll-hint">
+                        <span>View Work</span>
+                        <div class="scroll-arrow">&#8595;</div>
+                    </div>
+                </div>
+            </div>
         </section>
 
-        <section id="about">
-            <h2>About</h2>
-            <p>Tell your story here...</p>
+        <section id="galleries">
+            <div class="gallery-grid">
+                <div class="gallery-card" data-gallery="sorrento">
+                    <div class="gallery-image" style="background-image: url('https://res.cloudinary.com/deihjpq8s/image/upload/f_auto,q_auto,w_800/v1768430959/sorrento_01.jpg')"></div>
+                    <div class="gallery-info">
+                        <h3>Sorrento</h3>
+                        <p>The beautiful sights of Sorrento</p>
+                    </div>
+                </div>
+
+                <div class="gallery-card" data-gallery="venice">
+                    <div class="gallery-image" style="background-image: url('https://res.cloudinary.com/deihjpq8s/image/upload/f_auto,q_auto,w_800/v1768430959/venice_01.jpg')"></div>
+                    <div class="gallery-info">
+                        <h3>Venice</h3>
+                        <p>The canals and streets of Venice</p>
+                    </div>
+                </div>
+
+                <div class="gallery-card" data-gallery="bermuda">
+                    <div class="gallery-image" style="background-image: url('https://res.cloudinary.com/deihjpq8s/image/upload/f_auto,q_auto,w_800/v1768435273/bermuda_01.jpg')"></div>
+                    <div class="gallery-info">
+                        <h3>Bermuda</h3>
+                        <p>Island paradise from above and below</p>
+                    </div>
+                </div>
+
+                <div class="gallery-card" data-gallery="nj">
+                    <div class="gallery-image" style="background-image: url('https://res.cloudinary.com/deihjpq8s/image/upload/f_auto,q_auto,w_800/v1768435273/nj_01.jpg')"></div>
+                    <div class="gallery-info">
+                        <h3>New Jersey</h3>
+                        <p>Garden State landscapes</p>
+                    </div>
+                </div>
+
+                <div class="gallery-card" data-gallery="nyc">
+                    <div class="gallery-image" style="background-image: url('https://res.cloudinary.com/deihjpq8s/image/upload/f_auto,q_auto,w_800/v1768435712/nyc_01.jpg')"></div>
+                    <div class="gallery-info">
+                        <h3>New York City</h3>
+                        <p>The city that never sleeps</p>
+                    </div>
+                </div>
+
+                <div class="gallery-card" data-gallery="rome">
+                    <div class="gallery-image" style="background-image: url('https://res.cloudinary.com/deihjpq8s/image/upload/f_auto,q_auto,w_800/v1768435712/rome_01.jpg')"></div>
+                    <div class="gallery-info">
+                        <h3>Rome</h3>
+                        <p>The Eternal City</p>
+                    </div>
+                </div>
+            </div>
         </section>
 
-        <section id="projects">
-            <h2>Projects</h2>
-            <!-- Project cards will go here -->
+        <section id="about-me">
+            <h2 class="about-title">About Me</h2>
+            <div class="about-content">
+                <div class="about-image">
+                    <img src="https://res.cloudinary.com/deihjpq8s/image/upload/f_auto,q_auto/v1769127764/profile.jpg" alt="Matthew Gibson">
+                </div>
+                <div class="about-text">
+                    <p>Hi, I'm Matthew Gibson.</p>
+                    <p>I'm a New Jersey native who's been obsessed with cameras since I was old enough to sneak my parents' point-and-shoot at every birthday party or holiday. What started as "borrowing" their gear eventually turned into a hobby I can't imagine living without.</p>
+                    <p>Every spare moment is spent taking pictures. Whether it's chasing light along the Jersey Shore, a vacation to somewhere like Italy, or just finding cool shots in my own backyard, I'm always looking for that one frame that makes you stop scrolling.</p>
+                    <p>I don't travel often, but when I do get away, or even when I'm just exploring close to home, I bring the camera and the drone and try to come back with photos worth sharing.</p>
+                    <p>Thanks for stopping by.</p>
+                </div>
+            </div>
         </section>
 
-        <section id="contact">
-            <h2>Contact</h2>
-            <p>Get in touch...</p>
-        </section>
+    <!-- Gallery View (grid of photos) -->
+    <div id="gallery-view">
+        <button class="gallery-view-close">&times;</button>
+        <h2 class="gallery-view-title"></h2>
+        <div class="gallery-view-grid"></div>
+    </div>
+
+    <!-- Lightbox (single photo fullscreen) -->
+    <div id="lightbox">
+        <button class="lightbox-close">&times;</button>
+        <button class="lightbox-prev">&#10094;</button>
+        <button class="lightbox-next">&#10095;</button>
+        <div class="lightbox-content">
+            <img src="" alt="Gallery image">
+        </div>
+        <div class="lightbox-counter"></div>
+    </div>
+
     </main>
-
-    <footer>
-        <p>&copy; 2025 Matthew Gibson</p>
-    </footer>
 
     <!-- GSAP Animation Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>

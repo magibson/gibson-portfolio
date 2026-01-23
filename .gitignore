@@ -9,3 +9,7 @@ Thumbs.db
 
 # Optional: if you add node_modules later
 node_modules/
+
+# Local image files (hosted on Cloudinary)
+photos/
+assets/images/

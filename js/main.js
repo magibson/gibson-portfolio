@@ -634,3 +634,23 @@ navLinks.querySelectorAll('a').forEach(link => {
         navLinks.classList.remove('active');
     });
 });
+
+// ===================
+// FORM SUCCESS MESSAGE
+// ===================
+if (window.location.search.includes('success=true')) {
+    // Scroll to contact section after page loads
+    setTimeout(() => {
+        const contactSection = document.getElementById('contact');
+        if (contactSection) {
+            contactSection.scrollIntoView({ behavior: 'smooth' });
+            // Show success message
+            const form = contactSection.querySelector('form');
+            if (form) {
+                form.innerHTML = '<div class="form-success"><h3>Message Sent!</h3><p>Thanks for reaching out. I\'ll get back to you soon.</p></div>';
+            }
+        }
+        // Clean up URL
+        window.history.replaceState({}, '', '/');
+    }, 1500);
+}

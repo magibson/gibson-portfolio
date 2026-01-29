@@ -836,3 +836,20 @@ main {
         font-size: 2rem;
     }
 }
+
+.form-success {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.form-success h3 {
+    font-size: 1.8rem;
+    font-weight: 400;
+    margin-bottom: 1rem;
+    color: var(--color-text);
+}
+
+.form-success p {
+    color: var(--color-muted);
+    font-size: 1.1rem;
+}

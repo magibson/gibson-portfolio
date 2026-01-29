@@ -827,16 +827,6 @@ main {
     transform: translateY(0);
 }
 
-@media (max-width: 600px) {
-    #contact {
-        padding: 4rem 1.5rem;
-    }
-    
-    .contact-title {
-        font-size: 2rem;
-    }
-}
-
 .form-success {
     text-align: center;
     padding: 3rem 1rem;
@@ -852,4 +842,49 @@ main {
 .form-success p {
     color: var(--color-muted);
     font-size: 1.1rem;
+}
+
+@media (max-width: 600px) {
+    #contact {
+        margin: 0 1rem 4rem 1rem;
+        padding: 2rem 1.5rem;
+        border-radius: 16px;
+    }
+    
+    .contact-title {
+        font-size: 1.8rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .contact-intro {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .contact-form {
+        gap: 1.25rem;
+    }
+    
+    .form-group input,
+    .form-group textarea {
+        padding: 0.875rem;
+        font-size: 16px; /* Prevents iOS zoom on focus */
+    }
+    
+    .submit-btn {
+        padding: 1rem;
+        width: 100%;
+    }
+    
+    .form-success {
+        padding: 2rem 0.5rem;
+    }
+    
+    .form-success h3 {
+        font-size: 1.5rem;
+    }
+    
+    .form-success p {
+        font-size: 1rem;
+    }
 }

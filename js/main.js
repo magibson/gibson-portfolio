@@ -659,6 +659,11 @@ if (contactForm) {
                 body: new URLSearchParams(formData).toString()
             });
             
+            // Lock current height to prevent jump
+            const currentHeight = form.offsetHeight;
+            form.style.height = currentHeight + 'px';
+            form.style.overflow = 'hidden';
+            
             // Animate out form fields, show success
             gsap.to(form.querySelectorAll('.form-group, .submit-btn'), {
                 opacity: 0,
@@ -667,6 +672,17 @@ if (contactForm) {
                 stagger: 0.05,
                 onComplete: () => {
                     form.innerHTML = '<div class="form-success"><h3>Message Sent!</h3><p>Thanks for reaching out. I\'ll get back to you soon.</p></div>';
+                    
+                    // Get new height and animate to it
+                    const successEl = form.querySelector('.form-success');
+                    const newHeight = successEl.offsetHeight;
+                    
+                    gsap.to(form, {
+                        height: newHeight,
+                        duration: 0.4,
+                        ease: 'power2.inOut'
+                    });
+                    
                     gsap.from('.form-success', {
                         opacity: 0,
                         y: 20,

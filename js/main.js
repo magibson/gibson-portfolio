@@ -659,37 +659,19 @@ if (contactForm) {
                 body: new URLSearchParams(formData).toString()
             });
             
-            // Get the whole contact content section
-            const contactContent = document.querySelector('.contact-content');
-            const contactTitle = document.querySelector('.contact-title');
-            
-            // Lock current height to prevent jump
+            // Get the contact section
             const contactSection = document.getElementById('contact');
-            const currentHeight = contactSection.offsetHeight;
-            contactSection.style.height = currentHeight + 'px';
-            contactSection.style.overflow = 'hidden';
             
-            // Animate out everything
-            gsap.to([contactTitle, contactContent], {
+            // Fade out everything in contact section
+            gsap.to(contactSection.children, {
                 opacity: 0,
                 y: -20,
                 duration: 0.3,
-                stagger: 0.05,
                 onComplete: () => {
-                    // Remove old content
-                    contactTitle.remove();
-                    contactContent.innerHTML = '<div class="form-success"><h3>Message Sent!</h3><p>Thanks for reaching out. I\'ll get back to you soon.</p></div>';
+                    // Replace all content with success message
+                    contactSection.innerHTML = '<div class="form-success"><h3>Message Sent!</h3><p>Thanks for reaching out. I\'ll get back to you soon.</p></div>';
                     
-                    // Get new height and animate to it
-                    const successEl = contactContent.querySelector('.form-success');
-                    const newHeight = successEl.offsetHeight + 60; // padding
-                    
-                    gsap.to(contactSection, {
-                        height: newHeight,
-                        duration: 0.4,
-                        ease: 'power2.inOut'
-                    });
-                    
+                    // Animate in success message
                     gsap.from('.form-success', {
                         opacity: 0,
                         y: 20,

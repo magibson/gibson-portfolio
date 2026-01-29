@@ -56,7 +56,7 @@
     }
     </script>
     
-    <link rel="stylesheet" href="css/style.css?v=25">
+    <link rel="stylesheet" href="css/style.css?v=26">
     <script>
         // Force scroll to top immediately before page renders
         if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
@@ -181,6 +181,33 @@
                     <p>I don't travel often, but when I do get away, or even when I'm just exploring close to home, I bring the camera and the drone and try to come back with photos worth sharing.</p>
                     <p>Thanks for stopping by.</p>
                 </div>
+            </div>
+        </section>
+
+        <section id="contact">
+            <h2 class="contact-title">Get In Touch</h2>
+            <div class="contact-content">
+                <p class="contact-intro">Have a project in mind or just want to say hello? I'd love to hear from you.</p>
+                <form name="contact" method="POST" data-netlify="true" class="contact-form">
+                    <input type="hidden" name="form-name" value="contact">
+                    <div class="form-group">
+                        <label for="name">Name *</label>
+                        <input type="text" id="name" name="name" required placeholder="Your name">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email *</label>
+                        <input type="email" id="email" name="email" required placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone <span class="optional">(optional)</span></label>
+                        <input type="tel" id="phone" name="phone" placeholder="(123) 456-7890">
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message *</label>
+                        <textarea id="message" name="message" rows="5" required placeholder="Tell me about your project or just say hi..."></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Send Message</button>
+                </form>
             </div>
         </section>
 

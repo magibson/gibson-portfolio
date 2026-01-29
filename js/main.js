@@ -659,25 +659,32 @@ if (contactForm) {
                 body: new URLSearchParams(formData).toString()
             });
             
-            // Lock current height to prevent jump
-            const currentHeight = form.offsetHeight;
-            form.style.height = currentHeight + 'px';
-            form.style.overflow = 'hidden';
+            // Get the whole contact content section
+            const contactContent = document.querySelector('.contact-content');
+            const contactTitle = document.querySelector('.contact-title');
             
-            // Animate out form fields, show success
-            gsap.to(form.querySelectorAll('.form-group, .submit-btn'), {
+            // Lock current height to prevent jump
+            const contactSection = document.getElementById('contact');
+            const currentHeight = contactSection.offsetHeight;
+            contactSection.style.height = currentHeight + 'px';
+            contactSection.style.overflow = 'hidden';
+            
+            // Animate out everything
+            gsap.to([contactTitle, contactContent], {
                 opacity: 0,
                 y: -20,
                 duration: 0.3,
                 stagger: 0.05,
                 onComplete: () => {
-                    form.innerHTML = '<div class="form-success"><h3>Message Sent!</h3><p>Thanks for reaching out. I\'ll get back to you soon.</p></div>';
+                    // Remove old content
+                    contactTitle.remove();
+                    contactContent.innerHTML = '<div class="form-success"><h3>Message Sent!</h3><p>Thanks for reaching out. I\'ll get back to you soon.</p></div>';
                     
                     // Get new height and animate to it
-                    const successEl = form.querySelector('.form-success');
-                    const newHeight = successEl.offsetHeight;
+                    const successEl = contactContent.querySelector('.form-success');
+                    const newHeight = successEl.offsetHeight + 60; // padding
                     
-                    gsap.to(form, {
+                    gsap.to(contactSection, {
                         height: newHeight,
                         duration: 0.4,
                         ease: 'power2.inOut'

@@ -636,21 +636,51 @@ navLinks.querySelectorAll('a').forEach(link => {
 });
 
 // ===================
-// FORM SUCCESS MESSAGE
+// FORM SUBMISSION (AJAX)
 // ===================
-if (window.location.search.includes('success=true')) {
-    // Scroll to contact section after page loads
-    setTimeout(() => {
-        const contactSection = document.getElementById('contact');
-        if (contactSection) {
-            contactSection.scrollIntoView({ behavior: 'smooth' });
-            // Show success message
-            const form = contactSection.querySelector('form');
-            if (form) {
-                form.innerHTML = '<div class="form-success"><h3>Message Sent!</h3><p>Thanks for reaching out. I\'ll get back to you soon.</p></div>';
-            }
+const contactForm = document.getElementById('contact-form');
+if (contactForm) {
+    contactForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const form = e.target;
+        const submitBtn = form.querySelector('.submit-btn');
+        const originalText = submitBtn.textContent;
+        
+        // Show loading state
+        submitBtn.textContent = 'Sending...';
+        submitBtn.disabled = true;
+        
+        try {
+            const formData = new FormData(form);
+            await fetch('/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(formData).toString()
+            });
+            
+            // Animate out form fields, show success
+            gsap.to(form.querySelectorAll('.form-group, .submit-btn'), {
+                opacity: 0,
+                y: -20,
+                duration: 0.3,
+                stagger: 0.05,
+                onComplete: () => {
+                    form.innerHTML = '<div class="form-success"><h3>Message Sent!</h3><p>Thanks for reaching out. I\'ll get back to you soon.</p></div>';
+                    gsap.from('.form-success', {
+                        opacity: 0,
+                        y: 20,
+                        duration: 0.5,
+                        ease: 'power2.out'
+                    });
+                }
+            });
+        } catch (error) {
+            submitBtn.textContent = 'Error - Try Again';
+            submitBtn.disabled = false;
+            setTimeout(() => {
+                submitBtn.textContent = originalText;
+            }, 2000);
         }
-        // Clean up URL
-        window.history.replaceState({}, '', '/');
-    }, 1500);
+    });
 }

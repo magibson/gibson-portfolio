@@ -727,9 +727,14 @@ main {
 
 /* Contact Section */
 #contact {
-    padding: 8rem 2rem 6rem;
+    position: relative;
+    padding: 3rem;
     max-width: 600px;
-    margin: 0 auto;
+    margin: 0 auto 4rem auto;
+    background: rgba(10, 10, 10, 0.7);
+    border-radius: 24px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 .contact-title {

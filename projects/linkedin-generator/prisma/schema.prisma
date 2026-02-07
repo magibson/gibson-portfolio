@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  firstName    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  settings        UserSettings?
+  writingExamples WritingExample[]
+  posts           Post[]
+  batches         Batch[]
+  passwordResets  PasswordReset[]
+}
+
+model UserSettings {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  postsPerBatch   Int      @default(5)
+  batchCount      Int      @default(1)
+  postLength      String   @default("medium") // short, medium, long
+  emailAddress    String?
+  sourceWebsites  String   @default("[]") // JSON array
+  audience        String   @default("young-professionals") // audience type
+  customTopics    String   @default("[]") // JSON array, only used when audience is "custom"
+  schedules       String   @default("[]") // JSON array
+  aiInstructions  String   @default("") // Custom instructions for AI (e.g., "no emojis")
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model WritingExample {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  content   String
+  source    String?  // "manual" or "generated-approved"
+  createdAt DateTime @default(now())
+}
+
+model Post {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  batchId     String?
+  batch       Batch?   @relation(fields: [batchId], references: [id])
+  
+  topic       String
+  tone        String
+  contentType String
+  content     String
+  status      String   @default("draft") // draft, edited, used
+  
+  // Source article info (from curated articles)
+  sourceArticleUrl   String?
+  sourceArticleTitle String?
+  sourceArticleImage String?
+  audience           String?
+  
+  editHistory String   @default("[]") // JSON array of edits
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Batch {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  scheduledFor DateTime
+  generatedAt  DateTime?
+  sentAt       DateTime?
+  status       String   @default("scheduled") // scheduled, generating, complete, sent
+  
+  posts        Post[]
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model PasswordReset {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+}

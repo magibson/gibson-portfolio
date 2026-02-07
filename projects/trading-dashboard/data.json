@@ -1,0 +1,40 @@
+{
+  "portfolioValue": 1000.25,
+  "totalReturn": 0.03,
+  "cash": 990.0,
+  "daysRemaining": 24,
+  "ourReturn": 0.03,
+  "vooReturn": 0.54,
+  "vooStart": 636.22,
+  "vooCurrent": 639.68,
+  "positions": [
+    {
+      "ticker": "AMD",
+      "shares": 1,
+      "avgCost": 235.64,
+      "current": 250.91,
+      "marketValue": 4.7915035999999995,
+      "pl": 0.2916036,
+      "plPercent": 6.4799999999999995
+    },
+    {
+      "ticker": "NVDA",
+      "shares": 1,
+      "avgCost": 187.23,
+      "current": 186.77,
+      "marketValue": 3.4913011999999997,
+      "pl": -0.0085988,
+      "plPercent": -0.246
+    },
+    {
+      "ticker": "VST",
+      "shares": 1,
+      "avgCost": 158.22,
+      "current": 155.64,
+      "marketValue": 1.96728881,
+      "pl": -0.03261119,
+      "plPercent": -1.6310000000000002
+    }
+  ],
+  "lastUpdated": "2026-02-03T14:07:20.828941"
+}

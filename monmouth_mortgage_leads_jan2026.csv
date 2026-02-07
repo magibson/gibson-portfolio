@@ -1,0 +1,62 @@
+Address,Town,Sale_Price,Sq_Ft,Bedrooms,Bathrooms,Price_Per_SqFt,Lead_Score
+"19 Edgewood Drive",Freehold,$667500,2046,4,2,$326,A
+"85 Edwards Drive",Freehold,$685000,1860,4,3,$368,A
+"392 Georgia Road",Freehold,$801000,2066,4,3,$388,A
+"29 Chatham Ridge Drive",Freehold,$805000,2306,4,2,$349,A
+"70 Coachman Drive",Freehold,$825000,2387,4,2,$346,A
+"34 Polo Club Drive",Freehold,$835000,3222,5,2,$259,A
+"620 Kirwan Court",Freehold,$1200000,3572,4,2,$336,A
+"40 Lynn Blvd",Hazlet,$535000,2198,4,2,$243,A
+"1 Ramble Way",Hazlet,$810000,2625,5,3,$309,A
+"86 Essex Ave",Hazlet Township,$575000,1642,4,2,$350,A
+"35 4th Street",Highlands,$560900,2922,4,2,$192,A
+"137 Marina Bay Court",Highlands,$650000,1896,3,2,$343,B
+"8 Delwood Drive",Holmdel,$750000,3671,5,3,$204,A
+"16 Exeter Way",Holmdel,$2125000,4703,5,3,$452,B
+"9 Yellowstone Lane",Howell,$650000,1872,4,3,$347,A
+"26 Sweetbriar Trail",Howell,$740000,2262,5,3,$327,A
+"6 Coral Drive",Howell,$769000,2465,4,2,$312,A
+"68 Heritage Drive",Howell,$850000,2174,4,2,$391,A
+"27 Woodview Drive",Howell,$999999,2936,4,3,$341,A
+"309 1st Street",Keyport,$520000,2639,5,2,$197,A
+"227 Raritan Street",Keyport,$600000,2576,4,2,$233,A
+"69 Maple Place",Keyport,$710000,2675,3,2,$265,B
+"36 James Street",Lincroft,$999000,2486,4,2,$402,A
+"16 Hickory Lane",Lincroft,$1198000,2649,4,3,$452,A
+"144 Westwood Ave",Long Branch,$686000,1582,4,2,$434,A
+"464 2nd Ave",Long Branch,$808000,1782,4,3,$453,A
+"5 Crusade Court",Manalapan,$999999,3078,4,3,$325,A
+"30 Shilling Road",Manalapan,$1060000,3197,5,1,$332,A
+"1 Briar Hill Drive",Manalapan,$1120000,3176,5,2,$353,A
+"82 School Road",Marlboro,$620000,2217,4,3,$280,A
+"100 Timber Lane",Marlboro,$1720000,4579,4,2,$376,B
+"36 Union Street",Matawan,$810000,2307,4,3,$351,A
+"40 North Circle",Matawan,$819000,3084,4,3,$266,A
+"42 Cherry Tree Farm Road",Middletown,$745000,2148,4,3,$347,A
+"222 Red Hill Road",Middletown,$820000,2279,3,3,$360,B
+"36 New Monmouth Road",Middletown,$867000,3188,4,3,$272,A
+"30 Packard Drive",Middletown,$985000,2133,3,3,$462,B
+"26 Crest Road",Middletown,$999000,2694,3,2,$371,B
+"4 Runyon Road",Middletown,$1450000,3465,4,2,$418,A
+"14 Deer Run Drive",Millstone Township,$989000,3020,4,3,$327,A
+"12 Clayton Drive",Millstone Township,$990000,3375,4,3,$293,A
+"22 Riley Road",Morganville,$808000,2028,4,3,$398,A
+"9 Adams Street",Morganville,$900000,3156,4,1,$285,A
+"102 Greenwood Road",Morganville,$935000,2278,3,2,$410,B
+"35 Stony Hill Drive",Morganville,$1250000,3428,5,2,$365,A
+"10 Brooklawn Drive",Neptune,$585000,1488,3,2,$393,B
+"310 Atkins Ave",Neptune,$635000,1952,5,3,$325,A
+"36 Marcy Drive",Neptune,$875000,2098,3,3,$417,B
+"20 Duchess Ave",North Middletown,$712800,2000,3,1,$356,B
+"5 Lincoln Circle",Red Bank,$680000,1702,3,2,$400,B
+"39 Market Street",Red Bank,$800000,1908,3,3,$419,B
+"8 Allston Street",Red Bank,$959900,2375,4,2,$404,A
+"40 Windward Way",Red Bank,$1200000,3383,4,2,$355,A
+"80 Forest Street",West Long Branch,$835000,2449,4,3,$341,A
+"1624 Dumont Terrace",Wall Township,$756500,2648,6,2,$286,A
+"1009 Edmunds Ave",Union Beach,$590000,2040,3,2,$289,B
+"725 Prospect Ave",Union Beach,$750000,2050,4,3,$366,A
+"425 Clark Ave",Union Beach,$859000,1680,3,2,$511,B
+"20 Cormorant Drive",Middletown,$1855000,3912,4,3,$474,A
+"5 Laureen Court",Middletown,$1940245,2980,4,5,$651,A
+"6 Bordens Brook Way",Holmdel,$3000000,7672,6,5,$391,B

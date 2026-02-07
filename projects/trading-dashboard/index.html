@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Jarvis Trading Challenge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        header .subtitle {
+            color: #888;
+            font-size: 1.1rem;
+        }
+        .card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .card h2 {
+            font-size: 1.2rem;
+            color: #888;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat .value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stat .label {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        .positive { color: #00ff88; }
+        .negative { color: #ff4444; }
+        .neutral { color: #888; }
+        
+        .positions-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .positions-table th,
+        .positions-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .positions-table th {
+            color: #888;
+            font-weight: normal;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+        .positions-table td {
+            font-size: 1.1rem;
+        }
+        .ticker {
+            font-weight: bold;
+            color: #4a9eff;
+        }
+        
+        .vs-benchmark {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+        .vs-benchmark .side {
+            text-align: center;
+            flex: 1;
+        }
+        .vs-benchmark .vs {
+            font-size: 1.5rem;
+            color: #888;
+            padding: 0 20px;
+        }
+        .vs-benchmark .name {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        .vs-benchmark .return {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .timeline {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .timeline-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .timeline-date {
+            color: #888;
+            min-width: 100px;
+        }
+        .timeline-event {
+            flex: 1;
+        }
+        
+        .rules {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .rule {
+            padding: 15px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+        }
+        .rule .icon {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+        .rule .text {
+            font-size: 0.95rem;
+            color: #ccc;
+        }
+        
+        footer {
+            text-align: center;
+            color: #666;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        .status-active {
+            background: rgba(0,255,136,0.2);
+            color: #00ff88;
+        }
+        .status-pending {
+            background: rgba(255,200,0,0.2);
+            color: #ffc800;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Jarvis Trading Challenge</h1>
+            <p class="subtitle">Beat the S&P 500 in 1 Month | $1,000 Simulated Portfolio</p>
+            <p style="margin-top: 10px;">
+                <span class="status-badge status-active">CHALLENGE ACTIVE</span>
+            </p>
+        </header>
+        
+        <div class="card">
+            <h2>📊 Portfolio Overview</h2>
+            <div class="stats-grid">
+                <div class="stat">
+                    <div class="value" id="portfolio-value">$1,000</div>
+                    <div class="label">Portfolio Value</div>
+                </div>
+                <div class="stat">
+                    <div class="value neutral" id="total-return">0.00%</div>
+                    <div class="label">Total Return</div>
+                </div>
+                <div class="stat">
+                    <div class="value" id="cash">$144</div>
+                    <div class="label">Cash</div>
+                </div>
+                <div class="stat">
+                    <div class="value" id="days-remaining">28</div>
+                    <div class="label">Days Remaining</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>⚔️ Us vs S&P 500</h2>
+            <div class="vs-benchmark">
+                <div class="side">
+                    <div class="name">🤖 Jarvis</div>
+                    <div class="return neutral" id="our-return">0.00%</div>
+                </div>
+                <div class="vs">VS</div>
+                <div class="side">
+                    <div class="name">📈 VOO (S&P)</div>
+                    <div class="return neutral" id="voo-return">0.00%</div>
+                </div>
+            </div>
+            <p style="text-align: center; color: #888; margin-top: 10px;" id="benchmark-status">
+                Challenge starts Monday when markets open
+            </p>
+        </div>
+        
+        <div class="card">
+            <h2>📈 Current Positions</h2>
+            <table class="positions-table">
+                <thead>
+                    <tr>
+                        <th>Ticker</th>
+                        <th>Shares</th>
+                        <th>Avg Cost</th>
+                        <th>Current</th>
+                        <th>P&L</th>
+                    </tr>
+                </thead>
+                <tbody id="positions-body">
+                    <tr>
+                        <td class="ticker">NVDA</td>
+                        <td>2</td>
+                        <td>$191.13</td>
+                        <td>—</td>
+                        <td class="neutral">Pending</td>
+                    </tr>
+                    <tr>
+                        <td class="ticker">AMD</td>
+                        <td>2</td>
+                        <td>$236.73</td>
+                        <td>—</td>
+                        <td class="neutral">Pending</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="color: #888; font-size: 0.9rem; margin-top: 15px;">
+                * Orders placed Jan 31, will fill at market open Monday Feb 3
+            </p>
+        </div>
+        
+        <div class="card">
+            <h2>📜 Trade History</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-date">Jan 31</div>
+                    <div class="timeline-event">
+                        <strong>Challenge Started</strong> - Opened positions in NVDA (2) and AMD (2). 
+                        Strategy: Concentrated AI/semiconductor bet.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>📋 Challenge Rules</h2>
+            <div class="rules">
+                <div class="rule">
+                    <div class="icon">💰</div>
+                    <div class="text">$1,000 simulated capital</div>
+                </div>
+                <div class="rule">
+                    <div class="icon">🎯</div>
+                    <div class="text">Beat VOO (S&P 500) return</div>
+                </div>
+                <div class="rule">
+                    <div class="icon">📅</div>
+                    <div class="text">1 month: Jan 31 - Feb 28</div>
+                </div>
+                <div class="rule">
+                    <div class="icon">🛑</div>
+                    <div class="text">Stop if down 10% ($100)</div>
+                </div>
+                <div class="rule">
+                    <div class="icon">✂️</div>
+                    <div class="text">5% stop loss per position</div>
+                </div>
+                <div class="rule">
+                    <div class="icon">🤖</div>
+                    <div class="text">Full autonomy for Jarvis</div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Built by Jarvis 🔵 | Data from Alpaca Paper Trading</p>
+            <p style="margin-top: 5px;">Last updated: <span id="last-updated">Jan 31, 2026 3:00 AM</span></p>
+        </footer>
+    </div>
+    
+    <script>
+        // This will be populated by the update script
+        const data = {
+            portfolioValue: 1000,
+            totalReturn: 0,
+            cash: 144,
+            daysRemaining: 28,
+            ourReturn: 0,
+            vooReturn: 0,
+            vooStart: 636.22,
+            positions: [
+                { ticker: 'NVDA', shares: 2, avgCost: 191.13, current: null, pl: null },
+                { ticker: 'AMD', shares: 2, avgCost: 236.73, current: null, pl: null }
+            ]
+        };
+        
+        function updateDisplay() {
+            document.getElementById('portfolio-value').textContent = '$' + data.portfolioValue.toLocaleString();
+            document.getElementById('total-return').textContent = (data.totalReturn >= 0 ? '+' : '') + data.totalReturn.toFixed(2) + '%';
+            document.getElementById('cash').textContent = '$' + data.cash;
+            document.getElementById('days-remaining').textContent = data.daysRemaining;
+            document.getElementById('our-return').textContent = (data.ourReturn >= 0 ? '+' : '') + data.ourReturn.toFixed(2) + '%';
+            document.getElementById('voo-return').textContent = (data.vooReturn >= 0 ? '+' : '') + data.vooReturn.toFixed(2) + '%';
+            
+            // Color coding
+            const ourReturnEl = document.getElementById('our-return');
+            const vooReturnEl = document.getElementById('voo-return');
+            const totalReturnEl = document.getElementById('total-return');
+            
+            ourReturnEl.className = 'return ' + (data.ourReturn > 0 ? 'positive' : data.ourReturn < 0 ? 'negative' : 'neutral');
+            vooReturnEl.className = 'return ' + (data.vooReturn > 0 ? 'positive' : data.vooReturn < 0 ? 'negative' : 'neutral');
+            totalReturnEl.className = 'value ' + (data.totalReturn > 0 ? 'positive' : data.totalReturn < 0 ? 'negative' : 'neutral');
+            
+            // Benchmark status
+            const statusEl = document.getElementById('benchmark-status');
+            if (data.ourReturn > data.vooReturn) {
+                statusEl.textContent = '🏆 We\'re beating the market!';
+                statusEl.style.color = '#00ff88';
+            } else if (data.ourReturn < data.vooReturn) {
+                statusEl.textContent = '📉 Behind the benchmark';
+                statusEl.style.color = '#ff4444';
+            } else {
+                statusEl.textContent = 'Challenge starts Monday when markets open';
+            }
+        }
+        
+        updateDisplay();
+    </script>
+</body>
+</html>

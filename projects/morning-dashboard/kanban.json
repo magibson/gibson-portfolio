@@ -1,0 +1,178 @@
+{
+  "columns": {
+    "backlog": {
+      "tasks": [
+        {
+          "id": "resy",
+          "name": "Resy Integration",
+          "description": "Add Resy API to reservation system",
+          "project": "reservations",
+          "lastUpdated": "2026-01-29T15:55:00Z"
+        },
+        {
+          "id": "linkedin-vercel",
+          "name": "Deploy LinkedIn Generator to Vercel",
+          "description": "Stable URLs and prod builds instead of cloudflare tunnels",
+          "project": "linkedin-generator",
+          "lastUpdated": "2026-01-28T23:00:00Z"
+        },
+        {
+          "id": "instagram-strategy",
+          "name": "Instagram Growth Strategy",
+          "description": "Build content calendar, weekly trend research for @mattgibsonpics",
+          "project": "photography",
+          "lastUpdated": "2026-01-28T22:00:00Z"
+        },
+        {
+          "id": "apartment-browser",
+          "name": "Apartment Finder Browser Scraping",
+          "description": "Enable full scraping with browser deps",
+          "project": "apartment-finder",
+          "lastUpdated": "2026-01-28T15:00:00Z"
+        },
+        {
+          "id": "prospecting-webapp",
+          "name": "Unified Prospecting Tools WebApp",
+          "description": "Combine WARN tracker + LinkedIn Generator into one app",
+          "project": "future",
+          "lastUpdated": "2026-01-28T20:00:00Z"
+        },
+        {
+          "id": "jarvis-voice-reactivate",
+          "name": "Reactivate Jarvis Voice",
+          "description": "Push-to-talk voice interface (paused for cost savings)",
+          "project": "jarvis-voice",
+          "lastUpdated": "2026-01-27T23:00:00Z"
+        }
+      ]
+    },
+    "inProgress": {
+      "tasks": [
+        {
+          "id": "opentable",
+          "name": "OpenTable Setup",
+          "description": "Waiting on browser deps - Matt to run sudo apt install",
+          "project": "reservations",
+          "lastUpdated": "2026-01-29T15:55:00Z"
+        },
+        {
+          "id": "api-usage-tracking",
+          "name": "Real API Usage Tracking",
+          "description": "Replace estimated numbers with actual usage data from providers",
+          "project": "morning-dashboard",
+          "lastUpdated": "2026-01-31T02:27:00Z"
+        }
+      ]
+    },
+    "done": {
+      "tasks": [
+        {
+          "id": "networking-scanner",
+          "name": "Weekly Networking Scanner",
+          "description": "Scans for networking events 2-4 weeks out in Monmouth County, runs every Sunday",
+          "project": "prospecting",
+          "lastUpdated": "2026-01-31T03:30:52.520281"
+        },
+        {
+          "id": "api-dashboard",
+          "name": "API Status Dashboard",
+          "description": "Track all APIs, costs, and status - integrated into main dashboard",
+          "project": "morning-dashboard",
+          "lastUpdated": "2026-01-31T02:00:00Z"
+        },
+        {
+          "id": "x-research-scanner",
+          "name": "X Research Scanner",
+          "description": "3x daily automated X searches for prospects, FA tips, and photography trends",
+          "project": "xai-integration",
+          "lastUpdated": "2026-01-31T01:10:00Z"
+        },
+        {
+          "id": "xai-grok",
+          "name": "xAI/Grok Integration",
+          "description": "Connected to Grok API with X Search capabilities",
+          "project": "xai-integration",
+          "lastUpdated": "2026-01-31T00:55:00Z"
+        },
+        {
+          "id": "withings",
+          "name": "Withings Integration",
+          "description": "Body composition and weight tracking connected",
+          "project": "health",
+          "lastUpdated": "2026-01-31T00:33:00Z"
+        },
+        {
+          "id": "whoop-oauth",
+          "name": "Whoop Integration Fixed",
+          "description": "OAuth working - recovery, sleep, strain data flowing",
+          "project": "health",
+          "lastUpdated": "2026-01-30T23:57:00Z"
+        },
+        {
+          "id": "kanban-polish",
+          "name": "Kanban Board Polish",
+          "description": "Visual Kanban board with all projects - complete",
+          "project": "morning-dashboard",
+          "lastUpdated": "2026-01-29T16:05:00Z"
+        },
+        {
+          "id": "project-tracker",
+          "name": "Project Tracker CLI",
+          "description": "Track all projects with status and notes",
+          "project": "tools",
+          "lastUpdated": "2026-01-29T06:05:00Z"
+        },
+        {
+          "id": "quick-notes",
+          "name": "Quick Notes CLI",
+          "description": "Fast note capture for reminders and follow-ups",
+          "project": "tools",
+          "lastUpdated": "2026-01-29T08:00:00Z"
+        },
+        {
+          "id": "yelp-integration",
+          "name": "Yelp Integration",
+          "description": "Configured and working",
+          "project": "reservations",
+          "lastUpdated": "2026-01-29T03:05:00Z"
+        },
+        {
+          "id": "dashboard-upgrades",
+          "name": "Dashboard Major Upgrades",
+          "description": "Portfolio, TickTick, packages, watchlist with crypto/commodities",
+          "project": "morning-dashboard",
+          "lastUpdated": "2026-01-29T02:55:00Z"
+        },
+        {
+          "id": "warn-tracker",
+          "name": "WARN Act Tracker",
+          "description": "Daily NJ/PA layoff alerts with LinkedIn prospecting",
+          "project": "warn-tracker",
+          "lastUpdated": "2026-01-28T17:00:00Z"
+        },
+        {
+          "id": "linkedin-generator",
+          "name": "LinkedIn Content Generator",
+          "description": "Weekly posts with AI, auto-save, email delivery",
+          "project": "linkedin-generator",
+          "lastUpdated": "2026-01-28T23:00:00Z"
+        },
+        {
+          "id": "portfolio-seo",
+          "name": "Gibson Portfolio SEO",
+          "description": "Meta tags, Open Graph, JSON-LD structured data",
+          "project": "gibson-portfolio",
+          "lastUpdated": "2026-01-29T00:00:00Z"
+        },
+        {
+          "id": "tailscale-dashboard",
+          "name": "Dashboard Tailscale Access",
+          "description": "Private secure access via Tailscale network",
+          "project": "morning-dashboard",
+          "lastUpdated": "2026-01-29T02:35:00Z"
+        }
+      ]
+    }
+  },
+  "lastUpdated": "2026-01-31T03:30:52.520338"
+}

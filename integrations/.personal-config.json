@@ -1,0 +1,18 @@
+{
+  "reservations": {
+    "name": "Matt Gibson",
+    "phone": "732-533-3025",
+    "email": "msgibson103@gmail.com",
+    "default_party_size": 2,
+    "always_confirm_party_size": true,
+    "preferred_platform": "OpenTable"
+  },
+  "travel": {
+    "preferred_airline": "United",
+    "loyalty_program": "MileagePlus",
+    "mileageplus_status": "Silver",
+    "preferred_hotel": "Marriott",
+    "loyalty_program_hotel": "Bonvoy",
+    "home_airports": ["EWR", "JFK", "LGA"]
+  }
+}

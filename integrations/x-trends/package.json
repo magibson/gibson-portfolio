@@ -1,0 +1,24 @@
+{
+  "name": "x-trends",
+  "version": "1.0.0",
+  "description": "X (Twitter) trend monitoring clients",
+  "main": "clients/grok-intelligence.ts",
+  "scripts": {
+    "demo": "npx ts-node examples/demo.ts",
+    "demo:apify": "npx ts-node examples/demo.ts apify",
+    "demo:xai": "npx ts-node examples/demo.ts xai",
+    "demo:rapidapi": "npx ts-node examples/demo.ts rapidapi",
+    "demo:grok": "npx ts-node clients/grok-intelligence.ts",
+    "trends": "npx ts-node clients/apify-trends.ts",
+    "trends:ai": "npx ts-node clients/xai-trends.ts",
+    "trends:grok": "npx ts-node clients/grok-intelligence.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  }
+}

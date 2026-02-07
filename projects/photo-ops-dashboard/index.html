@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Local Photo Ops Dashboard</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f5f7fb;
+      --bg-alt: #e9eef7;
+      --card: #ffffff;
+      --text: #0b1020;
+      --muted: #51607a;
+      --accent: #0033cc;
+      --accent-2: #1b4be0;
+      --good: #1a8f3a;
+      --fair: #b36b00;
+      --poor: #b00020;
+      --shadow: 0 18px 40px rgba(10, 18, 40, 0.12);
+      --ring: rgba(0, 51, 204, 0.15);
+    }
+
+    body.dark {
+      --bg: #070b16;
+      --bg-alt: #0c1222;
+      --card: #0f172b;
+      --text: #e7ecf5;
+      --muted: #a6b0c5;
+      --accent: #3b6cff;
+      --accent-2: #7da1ff;
+      --shadow: 0 18px 40px rgba(4, 8, 20, 0.65);
+      --ring: rgba(61, 109, 255, 0.2);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body:not(.light) {
+        --bg: #070b16;
+        --bg-alt: #0c1222;
+        --card: #0f172b;
+        --text: #e7ecf5;
+        --muted: #a6b0c5;
+        --accent: #3b6cff;
+        --accent-2: #7da1ff;
+        --shadow: 0 18px 40px rgba(4, 8, 20, 0.65);
+        --ring: rgba(61, 109, 255, 0.2);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Optima", "Candara", "Segoe UI", "Noto Serif", serif;
+      color: var(--text);
+      background: radial-gradient(900px 480px at 8% 0%, rgba(0, 51, 204, 0.15), transparent 55%),
+        linear-gradient(160deg, var(--bg), var(--bg-alt));
+      min-height: 100vh;
+      padding: 24px 20px 40px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .title-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    h1 {
+      font-size: clamp(1.8rem, 2.8vw, 2.6rem);
+      margin: 0;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    .accent-pill {
+      align-self: flex-start;
+      background: rgba(0, 51, 204, 0.12);
+      color: var(--accent);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button {
+      border: 1px solid transparent;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--card);
+      color: var(--text);
+      box-shadow: var(--shadow);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      border-color: var(--ring);
+      box-shadow: 0 12px 30px rgba(10, 18, 40, 0.15);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 1.1rem;
+    }
+
+    .stat {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: rgba(0, 51, 204, 0.1);
+      color: var(--accent);
+    }
+
+    .conditions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .rating {
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #fff;
+    }
+
+    .rating.good { background: var(--good); }
+    .rating.fair { background: var(--fair); }
+    .rating.poor { background: var(--poor); }
+
+    .locations {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+    }
+
+    .location {
+      background: linear-gradient(160deg, rgba(0, 51, 204, 0.1), transparent 55%);
+      border: 1px solid rgba(0, 51, 204, 0.2);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .location h3 {
+      margin: 0 0 6px;
+      font-size: 1rem;
+    }
+
+    .location .drive {
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .location .status {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      background: rgba(0, 51, 204, 0.15);
+      color: var(--accent);
+    }
+
+    .alert {
+      display: flex;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(0, 51, 204, 0.08);
+      border: 1px dashed rgba(0, 51, 204, 0.3);
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .footer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 700px) {
+      body { padding: 18px 16px 30px; }
+      header { flex-direction: column; align-items: flex-start; }
+      button { width: 100%; justify-content: center; }
+      .toolbar { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="title-wrap">
+        <span class="accent-pill">Shrewsbury, NJ • Winter Photo Ops</span>
+        <h1>Local Photo Ops Dashboard</h1>
+        <div class="subtitle" id="dateLine">Loading date…</div>
+      </div>
+      <div class="toolbar">
+        <button id="themeToggle" type="button">Toggle Dark Mode</button>
+        <button id="refreshBtn" type="button">Refresh Weather</button>
+      </div>
+    </header>
+
+    <section class="grid">
+      <div class="card" id="weatherCard">
+        <h2>Current Weather</h2>
+        <div class="stat" id="temp">--°F</div>
+        <div class="muted" id="conditions">Loading…</div>
+        <div class="muted" id="wind">Wind: -- mph</div>
+        <div class="muted" id="feels">Feels like: --°F</div>
+      </div>
+
+      <div class="card">
+        <h2>Golden Hour Today</h2>
+        <div class="stat" id="sunrise">--:-- AM</div>
+        <div class="muted" id="sunset">Sunset: --:-- PM</div>
+        <div class="tag" id="goldenMorning">Morning: --</div>
+        <div class="tag" id="goldenEvening" style="margin-top: 8px;">Evening: --</div>
+      </div>
+
+      <div class="card">
+        <h2>Shooting Conditions</h2>
+        <div class="conditions">
+          <span class="rating" id="rating">--</span>
+          <span class="muted" id="ratingReason">Checking…</span>
+        </div>
+        <div class="muted" id="notes" style="margin-top: 12px;">Golden hour is best for the frozen bay.</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Quick Winter Locations (Drive times from Shrewsbury)</h2>
+      <div class="locations">
+        <div class="location">
+          <h3>Shrewsbury Bay</h3>
+          <div class="drive">0 min</div>
+          <div class="status">FROZEN</div>
+        </div>
+        <div class="location">
+          <h3>Sea Girt Jetties</h3>
+          <div class="drive">15 min</div>
+        </div>
+        <div class="location">
+          <h3>Holmdel Park</h3>
+          <div class="drive">15 min</div>
+        </div>
+        <div class="location">
+          <h3>Sandy Hook</h3>
+          <div class="drive">25 min</div>
+        </div>
+        <div class="location">
+          <h3>Solitude Falls</h3>
+          <div class="drive">45 min</div>
+        </div>
+        <div class="location">
+          <h3>Barnegat Lighthouse</h3>
+          <div class="drive">50 min</div>
+        </div>
+        <div class="location">
+          <h3>Paterson Great Falls</h3>
+          <div class="drive">55 min</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Recent Alerts</h2>
+      <div class="alert">No urgent alerts right now. Check again before heading out for icy trail closures or wildlife sightings.</div>
+    </section>
+
+    <div class="footer">
+      <div id="updated">Last updated: --</div>
+      <div>Weather via wttr.in • Golden hour calculated locally</div>
+    </div>
+  </div>
+
+  <script>
+    const LAT = 40.3268;
+    const LON = -74.0618;
+
+    const tempEl = document.getElementById("temp");
+    const conditionsEl = document.getElementById("conditions");
+    const windEl = document.getElementById("wind");
+    const feelsEl = document.getElementById("feels");
+    const ratingEl = document.getElementById("rating");
+    const ratingReasonEl = document.getElementById("ratingReason");
+    const updatedEl = document.getElementById("updated");
+    const dateLine = document.getElementById("dateLine");
+    const sunriseEl = document.getElementById("sunrise");
+    const sunsetEl = document.getElementById("sunset");
+    const goldenMorningEl = document.getElementById("goldenMorning");
+    const goldenEveningEl = document.getElementById("goldenEvening");
+
+    function formatTime(date) {
+      return date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+    }
+
+    function dayOfYear(date) {
+      const start = new Date(date.getFullYear(), 0, 0);
+      const diff = date - start;
+      return Math.floor(diff / 86400000);
+    }
+
+    function normalizeDegrees(value) {
+      let v = value % 360;
+      if (v < 0) v += 360;
+      return v;
+    }
+
+    function normalizeHours(value) {
+      let v = value % 24;
+      if (v < 0) v += 24;
+      return v;
+    }
+
+    function toRadians(deg) {
+      return deg * (Math.PI / 180);
+    }
+
+    function toDegrees(rad) {
+      return rad * (180 / Math.PI);
+    }
+
+    function calculateSunTime(date, isSunrise) {
+      const N = dayOfYear(date);
+      const lngHour = LON / 15;
+      const t = N + ((isSunrise ? 6 : 18) - lngHour) / 24;
+      const M = (0.9856 * t) - 3.289;
+      let L = M + (1.916 * Math.sin(toRadians(M))) + (0.020 * Math.sin(toRadians(2 * M))) + 282.634;
+      L = normalizeDegrees(L);
+
+      let RA = toDegrees(Math.atan(0.91764 * Math.tan(toRadians(L))));
+      RA = normalizeDegrees(RA);
+
+      const Lquadrant = Math.floor(L / 90) * 90;
+      const RAquadrant = Math.floor(RA / 90) * 90;
+      RA = RA + (Lquadrant - RAquadrant);
+      RA = RA / 15;
+
+      const sinDec = 0.39782 * Math.sin(toRadians(L));
+      const cosDec = Math.cos(Math.asin(sinDec));
+
+      const cosH = (Math.cos(toRadians(90.833)) - (sinDec * Math.sin(toRadians(LAT)))) / (cosDec * Math.cos(toRadians(LAT)));
+      if (cosH > 1 || cosH < -1) {
+        return null;
+      }
+
+      let H = isSunrise ? (360 - toDegrees(Math.acos(cosH))) : toDegrees(Math.acos(cosH));
+      H = H / 15;
+
+      const T = H + RA - (0.06571 * t) - 6.622;
+      let UT = T - lngHour;
+      UT = normalizeHours(UT);
+
+      const offsetHours = -date.getTimezoneOffset() / 60;
+      const localT = normalizeHours(UT + offsetHours);
+
+      const hours = Math.floor(localT);
+      const minutes = Math.round((localT - hours) * 60);
+      const localDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), hours, minutes);
+      return localDate;
+    }
+
+    function updateSunTimes() {
+      const today = new Date();
+      const sunrise = calculateSunTime(today, true);
+      const sunset = calculateSunTime(today, false);
+
+      if (!sunrise || !sunset) {
+        sunriseEl.textContent = "Sunrise unavailable";
+        sunsetEl.textContent = "Sunset unavailable";
+        goldenMorningEl.textContent = "Morning: --";
+        goldenEveningEl.textContent = "Evening: --";
+        return;
+      }
+
+      const goldenMorningEnd = new Date(sunrise.getTime() + 60 * 60 * 1000);
+      const goldenEveningStart = new Date(sunset.getTime() - 60 * 60 * 1000);
+
+      sunriseEl.textContent = `Sunrise: ${formatTime(sunrise)}`;
+      sunsetEl.textContent = `Sunset: ${formatTime(sunset)}`;
+      goldenMorningEl.textContent = `Morning: ${formatTime(sunrise)} - ${formatTime(goldenMorningEnd)}`;
+      goldenEveningEl.textContent = `Evening: ${formatTime(goldenEveningStart)} - ${formatTime(sunset)}`;
+    }
+
+    function ratingFromWeather(desc, wind, temp, precip) {
+      const lower = desc.toLowerCase();
+      if (lower.includes("rain") || lower.includes("snow") || lower.includes("storm") || precip > 0) {
+        return { rating: "Poor", className: "poor", reason: "Precipitation detected." };
+      }
+      if (wind >= 20) {
+        return { rating: "Fair", className: "fair", reason: "Windy conditions." };
+      }
+      if (temp <= 15) {
+        return { rating: "Fair", className: "fair", reason: "Very cold — dress for it." };
+      }
+      if (lower.includes("cloud")) {
+        return { rating: "Good", className: "good", reason: "Soft light with some clouds." };
+      }
+      return { rating: "Good", className: "good", reason: "Clear skies and calm wind." };
+    }
+
+    async function loadWeather() {
+      try {
+        const res = await fetch("https://wttr.in/Shrewsbury,NJ?format=j1");
+        if (!res.ok) throw new Error("Weather request failed");
+        const data = await res.json();
+        const current = data.current_condition[0];
+        const temp = Number(current.temp_F);
+        const feels = Number(current.FeelsLikeF);
+        const wind = Number(current.windspeedMiles);
+        const precip = Number(current.precipMM);
+        const desc = current.weatherDesc[0].value;
+
+        tempEl.textContent = `${temp}°F`;
+        conditionsEl.textContent = desc;
+        windEl.textContent = `Wind: ${wind} mph`;
+        feelsEl.textContent = `Feels like: ${feels}°F`;
+
+        const rating = ratingFromWeather(desc, wind, temp, precip);
+        ratingEl.textContent = rating.rating;
+        ratingEl.className = `rating ${rating.className}`;
+        ratingReasonEl.textContent = rating.reason;
+
+        updatedEl.textContent = `Last updated: ${new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`;
+      } catch (err) {
+        conditionsEl.textContent = "Unable to load weather.";
+        ratingEl.textContent = "--";
+        ratingEl.className = "rating";
+        ratingReasonEl.textContent = "Weather unavailable.";
+      }
+    }
+
+    function initDate() {
+      const now = new Date();
+      dateLine.textContent = now.toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" });
+    }
+
+    function initTheme() {
+      const saved = localStorage.getItem("photoops-theme");
+      if (saved === "dark") {
+        document.body.classList.add("dark");
+      } else if (saved === "light") {
+        document.body.classList.add("light");
+      }
+    }
+
+    function toggleTheme() {
+      const isDark = document.body.classList.toggle("dark");
+      document.body.classList.remove("light");
+      localStorage.setItem("photoops-theme", isDark ? "dark" : "light");
+    }
+
+    document.getElementById("themeToggle").addEventListener("click", toggleTheme);
+    document.getElementById("refreshBtn").addEventListener("click", loadWeather);
+
+    initTheme();
+    initDate();
+    updateSunTimes();
+    loadWeather();
+  </script>
+</body>
+</html>

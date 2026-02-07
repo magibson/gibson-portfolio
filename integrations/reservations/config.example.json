@@ -1,0 +1,18 @@
+{
+  "user_preferences": {
+    "name": "Your Name",
+    "email": "your_email@example.com",
+    "phone": "555-555-5555",
+    "default_party_size": 2,
+    "favorite_restaurants": []
+  },
+  "notifications": {
+    "enabled": true,
+    "telegram": true
+  },
+  "settings": {
+    "resy_base_url": "https://api.resy.com",
+    "opentable_base_url": "https://www.opentable.com",
+    "request_delay_ms": 2000
+  }
+}

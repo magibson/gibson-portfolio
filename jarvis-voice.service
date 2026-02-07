@@ -1,0 +1,27 @@
+[Unit]
+Description=Jarvis Voice Server
+After=network-online.target tailscaled.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=clawd
+Group=clawd
+WorkingDirectory=/home/clawd/clawd
+ExecStart=/usr/bin/python3 /home/clawd/clawd/jarvis-voice-server-secure.py
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# Ensure it keeps running
+WatchdogSec=30
+TimeoutStartSec=30
+TimeoutStopSec=10
+
+# Environment
+Environment=PYTHONUNBUFFERED=1
+Environment=HOME=/home/clawd
+
+[Install]
+WantedBy=multi-user.target

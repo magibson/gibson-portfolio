@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Move-Out 2027 Tracker Card</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1829;
+    --accent: #00d4ff;
+    --accent-2: #00f0ff;
+    --text: #e6f6ff;
+    --muted: #9bb3c7;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: transparent; color: var(--text); font-family: "Rajdhani", sans-serif; }
+  .card {
+    background: linear-gradient(135deg, rgba(13,24,41,0.9), rgba(10,15,26,0.95));
+    border: 1px solid rgba(0,212,255,0.25);
+    border-radius: 14px;
+    padding: 14px;
+  }
+  .title {
+    font-family: "Orbitron", sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+  }
+  .sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .progress {
+    height: 10px;
+    background: #08101b;
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid rgba(0,212,255,0.2);
+    margin: 10px 0 6px;
+  }
+  .progress > div {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    box-shadow: 0 0 10px rgba(0,212,255,0.4);
+    transition: width 0.4s ease;
+  }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .row strong { color: var(--text); }
+  .link {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--accent);
+    text-decoration: none;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="title">Move-Out 2027</div>
+    <div class="sub">Target: Dec 31, 2027</div>
+
+    <div class="progress"><div id="progressFill"></div></div>
+    <div class="row"><span>% complete</span><strong id="percentComplete">0%</strong></div>
+    <div class="row"><span>Projected date</span><strong id="projectedDate">—</strong></div>
+
+    <a class="link" href="/moveout-tracker.html">Open tracker</a>
+  </div>
+
+<script>
+const DATA_URL = "/data/moveout.json";
+const DEADLINE = new Date("2027-12-31T23:59:59");
+
+const el = {
+  fill: document.getElementById("progressFill"),
+  percent: document.getElementById("percentComplete"),
+  projected: document.getElementById("projectedDate"),
+};
+
+function addMonths(date, months) {
+  const d = new Date(date);
+  const day = d.getDate();
+  d.setDate(1);
+  d.setMonth(d.getMonth() + months);
+  const lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  d.setDate(Math.min(day, lastDay));
+  return d;
+}
+
+function formatDate(date) {
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+async function loadData() {
+  try {
+    const res = await fetch(DATA_URL, { cache: "no-store" });
+    if (!res.ok) throw new Error("load failed");
+    const data = await res.json();
+    const target = Number(data.targetSavings || 0);
+    const current = Number(data.currentSavings || 0);
+    const monthly = Number(data.monthlySavings || 0);
+
+    const percent = target > 0 ? Math.min(100, (current / target) * 100) : 0;
+    el.fill.style.width = percent.toFixed(1) + "%";
+    el.percent.textContent = percent.toFixed(1) + "%";
+
+    if (current >= target && target > 0) {
+      el.projected.textContent = "Goal reached";
+    } else if (monthly > 0 && target > 0) {
+      const remaining = Math.max(0, target - current);
+      const months = Math.ceil(remaining / monthly);
+      const projected = addMonths(new Date(), months);
+      el.projected.textContent = formatDate(projected);
+    } else {
+      el.projected.textContent = "—";
+    }
+  } catch (e) {
+    el.projected.textContent = "—";
+  }
+}
+
+loadData();
+</script>
+</body>
+</html>

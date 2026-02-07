@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "work": {
+      "id": "668b598bef8511130af04740",
+      "name": "💼Work",
+      "use_for": "NYL, career, financial advisor, networking, prospecting"
+    },
+    "life": {
+      "id": "6848f275f9b5511f0414ebae",
+      "name": "Life",
+      "use_for": "Personal, non-work tasks"
+    }
+  },
+  "default": "work"
+}

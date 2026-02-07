@@ -1,0 +1,13 @@
+[Unit]
+Description=JARVIS Stock Dashboard
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/clawd/clawd/projects/stock-dashboard
+ExecStart=/usr/bin/python3 /home/clawd/clawd/projects/stock-dashboard/app.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

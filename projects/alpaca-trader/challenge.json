@@ -1,0 +1,49 @@
+{
+  "challenge": "Beat the S&P 500",
+  "start_date": "2026-01-31",
+  "end_date": "2026-02-28",
+  "starting_capital": 1000,
+  "actual_paper_capital": 100000,
+  "simulated_capital": 1000,
+  "scale_factor": 100,
+  "benchmark": "VOO",
+  "benchmark_start_price": 636.22,
+  "max_loss_percent": 10,
+  "max_loss_dollars": 100,
+  "status": "active",
+  "autonomy": "full",
+  "rules": [
+    "Full autonomy - no approval needed",
+    "Max 3-4 positions at a time",
+    "Stop loss at 5% per position",
+    "Track vs VOO weekly",
+    "If down 10% total, stop and reassess",
+    "Weekly update to Matt every Friday"
+  ],
+  "trades": [
+    {
+      "date": "2026-01-31",
+      "action": "buy",
+      "symbol": "NVDA",
+      "shares": 2,
+      "simulated_cost": 382,
+      "status": "pending_fill",
+      "note": "AI leader, strong momentum +2.4% above SMA"
+    },
+    {
+      "date": "2026-01-31",
+      "action": "buy",
+      "symbol": "AMD", 
+      "shares": 2,
+      "simulated_cost": 474,
+      "status": "pending_fill",
+      "note": "AI play #2, riding NVDA coattails +2.3% above SMA"
+    }
+  ],
+  "portfolio_allocation": {
+    "NVDA": 382,
+    "AMD": 474,
+    "cash": 144
+  },
+  "weekly_snapshots": []
+}

@@ -1,0 +1,6 @@
+{
+  "client_id": "Kl3AMFS39xoxzZkwj5",
+  "client_secret": "6Y4dk0WLyt5IBejXAStKmqtzctm7I4G4",
+  "redirect_uri": "http://localhost:8585/callback",
+  "scope": "tasks:read tasks:write"
+}

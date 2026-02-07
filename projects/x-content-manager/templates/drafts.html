@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% set title = "Draft Queue - X Content Manager" %}
+
+{% block content %}
+<section class="card">
+  <h2>Add Draft</h2>
+  <form method="post" class="form">
+    <div class="field">
+      <label>Text content</label>
+      <textarea name="content" rows="3" maxlength="280" data-max="280" placeholder="280 characters max"></textarea>
+      <div class="counter"></div>
+    </div>
+    <div class="field">
+      <label>Image URL</label>
+      <input type="url" name="image_url" placeholder="https://" />
+    </div>
+    <div class="field">
+      <label>Tags / Categories</label>
+      <input type="text" name="tags" placeholder="photography, personal, business" />
+    </div>
+    <div class="field">
+      <label>Scheduled datetime</label>
+      <input type="datetime-local" name="scheduled_at" />
+    </div>
+    <div class="field">
+      <label>Status</label>
+      <select name="status">
+        {% for status in statuses %}
+          <option value="{{ status }}">{{ status }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="primary">Save Draft</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Draft Queue</h2>
+  {% if drafts %}
+    <div class="table">
+      <div class="row header">
+        <span>Content</span>
+        <span>Tags</span>
+        <span>Schedule</span>
+        <span>Status</span>
+        <span>Actions</span>
+      </div>
+      {% for draft in drafts %}
+        <div class="row">
+          <div>
+            <p>{{ draft.content }}</p>
+            {% if draft.image_url %}
+              <a href="{{ draft.image_url }}" target="_blank">Image</a>
+            {% endif %}
+          </div>
+          <span>{{ draft.tags or '-' }}</span>
+          <span>{{ draft.scheduled_at or '—' }}</span>
+          <form method="post" action="{{ url_for('update_draft', draft_id=draft.id) }}" class="inline">
+            <select name="status">
+              {% for status in statuses %}
+                <option value="{{ status }}" {% if status == draft.status %}selected{% endif %}>{{ status }}</option>
+              {% endfor %}
+            </select>
+            <input type="datetime-local" name="scheduled_at" value="{{ draft.scheduled_at or '' }}" />
+            <button type="submit">Update</button>
+          </form>
+          <form method="post" action="{{ url_for('delete_draft', draft_id=draft.id) }}" class="inline">
+            <button type="submit" class="ghost">Delete</button>
+          </form>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="muted">No drafts yet. Add one above.</p>
+  {% endif %}
+</section>
+{% endblock %}

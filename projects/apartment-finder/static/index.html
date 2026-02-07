@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏠 Apartment Finder - Shrewsbury NJ Area</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1>🏠 Apartment Finder</h1>
+                <span class="subtitle">Shrewsbury, NJ Area</span>
+            </div>
+            <div class="header-right">
+                <span id="lastUpdated" class="last-updated"></span>
+                <button id="refreshBtn" class="btn btn-primary" onclick="loadListings()">
+                    ↻ Refresh
+                </button>
+            </div>
+        </header>
+
+        <!-- Filters -->
+        <section class="filters">
+            <div class="filter-group">
+                <label>Price Range</label>
+                <div class="range-inputs">
+                    <input type="number" id="minPrice" placeholder="Min" value="1500">
+                    <span>–</span>
+                    <input type="number" id="maxPrice" placeholder="Max" value="2800">
+                </div>
+            </div>
+            <div class="filter-group">
+                <label>Bedrooms</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" id="bedStudio" checked> Studio</label>
+                    <label><input type="checkbox" id="bed1" checked> 1 BR</label>
+                </div>
+            </div>
+            <div class="filter-group">
+                <label>Location</label>
+                <select id="cityFilter">
+                    <option value="">All Locations</option>
+                    <option value="Shrewsbury">Shrewsbury</option>
+                    <option value="Red Bank">Red Bank</option>
+                    <option value="Little Silver">Little Silver</option>
+                    <option value="Tinton Falls">Tinton Falls</option>
+                    <option value="Eatontown">Eatontown</option>
+                    <option value="Fair Haven">Fair Haven</option>
+                    <option value="Rumson">Rumson</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Source</label>
+                <select id="sourceFilter">
+                    <option value="">All Sources</option>
+                    <option value="craigslist">Craigslist</option>
+                    <option value="apartments_com">Apartments.com</option>
+                    <option value="zillow">Zillow</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Sort By</label>
+                <select id="sortBy">
+                    <option value="newest">Newest First</option>
+                    <option value="price_asc">Price: Low to High</option>
+                    <option value="price_desc">Price: High to Low</option>
+                    <option value="truecost">True Cost</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>View</label>
+                <div class="view-toggle">
+                    <button id="viewList" class="active" onclick="setView('list')">☰ List</button>
+                    <button id="viewGrid" onclick="setView('grid')">⊞ Grid</button>
+                    <button id="viewMap" onclick="setView('map')">🗺 Map</button>
+                </div>
+            </div>
+            <div class="filter-group">
+                <label>&nbsp;</label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showFavorites"> ⭐ Favorites Only
+                </label>
+            </div>
+        </section>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <span id="statsTotal">Loading...</span>
+            <span id="statsNew"></span>
+            <span id="statsFavorites"></span>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- List/Grid View -->
+            <div id="listingsContainer" class="listings-container view-list">
+                <div class="loading">Loading listings...</div>
+            </div>
+
+            <!-- Map View (hidden by default) -->
+            <div id="mapContainer" class="map-container" style="display: none;">
+                <div id="map"></div>
+            </div>
+        </main>
+
+        <!-- Listing Detail Modal -->
+        <div id="detailModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <button class="modal-close" onclick="closeModal()">×</button>
+                <div id="modalBody"></div>
+            </div>
+        </div>
+
+        <!-- True Cost Calculator -->
+        <div id="costCalculator" class="cost-calculator" style="display: none;">
+            <h3>💰 True Monthly Cost</h3>
+            <div id="costBreakdown"></div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Built for Matt's 2027 goal • Data updates via cron</p>
+            <div class="footer-actions">
+                <button onclick="exportListings()">📥 Export CSV</button>
+                <button onclick="exportFavorites()">⭐ Export Favorites</button>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

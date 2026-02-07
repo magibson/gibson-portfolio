@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% set title = "Dashboard - X Content Manager" %}
+
+{% block content %}
+<section class="grid">
+  <div class="card stat">
+    <h2>Drafts</h2>
+    <p class="stat-number">{{ draft_count }}</p>
+    <span>Ready for polishing</span>
+  </div>
+  <div class="card stat">
+    <h2>Scheduled</h2>
+    <p class="stat-number">{{ scheduled_posts|length }}</p>
+    <span>Queued for publish</span>
+  </div>
+  <div class="card stat">
+    <h2>Quick Add</h2>
+    <p class="stat-text">Drop an idea into the queue.</p>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Quick Add Draft</h2>
+  <form method="post" action="{{ url_for('quick_add_draft') }}" class="form">
+    <div class="field">
+      <label>Draft text</label>
+      <textarea name="content" rows="3" maxlength="280" data-max="280" placeholder="Share the story behind the shot..."></textarea>
+      <div class="counter"></div>
+    </div>
+    <div class="field">
+      <label>Image URL (optional)</label>
+      <input type="url" name="image_url" placeholder="https://" />
+    </div>
+    <div class="field">
+      <label>Tags / Categories</label>
+      <input type="text" name="tags" placeholder="photography, personal" />
+    </div>
+    <div class="field">
+      <label>Schedule (optional)</label>
+      <input type="datetime-local" name="scheduled_at" />
+    </div>
+    <button type="submit" class="primary">Add Draft</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Scheduled Posts</h2>
+  {% if scheduled_posts %}
+    <ul class="list">
+      {% for post in scheduled_posts %}
+        <li>
+          <div>
+            <strong>{{ post.scheduled_at or 'TBD' }}</strong>
+            <p>{{ post.content }}</p>
+          </div>
+          <span class="pill">{{ post.status }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="muted">No scheduled posts yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

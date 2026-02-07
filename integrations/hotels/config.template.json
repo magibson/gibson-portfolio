@@ -1,0 +1,29 @@
+{
+  "serpapi": {
+    "api_key": "YOUR_SERPAPI_KEY_HERE",
+    "base_url": "https://serpapi.com/search.json"
+  },
+  "amadeus": {
+    "api_key": "",
+    "api_secret": "",
+    "base_url": "https://test.api.amadeus.com",
+    "note": "Optional - for direct booking integration"
+  },
+  "defaults": {
+    "currency": "USD",
+    "language": "en",
+    "country": "us",
+    "adults": 2,
+    "children": 0,
+    "rooms": 1
+  },
+  "cache": {
+    "enabled": true,
+    "ttl_minutes": 30
+  },
+  "telegram": {
+    "max_results": 5,
+    "show_photos": true,
+    "compact_mode": false
+  }
+}

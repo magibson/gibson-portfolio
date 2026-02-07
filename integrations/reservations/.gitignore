@@ -1,0 +1,30 @@
+# Credentials and secrets - NEVER COMMIT
+.env
+.env.*
+*.env
+
+# Config files with credentials
+config.json
+
+# Cookie/session storage
+.opentable-cookies.json
+*-cookies.json
+*-tokens.json
+*.cookies
+
+# Node modules
+node_modules/
+
+# Logs that might contain sensitive info
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo

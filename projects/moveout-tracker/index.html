@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Move-Out Savings Tracker — Matt (NJ)</title>
+  <style>
+    :root {
+      --bg: #0c1016;
+      --panel: #121826;
+      --panel-2: #0f1522;
+      --ink: #e7ecf5;
+      --muted: #9aa6b2;
+      --accent: #5cc8ff;
+      --accent-2: #7bf1c8;
+      --warning: #ffb86b;
+      --danger: #ff6b8a;
+      --ring: rgba(92, 200, 255, 0.25);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 10% 20%, rgba(92, 200, 255, 0.12), transparent 45%),
+                  radial-gradient(circle at 80% 0%, rgba(123, 241, 200, 0.1), transparent 40%),
+                  var(--bg);
+      color: var(--ink);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 32px auto 64px;
+      padding: 0 24px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    header h1 {
+      font-size: 32px;
+      margin: 0 0 8px 0;
+      letter-spacing: 0.4px;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .pill {
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(92, 200, 255, 0.12);
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    .grid {
+      display: grid;
+      gap: 20px;
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+
+    .panel {
+      background: linear-gradient(160deg, rgba(18, 24, 38, 0.95), rgba(10, 14, 23, 0.95));
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    .panel h2 {
+      margin: 0 0 12px 0;
+      font-size: 18px;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .stat .label {
+      color: var(--muted);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    .stat .value {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .progress {
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .progress > div {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    input, select {
+      width: 100%;
+      background: var(--panel-2);
+      color: var(--ink);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      outline: none;
+      transition: border 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--ring);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-top: 12px;
+    }
+
+    .helper {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 6px;
+    }
+
+    .range {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .range span {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(123, 241, 200, 0.1);
+      color: var(--accent-2);
+      font-size: 12px;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 16px;
+    }
+
+    .timeline {
+      height: 220px;
+      background: var(--panel-2);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .footer {
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+      margin-top: 24px;
+    }
+
+    .accent {
+      color: var(--accent);
+    }
+
+    @media (max-width: 900px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .split {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <div class="pill">Move-Out Savings Tracker</div>
+        <h1>Matt's NJ Move-Out Plan</h1>
+        <p>25-year-old in New Jersey saving to move out by 2027. Update inputs to keep the plan on track.</p>
+      </div>
+      <div class="panel" style="min-width: 240px;">
+        <div class="stat">
+          <span class="label">Projected Move-Out</span>
+          <span class="value" id="projectedDate">--</span>
+        </div>
+        <div class="helper">Based on current savings pace.</div>
+      </div>
+    </header>
+
+    <section class="grid grid-3">
+      <div class="panel">
+        <div class="stat">
+          <span class="label">Target Savings Goal</span>
+          <span class="value" id="goalDisplay">$0</span>
+        </div>
+        <label for="goalInput">Edit goal</label>
+        <input id="goalInput" type="number" min="0" step="100" />
+        <div class="helper">Aim to cover deposit + 3 months of expenses.</div>
+      </div>
+      <div class="panel">
+        <div class="stat">
+          <span class="label">Current Progress</span>
+          <span class="value" id="currentDisplay">$0</span>
+        </div>
+        <label for="currentInput">Current savings</label>
+        <input id="currentInput" type="number" min="0" step="100" />
+        <div class="progress" aria-hidden="true"><div id="progressBar"></div></div>
+        <div class="helper" id="progressText">0% funded</div>
+      </div>
+      <div class="panel">
+        <div class="stat">
+          <span class="label">Monthly Savings Needed</span>
+          <span class="value" id="monthlyNeeded">$0</span>
+        </div>
+        <label for="monthlyInput">Planned monthly savings</label>
+        <input id="monthlyInput" type="number" min="0" step="25" />
+        <div class="helper">To hit the Dec 2027 target. Update as your income or expenses change.</div>
+      </div>
+    </section>
+
+    <section class="grid grid-2" style="margin-top: 20px;">
+      <div class="panel">
+        <h2>NJ Cost Estimator</h2>
+        <label for="areaSelect">Select area</label>
+        <select id="areaSelect"></select>
+        <div class="row">
+          <div>
+            <label>Estimated rent range</label>
+            <div class="range">
+              <span id="rentRange">--</span>
+              <span class="badge" id="rentMid">Midpoint: --</span>
+            </div>
+          </div>
+          <div>
+            <label for="rentInput">Use for rent budget</label>
+            <input id="rentInput" type="number" min="0" step="50" />
+          </div>
+        </div>
+        <div class="helper">Ranges are typical 1BR estimates. Adjust based on listings.</div>
+      </div>
+
+      <div class="panel">
+        <h2>Budget Breakdown (Monthly)</h2>
+        <div class="row">
+          <div>
+            <label for="utilitiesInput">Utilities</label>
+            <input id="utilitiesInput" type="number" min="0" step="10" />
+          </div>
+          <div>
+            <label for="foodInput">Food</label>
+            <input id="foodInput" type="number" min="0" step="10" />
+          </div>
+          <div>
+            <label for="transportInput">Transport</label>
+            <input id="transportInput" type="number" min="0" step="10" />
+          </div>
+          <div>
+            <label for="miscInput">Misc</label>
+            <input id="miscInput" type="number" min="0" step="10" />
+          </div>
+        </div>
+        <div class="helper">Total monthly budget: <span class="accent" id="budgetTotal">$0</span></div>
+      </div>
+    </section>
+
+    <section class="grid grid-2" style="margin-top: 20px;">
+      <div class="panel">
+        <h2>Savings Timeline</h2>
+        <div class="timeline">
+          <canvas id="timelineChart" width="520" height="200"></canvas>
+        </div>
+        <div class="helper">Shows cumulative savings based on your monthly rate.</div>
+      </div>
+
+      <div class="panel">
+        <h2>What If?</h2>
+        <label for="whatIfSlider">Adjust savings rate</label>
+        <input id="whatIfSlider" type="range" min="50" max="200" step="5" />
+        <div class="range">
+          <span>Slower</span>
+          <span class="badge" id="whatIfValue">100%</span>
+          <span>Faster</span>
+        </div>
+        <div class="row">
+          <div>
+            <label>Adjusted monthly savings</label>
+            <div class="stat">
+              <span class="value" id="adjustedMonthly">$0</span>
+            </div>
+          </div>
+          <div>
+            <label>New projected move-out</label>
+            <div class="stat">
+              <span class="value" id="adjustedDate">--</span>
+            </div>
+          </div>
+        </div>
+        <div class="helper">Use this to test raises, side gigs, or tighter budgets.</div>
+      </div>
+    </section>
+
+    <div class="footer">Auto-saved locally. Built for Matt's 2027 move-out goal.</div>
+  </div>
+
+  <script>
+    const defaults = {
+      goal: 28000,
+      current: 6200,
+      monthly: 750,
+      rent: 1900,
+      utilities: 190,
+      food: 450,
+      transport: 180,
+      misc: 220,
+      area: 'Jersey City',
+      whatIf: 100
+    };
+
+    const targetMoveOut = new Date('2027-12-01T00:00:00');
+
+    const areas = {
+      'Jersey City': [2100, 3200],
+      'Newark': [1450, 2200],
+      'Hoboken': [2400, 3500],
+      'New Brunswick': [1500, 2300],
+      'Montclair': [1800, 2600],
+      'Morristown': [1900, 2700],
+      'Asbury Park': [1700, 2500],
+      'Princeton': [2000, 3000]
+    };
+
+    const elements = {
+      goalInput: document.getElementById('goalInput'),
+      currentInput: document.getElementById('currentInput'),
+      monthlyInput: document.getElementById('monthlyInput'),
+      rentInput: document.getElementById('rentInput'),
+      utilitiesInput: document.getElementById('utilitiesInput'),
+      foodInput: document.getElementById('foodInput'),
+      transportInput: document.getElementById('transportInput'),
+      miscInput: document.getElementById('miscInput'),
+      goalDisplay: document.getElementById('goalDisplay'),
+      currentDisplay: document.getElementById('currentDisplay'),
+      monthlyNeeded: document.getElementById('monthlyNeeded'),
+      progressBar: document.getElementById('progressBar'),
+      progressText: document.getElementById('progressText'),
+      projectedDate: document.getElementById('projectedDate'),
+      adjustedDate: document.getElementById('adjustedDate'),
+      adjustedMonthly: document.getElementById('adjustedMonthly'),
+      budgetTotal: document.getElementById('budgetTotal'),
+      areaSelect: document.getElementById('areaSelect'),
+      rentRange: document.getElementById('rentRange'),
+      rentMid: document.getElementById('rentMid'),
+      whatIfSlider: document.getElementById('whatIfSlider'),
+      whatIfValue: document.getElementById('whatIfValue')
+    };
+
+    const storageKey = 'moveout-tracker-data';
+
+    const formatMoney = (value) => {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value || 0);
+    };
+
+    const monthsBetween = (goal, current, monthly) => {
+      if (monthly <= 0) return Infinity;
+      const remaining = Math.max(goal - current, 0);
+      return Math.ceil(remaining / monthly);
+    };
+
+    const addMonths = (date, months) => {
+      const target = new Date(date.getTime());
+      target.setMonth(target.getMonth() + months);
+      return target;
+    };
+
+    const formatDate = (date) => {
+      return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    };
+
+    const loadState = () => {
+      const raw = localStorage.getItem(storageKey);
+      return raw ? { ...defaults, ...JSON.parse(raw) } : { ...defaults };
+    };
+
+    const saveState = (state) => {
+      localStorage.setItem(storageKey, JSON.stringify(state));
+    };
+
+    const updateArea = (state) => {
+      const range = areas[state.area] || [0, 0];
+      const mid = Math.round((range[0] + range[1]) / 2);
+      elements.rentRange.textContent = `${formatMoney(range[0])} - ${formatMoney(range[1])}`;
+      elements.rentMid.textContent = `Midpoint: ${formatMoney(mid)}`;
+      if (!state.rent || state.rent === defaults.rent) {
+        elements.rentInput.value = mid;
+        state.rent = mid;
+      }
+    };
+
+    const drawTimeline = (state, adjustedMonthly) => {
+      const canvas = document.getElementById('timelineChart');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const goal = state.goal;
+      const current = state.current;
+      const monthly = adjustedMonthly || state.monthly;
+      const months = Math.min(monthsBetween(goal, current, monthly), 48);
+      const maxValue = Math.max(goal, current + monthly * months);
+
+      ctx.fillStyle = '#0f1522';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 4; i++) {
+        const y = 20 + i * (canvas.height - 40) / 4;
+        ctx.beginPath();
+        ctx.moveTo(20, y);
+        ctx.lineTo(canvas.width - 20, y);
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle = '#5cc8ff';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      const points = Math.max(months, 1);
+      for (let i = 0; i <= points; i++) {
+        const value = current + monthly * i;
+        const x = 20 + (canvas.width - 40) * (i / points);
+        const y = canvas.height - 20 - (canvas.height - 40) * (value / maxValue);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      ctx.fillStyle = '#7bf1c8';
+      const goalY = canvas.height - 20 - (canvas.height - 40) * (goal / maxValue);
+      ctx.fillRect(20, goalY - 1, canvas.width - 40, 2);
+
+      ctx.fillStyle = '#9aa6b2';
+      ctx.font = '12px "Plus Jakarta Sans", system-ui';
+      ctx.fillText('Now', 20, canvas.height - 6);
+      ctx.fillText('Goal', 20, goalY - 6);
+    };
+
+    const updateUI = () => {
+      const state = loadState();
+      elements.goalInput.value = state.goal;
+      elements.currentInput.value = state.current;
+      elements.monthlyInput.value = state.monthly;
+      elements.rentInput.value = state.rent;
+      elements.utilitiesInput.value = state.utilities;
+      elements.foodInput.value = state.food;
+      elements.transportInput.value = state.transport;
+      elements.miscInput.value = state.misc;
+      elements.whatIfSlider.value = state.whatIf;
+      elements.whatIfValue.textContent = `${state.whatIf}%`;
+
+      elements.goalDisplay.textContent = formatMoney(state.goal);
+      elements.currentDisplay.textContent = formatMoney(state.current);
+
+      const progress = state.goal > 0 ? Math.min((state.current / state.goal) * 100, 100) : 0;
+      elements.progressBar.style.width = `${progress.toFixed(1)}%`;
+      elements.progressText.textContent = `${progress.toFixed(1)}% funded`;
+
+      const today = new Date();
+      const monthsToTarget = Math.max(1, (targetMoveOut.getFullYear() - today.getFullYear()) * 12 + (targetMoveOut.getMonth() - today.getMonth()));
+      const monthlyNeeded = state.goal > state.current ? Math.ceil((state.goal - state.current) / monthsToTarget) : 0;
+      elements.monthlyNeeded.textContent = formatMoney(monthlyNeeded);
+
+      const months = monthsBetween(state.goal, state.current, state.monthly);
+      if (months === Infinity) {
+        elements.projectedDate.textContent = 'Set savings rate';
+      } else {
+        const projected = addMonths(new Date(), months);
+        elements.projectedDate.textContent = formatDate(projected);
+      }
+
+      const adjustedMonthly = Math.round(state.monthly * (state.whatIf / 100));
+      elements.adjustedMonthly.textContent = formatMoney(adjustedMonthly);
+      const adjustedMonths = monthsBetween(state.goal, state.current, adjustedMonthly);
+      elements.adjustedDate.textContent = adjustedMonths === Infinity ? 'N/A' : formatDate(addMonths(new Date(), adjustedMonths));
+
+      updateArea(state);
+      const totalBudget = state.rent + state.utilities + state.food + state.transport + state.misc;
+      elements.budgetTotal.textContent = formatMoney(totalBudget);
+      drawTimeline(state, adjustedMonthly);
+      saveState(state);
+    };
+
+    const bindInputs = () => {
+      Object.keys(areas).forEach((area) => {
+        const option = document.createElement('option');
+        option.value = area;
+        option.textContent = area;
+        elements.areaSelect.appendChild(option);
+      });
+
+      const state = loadState();
+      elements.areaSelect.value = state.area;
+
+      const handlers = [
+        ['goalInput', 'goal'],
+        ['currentInput', 'current'],
+        ['monthlyInput', 'monthly'],
+        ['rentInput', 'rent'],
+        ['utilitiesInput', 'utilities'],
+        ['foodInput', 'food'],
+        ['transportInput', 'transport'],
+        ['miscInput', 'misc'],
+        ['whatIfSlider', 'whatIf']
+      ];
+
+      handlers.forEach(([id, key]) => {
+        elements[id].addEventListener('input', (event) => {
+          const state = loadState();
+          const value = Number(event.target.value);
+          state[key] = Number.isFinite(value) ? value : state[key];
+          saveState(state);
+          updateUI();
+        });
+      });
+
+      elements.areaSelect.addEventListener('change', (event) => {
+        const state = loadState();
+        state.area = event.target.value;
+        saveState(state);
+        updateUI();
+      });
+    };
+
+    bindInputs();
+    updateUI();
+  </script>
+</body>
+</html>

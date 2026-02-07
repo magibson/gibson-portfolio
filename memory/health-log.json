@@ -1,0 +1,143 @@
+{
+  "entries": [
+    {
+      "recovery": {
+        "score": 55.0,
+        "hrv": 36.52962,
+        "resting_hr": 67.0,
+        "spo2": 97.92308
+      },
+      "sleep": {
+        "performance": 82.0,
+        "efficiency": 91.61395,
+        "hours": 7.7,
+        "rem_mins": 123,
+        "deep_mins": 114
+      },
+      "strain": {
+        "score": 5.0,
+        "calories": 1843,
+        "avg_hr": 71,
+        "max_hr": 142
+      },
+      "date": "2026-01-31",
+      "logged_at": "2026-01-31T00:09:06.187578"
+    },
+    {
+      "recovery": {
+        "score": 38.0,
+        "hrv": 26.352785,
+        "resting_hr": 89.0,
+        "spo2": 95.181816
+      },
+      "sleep": {
+        "performance": 47.0,
+        "efficiency": 92.66056,
+        "hours": 5.9,
+        "rem_mins": 83,
+        "deep_mins": 87
+      },
+      "strain": {
+        "score": 4.1,
+        "calories": 534,
+        "avg_hr": 87,
+        "max_hr": 127
+      },
+      "date": "2026-02-02",
+      "logged_at": "2026-02-02T13:11:24.941398"
+    },
+    {
+      "recovery": {
+        "score": 38.0,
+        "hrv": 26.352785,
+        "resting_hr": 89.0,
+        "spo2": 95.181816
+      },
+      "sleep": {
+        "performance": 47.0,
+        "efficiency": 92.66056,
+        "hours": 5.9,
+        "rem_mins": 83,
+        "deep_mins": 87
+      },
+      "strain": {
+        "score": 5.2,
+        "calories": 2410,
+        "avg_hr": 81,
+        "max_hr": 146
+      },
+      "date": "2026-02-03",
+      "logged_at": "2026-02-03T13:00:59.964565"
+    },
+    {
+      "recovery": {
+        "score": 76.0,
+        "hrv": 42.229145,
+        "resting_hr": 64.0,
+        "spo2": 97.25
+      },
+      "sleep": {
+        "performance": 82.0,
+        "efficiency": 95.77657,
+        "hours": 7.0,
+        "rem_mins": 135,
+        "deep_mins": 105
+      },
+      "strain": {
+        "score": 0.1,
+        "calories": 576,
+        "avg_hr": 64,
+        "max_hr": 110
+      },
+      "date": "2026-02-04",
+      "logged_at": "2026-02-04T13:30:08.680439"
+    },
+    {
+      "recovery": {
+        "score": 68.0,
+        "hrv": 39.06473,
+        "resting_hr": 68.0,
+        "spo2": 95.55556
+      },
+      "sleep": {
+        "performance": 80.0,
+        "efficiency": 94.00539,
+        "hours": 7.4,
+        "rem_mins": 99,
+        "deep_mins": 104
+      },
+      "strain": {
+        "score": 1.1,
+        "calories": 708,
+        "avg_hr": 68,
+        "max_hr": 115
+      },
+      "date": "2026-02-05",
+      "logged_at": "2026-02-05T13:21:11.079677"
+    },
+    {
+      "recovery": {
+        "score": 68.0,
+        "hrv": 39.06473,
+        "resting_hr": 68.0,
+        "spo2": 95.55556
+      },
+      "sleep": {
+        "performance": 80.0,
+        "efficiency": 94.00539,
+        "hours": 7.4,
+        "rem_mins": 99,
+        "deep_mins": 104
+      },
+      "strain": {
+        "score": 4.6,
+        "calories": 2547,
+        "avg_hr": 74,
+        "max_hr": 131
+      },
+      "date": "2026-02-06",
+      "logged_at": "2026-02-06T13:00:14.416218"
+    }
+  ],
+  "last_updated": "2026-02-06T13:00:14.418246"
+}

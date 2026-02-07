@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lead Tracker</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header class="top-bar">
+    <div>
+      <h1>Lead Tracker</h1>
+      <p class="sub">Mortgage Protection Leads</p>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <span class="label">Total Leads</span>
+        <span class="value" id="stat-total">{{ stats.total }}</span>
+      </div>
+      <div class="stat">
+        <span class="label">Calls Made</span>
+        <span class="value" id="stat-calls">{{ stats.calls_made }}</span>
+      </div>
+      <div class="stat">
+        <span class="label">Appointments Set</span>
+        <span class="value" id="stat-appts">{{ stats.appointments }}</span>
+      </div>
+      <div class="stat">
+        <span class="label">Conversion Rate</span>
+        <span class="value" id="stat-conv">{{ "%.1f" % stats.conversion }}%</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="controls">
+    <label for="status-filter">Filter by Status</label>
+    <select id="status-filter">
+      <option value="all">All</option>
+      {% for s in status_options %}
+      <option value="{{ s }}">{{ s }}</option>
+      {% endfor %}
+    </select>
+  </section>
+
+  <main class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Address</th>
+          <th>City</th>
+          <th>Primary Phone</th>
+          <th>Phone Type</th>
+          <th>Alt Phone</th>
+          <th>Email</th>
+          <th>Est Value</th>
+          <th>Months Owned</th>
+          <th>Beds</th>
+          <th>Baths</th>
+          <th>SqFt</th>
+          <th>Status</th>
+          <th>Last Contact</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for lead in leads %}
+        <tr data-id="{{ lead._id }}" data-status="{{ lead.status }}">
+          <td>{{ lead.Name }}</td>
+          <td>{{ lead.Address }}</td>
+          <td>{{ lead.City }}</td>
+          <td>
+            <a class="tel" href="tel:{{ lead.Primary_Phone|replace(' ', '') }}">{{ lead.Primary_Phone }}</a>
+          </td>
+          <td>{{ lead.Phone_Type }}</td>
+          <td>
+            {% if lead.Alt_Phone %}
+            <a class="tel" href="tel:{{ lead.Alt_Phone|replace(' ', '') }}">{{ lead.Alt_Phone }}</a>
+            {% endif %}
+          </td>
+          <td><a class="email" href="mailto:{{ lead.Email }}">{{ lead.Email }}</a></td>
+          <td>{{ lead.Est_Value }}</td>
+          <td>{{ lead.Months_Owned }}</td>
+          <td>{{ lead.Beds }}</td>
+          <td>{{ lead.Baths }}</td>
+          <td>{{ lead.SqFt }}</td>
+          <td>
+            <select class="status">
+              {% for s in status_options %}
+              <option value="{{ s }}" {% if s == lead.status %}selected{% endif %}>{{ s }}</option>
+              {% endfor %}
+            </select>
+          </td>
+          <td class="last-contact">{{ lead.last_contact or '-' }}</td>
+          <td>
+            <textarea class="notes" rows="2" placeholder="Add notes...">{{ lead.notes }}</textarea>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

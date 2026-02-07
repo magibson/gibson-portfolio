@@ -1,0 +1,13 @@
+[Unit]
+Description=JARVIS Lead Tracker
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/clawd/clawd/projects/lead-tracker
+ExecStart=/usr/bin/python3 /home/clawd/clawd/projects/lead-tracker/app.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

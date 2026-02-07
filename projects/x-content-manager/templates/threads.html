@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% set title = "Thread Composer - X Content Manager" %}
+
+{% block content %}
+<section class="card">
+  <h2>Create Thread</h2>
+  <form method="post" class="form">
+    <div class="field">
+      <label>Thread title</label>
+      <input type="text" name="title" placeholder="Behind the scenes: mountain shoot" />
+    </div>
+    <button type="submit" class="primary">Create Thread</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Your Threads</h2>
+  {% if threads %}
+    <ul class="list">
+      {% for thread in threads %}
+        <li>
+          <div>
+            <strong>{{ thread.title }}</strong>
+            <p class="muted">Created {{ thread.created_at }}</p>
+          </div>
+          <div class="actions">
+            <a class="button" href="{{ url_for('thread_detail', thread_id=thread.id) }}">Open</a>
+            <form method="post" action="{{ url_for('delete_thread', thread_id=thread.id) }}">
+              <button type="submit" class="ghost">Delete</button>
+            </form>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="muted">No threads yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

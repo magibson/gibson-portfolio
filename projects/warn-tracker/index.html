@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WARN Act Tracker - NJ/PA</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #e2e8f0; min-height: 100vh; padding: 24px; }
+  .container { max-width: 1200px; margin: 0 auto; }
+
+  /* Header */
+  .header { text-align: center; margin-bottom: 24px; padding: 24px; background: linear-gradient(145deg, #1e293b, #334155); border-radius: 16px; border: 1px solid #475569; }
+  .header h1 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+  .header p { color: #94a3b8; font-size: 13px; margin-bottom: 4px; }
+  .last-updated { font-size: 11px; color: #64748b; margin-top: 8px; }
+  .compliance-note { background: #22c55e15; border: 1px solid #22c55e40; border-radius: 8px; padding: 10px 14px; margin-top: 14px; font-size: 12px; color: #86efac; }
+  .compliance-note strong { color: #4ade80; }
+
+  /* Source Links */
+  .source-section { margin-bottom: 20px; }
+  .source-section h3 { font-size: 13px; color: #94a3b8; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .source-links { display: flex; gap: 10px; flex-wrap: wrap; }
+  .source-link { padding: 10px 16px; background: #1e293b; color: #60a5fa; border: 1px solid #334155; border-radius: 10px; text-decoration: none; font-size: 13px; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+  .source-link:hover { background: #3b82f6; color: white; border-color: #3b82f6; }
+  .source-link .icon { font-size: 16px; }
+
+  /* Stats */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .stat-card { padding: 16px; background: #1e293b; border-radius: 12px; border: 1px solid #334155; text-align: center; }
+  .stat-card .number { font-size: 28px; font-weight: 700; color: #3b82f6; }
+  .stat-card .label { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+  .stat-card.highlight .number { color: #f87171; }
+  .stat-card.success .number { color: #4ade80; }
+
+  /* Controls */
+  .controls { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; align-items: flex-end; }
+  .control-group { flex: 1; min-width: 150px; }
+  .control-group label { display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .control-group select, .control-group input { width: 100%; padding: 10px 12px; background: #0f172a; border: 1px solid #475569; border-radius: 8px; color: white; font-size: 14px; outline: none; }
+  .control-group select:focus, .control-group input:focus { border-color: #3b82f6; }
+  .btn { padding: 10px 18px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; white-space: nowrap; }
+  .btn:hover { background: #2563eb; }
+  .btn.secondary { background: #475569; }
+  .btn.secondary:hover { background: #64748b; }
+  .btn.small { padding: 6px 12px; font-size: 11px; }
+
+  /* Table */
+  .table-container { background: #1e293b; border-radius: 12px; border: 1px solid #334155; overflow: hidden; }
+  .table-header { padding: 14px 16px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+  .table-header h3 { font-size: 14px; font-weight: 600; }
+  .table-actions { display: flex; gap: 8px; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; padding: 12px 14px; font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #334155; cursor: pointer; white-space: nowrap; user-select: none; }
+  th:hover { color: #e2e8f0; }
+  th.sorted { color: #60a5fa; }
+  th .sort-icon { margin-left: 4px; opacity: 0.5; }
+  th.sorted .sort-icon { opacity: 1; }
+  td { padding: 12px 14px; font-size: 13px; border-bottom: 1px solid #1e293b40; vertical-align: top; }
+  tr:hover td { background: #334155; }
+  .company-name { font-weight: 600; color: #f1f5f9; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .location { color: #94a3b8; }
+  
+  /* Badges */
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .badge.nj { background: #3b82f620; color: #60a5fa; }
+  .badge.pa { background: #f59e0b20; color: #fbbf24; }
+  .badge.new { background: #22c55e30; color: #4ade80; animation: pulse 2s infinite; }
+  .badge.big { background: #ef444430; color: #f87171; font-weight: 700; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+  
+  .affected { font-weight: 600; color: #f87171; }
+  .affected.big { color: #ef4444; font-size: 15px; }
+  .copy-btn { padding: 4px 10px; background: #47556920; border: 1px solid #475569; border-radius: 6px; color: #94a3b8; cursor: pointer; font-size: 11px; transition: all 0.2s; }
+  .copy-btn:hover { background: #3b82f6; color: white; border-color: #3b82f6; }
+  .empty { text-align: center; padding: 40px; color: #64748b; font-size: 14px; }
+
+  /* Action buttons container */
+  .action-btns { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .action-row { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  /* News dropdown */
+  .news-loading { opacity: 0.6; cursor: wait; }
+  .news-results { margin-top: 8px; padding: 10px; background: #0f172a; border-radius: 8px; font-size: 12px; max-width: 400px; }
+  .news-results a { color: #60a5fa; text-decoration: none; display: block; padding: 4px 0; }
+  .news-results a:hover { text-decoration: underline; }
+  .news-results .no-news { color: #64748b; }
+
+  /* Toast */
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #22c55e; color: white; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 500; opacity: 0; transform: translateY(20px); transition: all 0.3s; pointer-events: none; z-index: 1000; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* Manual Entry */
+  .manual-entry { background: #1e293b; border-radius: 12px; border: 1px solid #334155; padding: 16px; margin-bottom: 20px; }
+  .manual-entry h3 { font-size: 13px; margin-bottom: 12px; color: #94a3b8; }
+  .entry-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+  .entry-form input, .entry-form select { padding: 10px 12px; background: #0f172a; border: 1px solid #475569; border-radius: 8px; color: white; font-size: 13px; }
+  .entry-form input::placeholder { color: #64748b; }
+
+  /* Action buttons - clean uniform style */
+  .action-btn { display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-size: 11px; font-weight: 600; transition: all 0.15s; border: none; cursor: pointer; white-space: nowrap; }
+  .action-btn.primary { background: #3b82f6; color: white; }
+  .action-btn.primary:hover { background: #2563eb; }
+  .action-btn.secondary { background: #334155; color: #e2e8f0; }
+  .action-btn.secondary:hover { background: #475569; }
+  .action-btn.success { background: #10b981; color: white; }
+  .action-btn.success:hover { background: #059669; }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    body { padding: 16px; }
+    .controls { flex-direction: column; }
+    .control-group { min-width: 100%; }
+    .table-header { flex-direction: column; align-items: stretch; }
+    .table-actions { justify-content: stretch; }
+    .table-actions .btn { flex: 1; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <h1>📋 WARN Act Tracker</h1>
+    <p>Public layoff data for New Jersey & Pennsylvania</p>
+    <div id="lastUpdated" class="last-updated"></div>
+    <div class="compliance-note">
+      <strong>⚠️ Compliance Notice:</strong> This tool displays publicly available WARN Act data only. 
+      No client/prospect data is stored. Use your work CRM for all contact management.
+    </div>
+  </div>
+
+  <!-- Official Data Sources -->
+  <div class="source-section">
+    <h3>📄 Official Data Sources</h3>
+    <div class="source-links">
+      <a href="https://www.nj.gov/labor/employer-services/warn/" target="_blank" class="source-link"><span class="icon">🏛️</span> NJ WARN Notices</a>
+      <a href="https://www.nj.gov/labor/assets/PDFs/WARN/2025_WARN_Notice_Archive.pdf" target="_blank" class="source-link"><span class="icon">📑</span> NJ 2025 PDF</a>
+      <a href="https://www.pa.gov/agencies/dli/programs-services/workforce-development-home/warn-requirements/warn-notices.html" target="_blank" class="source-link"><span class="icon">🏛️</span> PA WARN Notices</a>
+      <a href="https://www.warntracker.com/?state=NJ" target="_blank" class="source-link"><span class="icon">🔍</span> WARNTracker</a>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card"><div class="number" id="statTotal">0</div><div class="label">Total Notices</div></div>
+    <div class="stat-card highlight"><div class="number" id="statEmployees">0</div><div class="label">Employees Affected</div></div>
+    <div class="stat-card"><div class="number" id="statFiltered">0</div><div class="label">Filtered Results</div></div>
+    <div class="stat-card success"><div class="number" id="statNew">0</div><div class="label">New (24h)</div></div>
+    <div class="stat-card highlight"><div class="number" id="statBig">0</div><div class="label">Big (100+)</div></div>
+  </div>
+
+  <!-- Manual Entry -->
+  <details class="manual-entry">
+    <summary style="cursor: pointer; font-weight: 600; font-size: 14px; color: #e2e8f0;">➕ Add Entry from Official Sources</summary>
+    <div style="margin-top: 12px;">
+      <div class="entry-form">
+        <input type="text" id="addCompany" placeholder="Company Name" />
+        <select id="addState"><option value="NJ">New Jersey</option><option value="PA">Pennsylvania</option></select>
+        <input type="text" id="addCity" placeholder="City" />
+        <input type="number" id="addAffected" placeholder="# Affected" />
+        <input type="date" id="addDate" />
+        <select id="addType"><option value="Layoff">Layoff</option><option value="Closing">Closing</option></select>
+      </div>
+      <div style="margin-top: 12px; display: flex; gap: 8px;">
+        <button class="btn" onclick="addEntry()">Add Entry</button>
+        <button class="btn secondary" onclick="clearEntries()">Clear All Custom</button>
+      </div>
+    </div>
+  </details>
+
+  <!-- Filters -->
+  <div class="controls">
+    <div class="control-group">
+      <label>State</label>
+      <select id="filterState" onchange="applyFilters()">
+        <option value="">All States</option>
+        <option value="NJ">New Jersey</option>
+        <option value="PA">Pennsylvania</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>Min. Employees</label>
+      <select id="filterSize" onchange="applyFilters()">
+        <option value="0">Any Size</option>
+        <option value="50">50+</option>
+        <option value="100">100+ (Big)</option>
+        <option value="200">200+</option>
+        <option value="500">500+</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>Time Period</label>
+      <select id="filterTime" onchange="applyFilters()">
+        <option value="">All Time</option>
+        <option value="1">Last 24 Hours</option>
+        <option value="7">Last 7 Days</option>
+        <option value="30">Last 30 Days</option>
+        <option value="60">Last 60 Days</option>
+        <option value="90">Last 90 Days</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>Show Only</label>
+      <select id="filterSpecial" onchange="applyFilters()">
+        <option value="">All Notices</option>
+        <option value="new">New (24h)</option>
+        <option value="big">Big (100+)</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>Search</label>
+      <input type="text" id="filterSearch" placeholder="Company or city..." oninput="applyFilters()" />
+    </div>
+  </div>
+
+  <!-- Results Table -->
+  <div class="table-container">
+    <div class="table-header">
+      <h3>📋 WARN Notices <span id="resultCount" style="color: #94a3b8; font-weight: 400;"></span></h3>
+      <div class="table-actions">
+        <button class="btn secondary" onclick="copyFiltered()">📋 Copy List</button>
+        <button class="btn" onclick="exportCSV()">📥 Export CSV</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortBy('company')">Company <span class="sort-icon">↕</span></th>
+            <th onclick="sortBy('state')">State <span class="sort-icon">↕</span></th>
+            <th onclick="sortBy('city')">Location <span class="sort-icon">↕</span></th>
+            <th onclick="sortBy('affected')">Affected <span class="sort-icon">↕</span></th>
+            <th onclick="sortBy('date')">Eff. Date <span class="sort-icon">↕</span></th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+      <div class="empty" id="emptyState" style="display: none;">No notices match your filters.</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Copied to clipboard!</div>
+
+<script>
+// Sample data - will be replaced by data.json when scraper runs
+const SAMPLE_DATA = [
+  // New Jersey 2025
+  { id: "nj1", company: "Ready Pac Produce", state: "NJ", city: "Florence", affected: 75, date: "2025-04-01", type: "Layoff", first_seen: "2025-01-28T10:00:00" },
+  { id: "nj2", company: "Barclays Services Corporation", state: "NJ", city: "Whippany", affected: 69, date: "2025-04-16", type: "Layoff", first_seen: "2025-01-28T10:00:00" },
+  { id: "nj3", company: "Optum Services", state: "NJ", city: "Basking Ridge", affected: 85, date: "2025-03-15", type: "Layoff", first_seen: "2025-01-27T08:00:00" },
+  { id: "nj4", company: "The Bank of New York Mellon", state: "NJ", city: "Jersey City", affected: 120, date: "2025-02-28", type: "Layoff", first_seen: "2025-01-26T08:00:00" },
+  { id: "nj5", company: "Charles Schwab & Co.", state: "NJ", city: "Jersey City", affected: 109, date: "2025-02-05", type: "Layoff", first_seen: "2025-01-25T08:00:00" },
+  { id: "nj6", company: "John Wiley & Sons", state: "NJ", city: "Hoboken", affected: 103, date: "2025-01-31", type: "Closing", first_seen: "2025-01-24T08:00:00" },
+  
+  // Pennsylvania 2025-2026
+  { id: "pa1", company: "Penn Medicine", state: "PA", city: "Philadelphia", affected: 795, date: "2026-02-01", type: "Layoff", first_seen: "2025-01-28T09:00:00" },
+  { id: "pa2", company: "GF Piping Systems", state: "PA", city: "Reading", affected: 100, date: "2026-03-15", type: "Closing", first_seen: "2025-01-28T09:00:00" },
+  { id: "pa3", company: "Greenleaf Corporation", state: "PA", city: "Meadville", affected: 59, date: "2026-03-15", type: "Closing", first_seen: "2025-01-27T08:00:00" },
+  { id: "pa4", company: "Huntleigh USA Corp (PHL Airport)", state: "PA", city: "Philadelphia", affected: 68, date: "2026-03-09", type: "Layoff", first_seen: "2025-01-26T08:00:00" },
+  { id: "pa5", company: "Lutron Electronics", state: "PA", city: "Coopersburg", affected: 104, date: "2026-03-13", type: "Closing", first_seen: "2025-01-25T08:00:00" },
+  { id: "pa6", company: "Lutron Electronics", state: "PA", city: "Pottstown", affected: 84, date: "2026-03-20", type: "Closing", first_seen: "2025-01-25T08:00:00" },
+  { id: "pa7", company: "Lutron Electronics", state: "PA", city: "Willow Grove", affected: 105, date: "2026-04-03", type: "Closing", first_seen: "2025-01-25T08:00:00" },
+  { id: "pa8", company: "City Fitness", state: "PA", city: "Philadelphia", affected: 297, date: "2026-02-01", type: "Closing", first_seen: "2025-01-24T08:00:00" },
+  { id: "pa9", company: "Utz Brands", state: "PA", city: "Hanover", affected: 73, date: "2026-02-27", type: "Closing", first_seen: "2025-01-24T08:00:00" },
+  { id: "pa10", company: "Home Depot", state: "PA", city: "Lancaster", affected: 76, date: "2026-02-27", type: "Closing", first_seen: "2025-01-23T08:00:00" },
+  { id: "pa11", company: "LSG Sky Chefs", state: "PA", city: "Philadelphia", affected: 128, date: "2026-02-13", type: "Closing", first_seen: "2025-01-23T08:00:00" },
+  { id: "pa12", company: "Hallmark Cards", state: "PA", city: "Elysburg", affected: 164, date: "2026-02-02", type: "Layoff", first_seen: "2025-01-22T08:00:00" },
+  { id: "pa13", company: "Nice-Pak Products", state: "PA", city: "Hamburg", affected: 58, date: "2026-01-02", type: "Closing", first_seen: "2025-01-22T08:00:00" },
+  { id: "pa14", company: "Revolution Medicines", state: "PA", city: "Philadelphia", affected: 137, date: "2026-03-01", type: "Closing", first_seen: "2025-01-21T08:00:00" },
+  { id: "pa15", company: "Challenge Printing", state: "PA", city: "Lewisberry", affected: 128, date: "2025-12-04", type: "Closing", first_seen: "2025-01-21T08:00:00" },
+  { id: "pa16", company: "TrailStone Group", state: "PA", city: "Berlin", affected: 96, date: "2026-02-13", type: "Closing", first_seen: "2025-01-20T08:00:00" },
+  { id: "pa17", company: "DSV Air & Sea", state: "PA", city: "Carlisle", affected: 69, date: "2026-01-12", type: "Layoff", first_seen: "2025-01-20T08:00:00" },
+  { id: "pa18", company: "Clorox Company", state: "PA", city: "Hatfield", affected: 76, date: "2026-01-12", type: "Closing", first_seen: "2025-01-19T08:00:00" },
+  { id: "pa19", company: "Nestlé Purina", state: "PA", city: "DuBois", affected: 110, date: "2026-01-31", type: "Closing", first_seen: "2025-01-19T08:00:00" },
+  { id: "pa20", company: "Tower Health", state: "PA", city: "Pottstown", affected: 131, date: "2026-01-01", type: "Layoff", first_seen: "2025-01-18T08:00:00" },
+  { id: "pa21", company: "Alpha Coal Resources", state: "PA", city: "Schuylkill Haven", affected: 150, date: "2026-01-01", type: "Closing", first_seen: "2025-01-18T08:00:00" },
+  { id: "pa22", company: "Republic Services", state: "PA", city: "Carlisle", affected: 52, date: "2026-01-20", type: "Layoff", first_seen: "2025-01-17T08:00:00" },
+  { id: "pa23", company: "Spirit Airlines", state: "PA", city: "Philadelphia", affected: 49, date: "2025-12-30", type: "Closing", first_seen: "2025-01-17T08:00:00" },
+  { id: "pa24", company: "Westinghouse Electric", state: "PA", city: "Mount Pleasant", affected: 196, date: "2025-12-31", type: "Layoff", first_seen: "2025-01-16T08:00:00" },
+  { id: "pa25", company: "Amazon MGE2", state: "PA", city: "Allentown", affected: 70, date: "2025-12-26", type: "Closing", first_seen: "2025-01-16T08:00:00" },
+  { id: "pa26", company: "BlueLabs Analytics", state: "PA", city: "Camp Hill", affected: 153, date: "2025-12-13", type: "Layoff", first_seen: "2025-01-15T08:00:00" },
+  { id: "pa27", company: "Shawnee Mountain Ski Area", state: "PA", city: "Shawnee-on-Delaware", affected: 124, date: "2025-12-31", type: "Closing", first_seen: "2025-01-15T08:00:00" },
+  { id: "pa28", company: "Reinhart Foodservice", state: "PA", city: "Ephrata", affected: 92, date: "2025-12-15", type: "Closing", first_seen: "2025-01-14T08:00:00" },
+  { id: "pa29", company: "Verano Holdings", state: "PA", city: "Charleroi", affected: 252, date: "2025-10-09", type: "Closing", first_seen: "2025-01-14T08:00:00" },
+  { id: "pa30", company: "Comcast", state: "PA", city: "Philadelphia", affected: 200, date: "2025-12-05", type: "Closing", first_seen: "2025-01-13T08:00:00" },
+  { id: "pa31", company: "Corvus Pharmaceuticals", state: "PA", city: "King of Prussia", affected: 55, date: "2025-12-01", type: "Layoff", first_seen: "2025-01-13T08:00:00" },
+  { id: "pa32", company: "Air Products", state: "PA", city: "Allentown", affected: 60, date: "2025-12-01", type: "Closing", first_seen: "2025-01-12T08:00:00" },
+  { id: "pa33", company: "Rite Aid", state: "PA", city: "Mechanicsburg", affected: 75, date: "2025-11-28", type: "Layoff", first_seen: "2025-01-12T08:00:00" },
+  { id: "pa34", company: "B. Braun Medical", state: "PA", city: "Bethlehem", affected: 66, date: "2026-02-28", type: "Closing", first_seen: "2025-01-11T08:00:00" },
+  { id: "pa35", company: "Victaulic", state: "PA", city: "Schnecksville", affected: 716, date: "2025-08-12", type: "Layoff", first_seen: "2025-01-10T08:00:00" },
+  { id: "pa36", company: "WESCO Distribution", state: "PA", city: "Pittsburgh", affected: 180, date: "2025-06-13", type: "Closing", first_seen: "2025-01-10T08:00:00" },
+  { id: "pa37", company: "Dentsply Sirona", state: "PA", city: "York", affected: 365, date: "2025-09-25", type: "Layoff", first_seen: "2025-01-09T08:00:00" },
+  { id: "pa38", company: "Mahanoy City Call Center", state: "PA", city: "Pottsville", affected: 314, date: "2025-08-15", type: "Layoff", first_seen: "2025-01-09T08:00:00" }
+];
+
+// State
+let allData = [];
+let customEntries = JSON.parse(localStorage.getItem('warn_custom_v2') || '[]');
+let sortColumn = 'date';
+let sortDirection = 'desc';
+let filteredData = [];
+let newsCache = {};
+let lastUpdated = null;
+
+// Load data
+async function loadData() {
+  try {
+    console.log('Fetching data.json...');
+    const response = await fetch('data.json');
+    console.log('Response status:', response.status);
+    if (response.ok) {
+      const jsonData = await response.json();
+      allData = jsonData.notices || [];
+      lastUpdated = jsonData.last_updated;
+      updateLastUpdated();
+      console.log(`✅ Loaded ${allData.length} notices from data.json`);
+      
+      // Show confirmation in UI
+      const header = document.querySelector('.header p');
+      if (header && allData.length > 0) {
+        header.textContent = `${allData.length} layoff notices from NJ & PA`;
+      }
+    } else {
+      throw new Error('data.json not found: ' + response.status);
+    }
+  } catch (e) {
+    console.error('❌ Error loading data:', e);
+    console.log('Falling back to sample data');
+    allData = SAMPLE_DATA;
+  }
+  applyFilters();
+}
+
+function updateLastUpdated() {
+  const el = document.getElementById('lastUpdated');
+  if (lastUpdated) {
+    const date = new Date(lastUpdated);
+    el.textContent = `Last updated: ${date.toLocaleString()}`;
+  }
+}
+
+// Check if notice is "new" (first seen within 24 hours)
+function isNew(notice) {
+  if (!notice.first_seen) return false;
+  const firstSeen = new Date(notice.first_seen);
+  const now = new Date();
+  return (now - firstSeen) < (24 * 60 * 60 * 1000);
+}
+
+// Check if notice is "big" (100+ employees)
+function isBig(notice) {
+  return (notice.affected || 0) >= 100;
+}
+
+// Combine data
+function getAllData() {
+  const combined = [...allData, ...customEntries];
+  // Filter out NY (only keep NJ and PA)
+  return combined.filter(item => item.state === 'NJ' || item.state === 'PA');
+}
+
+// Filter and sort
+function applyFilters() {
+  const state = document.getElementById('filterState').value;
+  const minSize = parseInt(document.getElementById('filterSize').value) || 0;
+  const timePeriod = parseInt(document.getElementById('filterTime').value) || 0;
+  const special = document.getElementById('filterSpecial').value;
+  const search = document.getElementById('filterSearch').value.toLowerCase();
+  
+  const now = new Date();
+  const cutoffDate = timePeriod ? new Date(now.getTime() - timePeriod * 24 * 60 * 60 * 1000) : null;
+  
+  filteredData = getAllData().filter(item => {
+    if (state && item.state !== state) return false;
+    if (item.affected < minSize) return false;
+    if (cutoffDate && new Date(item.date) < cutoffDate) return false;
+    if (search && !item.company.toLowerCase().includes(search) && !item.city.toLowerCase().includes(search)) return false;
+    if (special === 'new' && !isNew(item)) return false;
+    if (special === 'big' && !isBig(item)) return false;
+    return true;
+  });
+  
+  // Sort
+  filteredData.sort((a, b) => {
+    let aVal = a[sortColumn];
+    let bVal = b[sortColumn];
+    if (sortColumn === 'affected') {
+      aVal = parseInt(aVal) || 0;
+      bVal = parseInt(bVal) || 0;
+    } else if (sortColumn === 'date') {
+      aVal = new Date(aVal);
+      bVal = new Date(bVal);
+    } else {
+      aVal = String(aVal).toLowerCase();
+      bVal = String(bVal).toLowerCase();
+    }
+    if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+    return 0;
+  });
+  
+  renderTable();
+  updateStats();
+  savePreferences();
+}
+
+function sortBy(column) {
+  if (sortColumn === column) {
+    sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortColumn = column;
+    sortDirection = column === 'date' || column === 'affected' ? 'desc' : 'asc';
+  }
+  
+  document.querySelectorAll('th').forEach(th => th.classList.remove('sorted'));
+  event.target.closest('th')?.classList.add('sorted');
+  
+  applyFilters();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  const empty = document.getElementById('emptyState');
+  const count = document.getElementById('resultCount');
+  
+  count.textContent = `(${filteredData.length} shown)`;
+  
+  if (filteredData.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  
+  empty.style.display = 'none';
+  
+  try {
+    tbody.innerHTML = filteredData.map((item, idx) => {
+      const itemIsNew = isNew(item);
+      const itemIsBig = isBig(item);
+      const badges = [];
+      if (itemIsNew) badges.push('<span class="badge new">NEW</span>');
+      if (itemIsBig) badges.push('<span class="badge big">BIG</span>');
+      
+      // Defensive: ensure required fields exist
+      const company = item.company || 'Unknown';
+      const state = item.state || 'XX';
+      const city = item.city || '';
+      const affected = item.affected || 0;
+      
+      // Build various LinkedIn URLs
+      const stateName = state === 'NJ' ? 'New Jersey' : 'Pennsylvania';
+      const linkedInSearch = encodeURIComponent(`${company}, ${stateName}`);
+      const searchUrl = `https://www.linkedin.com/search/results/people/?keywords=${linkedInSearch}&network=%5B%22S%22%2C%22O%22%5D&origin=FACETED_SEARCH`;
+      // Direct company page link
+      const companySlug = company.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+      const companyPageUrl = `https://www.linkedin.com/company/${companySlug}/people/`;
+      const openToWorkSearch = encodeURIComponent(`#opentowork ${company}`);
+      const openToWorkUrl = `https://www.linkedin.com/search/results/content/?keywords=${openToWorkSearch}&origin=GLOBAL_SEARCH_HEADER`;
+      const googleLinkedInUrl = `https://www.google.com/search?q=${encodeURIComponent(`"${company}" layoff site:linkedin.com`)}`;
+      // Clean company name - remove location suffixes like "(Monmouth)" or "(Bergen)"
+      const cleanCompany = company.replace(/\s*\([^)]*\)\s*/g, '').trim();
+      
+      // Clean city display (remove carriage returns from scraped data)
+      const cleanCity = city.replace(/\r?\n/g, ' ').trim();
+      
+      // Sales Navigator search - just company name, user sets up Persona for geography/seniority
+      const salesNavFiltered = 'https://www.linkedin.com/sales/search/people?keywords=' + encodeURIComponent(cleanCompany);
+      const salesNavSimple = salesNavFiltered;
+      
+      return `
+      <tr>
+        <td>
+          <div class="company-name">
+            ${esc(company)}
+            ${badges.join('')}
+          </div>
+          <div id="news-${idx}" style="display: none;"></div>
+        </td>
+        <td><span class="badge ${state.toLowerCase()}">${state}</span></td>
+        <td class="location">${esc(cleanCity)}</td>
+        <td class="affected ${itemIsBig ? 'big' : ''}">${affected.toLocaleString()}</td>
+        <td>${formatDate(item.date)}</td>
+      <td>
+        <div class="action-btns">
+          <a href="${salesNavFiltered}" target="_blank" class="action-btn primary" style="background:#7c3aed;">🎯 Sales Nav</a>
+          <a href="${searchUrl}" target="_blank" class="action-btn primary">Search</a>
+          <a href="${openToWorkUrl}" target="_blank" class="action-btn success">Open to Work</a>
+          <a href="${googleLinkedInUrl}" target="_blank" class="action-btn secondary">Layoff Posts</a>
+          <button class="action-btn secondary" onclick="getNews(${idx})">News</button>
+        </div>
+      </td>
+    </tr>
+    `;
+    }).join('');
+  } catch (e) {
+    console.error('Render error:', e);
+    tbody.innerHTML = '<tr><td colspan="6" style="color:red;padding:20px;">Error rendering table. Check console.</td></tr>';
+  }
+}
+
+function updateStats() {
+  const all = getAllData();
+  const now = new Date();
+  
+  document.getElementById('statTotal').textContent = all.length;
+  document.getElementById('statEmployees').textContent = all.reduce((sum, i) => sum + (parseInt(i.affected) || 0), 0).toLocaleString();
+  document.getElementById('statFiltered').textContent = filteredData.length;
+  document.getElementById('statNew').textContent = all.filter(i => isNew(i)).length;
+  document.getElementById('statBig').textContent = all.filter(i => isBig(i)).length;
+}
+
+// News search - uses pre-fetched articles from scraper
+function getNews(idx) {
+  const newsDiv = document.getElementById(`news-${idx}`);
+  
+  // Toggle off if already showing
+  if (newsDiv.style.display === 'block') {
+    newsDiv.style.display = 'none';
+    return;
+  }
+  
+  // Get articles from the data (pre-fetched by scraper)
+  const item = filteredData[idx];
+  if (!item) return;
+  
+  const articles = item.news || [];
+  
+  if (articles.length > 0) {
+    const results = articles.slice(0, 5).map(a => ({
+      title: a.title,
+      url: a.url,
+      source: a.source || ''
+    }));
+    renderNews(newsDiv, results);
+  } else {
+    // Fallback to search links if no pre-fetched articles
+    const query = encodeURIComponent(`${item.company} layoff`);
+    const results = [
+      { title: `🔍 Search Google News`, url: `https://www.google.com/search?q=${query}&tbm=nws` },
+      { title: `🔍 Search Bing News`, url: `https://www.bing.com/news/search?q=${query}` }
+    ];
+    renderNews(newsDiv, results);
+  }
+}
+
+function renderNews(newsDiv, results) {
+  if (results.length === 0) {
+    newsDiv.innerHTML = `<div class="news-results"><span class="no-news">No recent news found</span></div>`;
+  } else {
+    newsDiv.innerHTML = `<div class="news-results">${results.map(r => {
+      const source = r.source ? `<span style="color:#64748b;font-size:10px;margin-left:4px;">(${esc(r.source)})</span>` : '';
+      return `<a href="${r.url}" target="_blank">${esc(r.title)}${source}</a>`;
+    }).join('')}</div>`;
+  }
+  newsDiv.style.display = 'block';
+}
+
+// Entry management
+function addEntry() {
+  const company = document.getElementById('addCompany').value.trim();
+  const state = document.getElementById('addState').value;
+  const city = document.getElementById('addCity').value.trim();
+  const affected = parseInt(document.getElementById('addAffected').value) || 0;
+  const date = document.getElementById('addDate').value;
+  const type = document.getElementById('addType').value;
+  
+  if (!company || !city || !date) {
+    showToast('Please fill in Company, City, and Date');
+    return;
+  }
+  
+  customEntries.push({ 
+    id: 'custom_' + Date.now(),
+    company, 
+    state, 
+    city, 
+    affected, 
+    date, 
+    type,
+    first_seen: new Date().toISOString()
+  });
+  localStorage.setItem('warn_custom_v2', JSON.stringify(customEntries));
+  
+  ['addCompany', 'addCity', 'addAffected', 'addDate'].forEach(id => document.getElementById(id).value = '');
+  
+  applyFilters();
+  showToast('Entry added');
+}
+
+function clearEntries() {
+  if (confirm('Clear all custom entries? Auto-scraped data will remain.')) {
+    customEntries = [];
+    localStorage.setItem('warn_custom_v2', '[]');
+    applyFilters();
+    showToast('Custom entries cleared');
+  }
+}
+
+// Copy functions
+function copyRow(company, city, state) {
+  const text = `${company} - ${city}, ${state}`;
+  navigator.clipboard.writeText(text);
+  showToast('Copied: ' + text);
+}
+
+function copyFiltered() {
+  const text = filteredData.map(i => {
+    const badges = [];
+    if (isNew(i)) badges.push('[NEW]');
+    if (isBig(i)) badges.push('[BIG]');
+    return `${badges.join(' ')} ${i.company} | ${i.city}, ${i.state} | ${i.affected} employees | ${formatDate(i.date)}`;
+  }).join('\n');
+  navigator.clipboard.writeText(text);
+  showToast(`Copied ${filteredData.length} entries to clipboard`);
+}
+
+function exportCSV() {
+  const headers = ['Company', 'State', 'City', 'Affected', 'Effective Date', 'Type', 'Is New', 'Is Big'];
+  const rows = filteredData.map(i => [i.company, i.state, i.city, i.affected, i.date, i.type, isNew(i), isBig(i)]);
+  const csv = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+  
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `warn-notices-${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('CSV downloaded');
+}
+
+// Preferences - use URL params so filters persist on refresh
+function savePreferences() {
+  const params = new URLSearchParams();
+  const state = document.getElementById('filterState').value;
+  const size = document.getElementById('filterSize').value;
+  const time = document.getElementById('filterTime').value;
+  const special = document.getElementById('filterSpecial').value;
+  const search = document.getElementById('filterSearch').value;
+  
+  if (state) params.set('state', state);
+  if (size && size !== '0') params.set('size', size);
+  if (time) params.set('time', time);
+  if (special) params.set('special', special);
+  if (search) params.set('q', search);
+  
+  const newUrl = params.toString() ? '?' + params.toString() : window.location.pathname;
+  history.replaceState(null, '', newUrl);
+}
+
+function loadPreferences() {
+  const params = new URLSearchParams(window.location.search);
+  
+  if (params.has('state')) document.getElementById('filterState').value = params.get('state');
+  if (params.has('size')) document.getElementById('filterSize').value = params.get('size');
+  if (params.has('time')) document.getElementById('filterTime').value = params.get('time');
+  if (params.has('special')) document.getElementById('filterSpecial').value = params.get('special');
+  if (params.has('q')) document.getElementById('filterSearch').value = params.get('q');
+}
+
+// Helpers
+function esc(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+function formatDate(d) { 
+  if (!d) return '—';
+  const date = new Date(d);
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// Init
+loadPreferences();
+loadData();
+</script>
+</body>
+</html>

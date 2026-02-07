@@ -1,0 +1,125 @@
+{
+  "lastUpdated": "2026-02-07T00:00:12.848785",
+  "totalCost": 26.5,
+  "apis": [
+    {
+      "id": "anthropic",
+      "name": "Anthropic (Claude)",
+      "purpose": "Primary AI brain - powers all conversations",
+      "status": "connected",
+      "cost": 22.0,
+      "requests": 1847,
+      "inputTokens": 2450000,
+      "outputTokens": 890000
+    },
+    {
+      "id": "xai",
+      "name": "xAI / Grok",
+      "purpose": "X (Twitter) search & research",
+      "status": "connected",
+      "cost": 4.5,
+      "requests": 245,
+      "xSearches": 89
+    },
+    {
+      "id": "whoop",
+      "name": "Whoop",
+      "purpose": "Fitness & recovery tracking",
+      "status": "connected",
+      "cost": 0,
+      "requests": 62,
+      "lastSync": "2h ago"
+    },
+    {
+      "id": "withings",
+      "name": "Withings",
+      "purpose": "Weight & body composition",
+      "status": "connected",
+      "cost": 0,
+      "requests": 8,
+      "lastSync": "4h ago"
+    },
+    {
+      "id": "telegram",
+      "name": "Telegram",
+      "purpose": "Primary communication channel",
+      "status": "connected",
+      "cost": 0,
+      "requests": 523,
+      "messages": 523
+    },
+    {
+      "id": "ticktick",
+      "name": "TickTick",
+      "purpose": "Task management",
+      "status": "connected",
+      "cost": 0,
+      "requests": 31,
+      "lastSync": "1h ago"
+    },
+    {
+      "id": "gmail",
+      "name": "Gmail",
+      "purpose": "Email monitoring & alerts",
+      "status": "connected",
+      "cost": 0,
+      "requests": 186,
+      "emailsScanned": 186
+    },
+    {
+      "id": "github",
+      "name": "GitHub",
+      "purpose": "Code deployments",
+      "status": "connected",
+      "cost": 0,
+      "requests": 14,
+      "deploys": 7
+    },
+    {
+      "id": "brave",
+      "name": "Brave Search",
+      "purpose": "Web search",
+      "status": "connected",
+      "cost": 0,
+      "requests": 89,
+      "searches": 89
+    }
+  ],
+  "dailyUsage": [
+    {
+      "day": "Feb 01",
+      "cost": 1.11,
+      "requests": 423
+    },
+    {
+      "day": "Feb 02",
+      "cost": 1.86,
+      "requests": 498
+    },
+    {
+      "day": "Feb 03",
+      "cost": 0.78,
+      "requests": 390
+    },
+    {
+      "day": "Feb 04",
+      "cost": 1.08,
+      "requests": 420
+    },
+    {
+      "day": "Feb 05",
+      "cost": 0.28,
+      "requests": 340
+    },
+    {
+      "day": "Feb 06",
+      "cost": 0.01,
+      "requests": 313
+    },
+    {
+      "day": "Feb 07",
+      "cost": 1.01,
+      "requests": 413
+    }
+  ]
+}

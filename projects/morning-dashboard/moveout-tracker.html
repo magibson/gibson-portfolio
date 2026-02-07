@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Move-Out 2027 Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0f1a;
+    --accent: #00d4ff;
+    --accent-2: #00f0ff;
+    --text: #e6f6ff;
+    --muted: #9bb3c7;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Rajdhani", sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+  }
+  .card {
+    width: 100%;
+    max-width: 800px;
+    background: linear-gradient(135deg, rgba(13,24,41,0.95), rgba(10,15,26,0.98));
+    border: 1px solid rgba(0,212,255,0.25);
+    border-radius: 18px;
+    padding: 28px;
+    position: relative;
+  }
+  .card::before, .card::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,212,255,0.6), transparent);
+  }
+  .card::before { top: 0; }
+  .card::after { bottom: 0; }
+
+  h1 {
+    font-family: "Orbitron", sans-serif;
+    font-size: 26px;
+    margin: 0 0 6px;
+    letter-spacing: 1px;
+  }
+
+  .sub {
+    color: var(--muted);
+    margin-bottom: 18px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  @media (max-width: 760px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: rgba(10,15,26,0.7);
+    border: 1px solid rgba(0,212,255,0.15);
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  label {
+    display: block;
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  input {
+    width: 100%;
+    padding: 10px 12px;
+    background: #08101b;
+    color: var(--text);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 8px;
+    font-size: 16px;
+  }
+
+  .progress {
+    height: 16px;
+    background: #08101b;
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid rgba(0,212,255,0.2);
+    margin-top: 8px;
+  }
+  .progress > div {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    box-shadow: 0 0 12px rgba(0,212,255,0.5);
+    transition: width 0.4s ease;
+  }
+
+  .stat {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    color: var(--muted);
+  }
+  .stat strong { color: var(--text); }
+
+  .pill {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    border: 1px solid rgba(0,212,255,0.3);
+    background: rgba(0,212,255,0.08);
+  }
+
+  .message {
+    font-size: 18px;
+    margin-top: 10px;
+  }
+
+  .save-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  button {
+    background: rgba(0,212,255,0.15);
+    border: 1px solid rgba(0,212,255,0.35);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  button:hover { background: rgba(0,212,255,0.25); }
+
+  .tiny {
+    color: var(--muted);
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>Move-Out 2027 Tracker</h1>
+    <div class="sub">Target: move out by end of 2027 (Dec 31, 2027)</div>
+
+    <div class="grid">
+      <div class="panel">
+        <label for="targetSavings">Target savings ($)</label>
+        <input id="targetSavings" type="number" min="0" step="100" />
+
+        <label for="currentSavings" style="margin-top:12px;">Current savings ($)</label>
+        <input id="currentSavings" type="number" min="0" step="100" />
+
+        <label for="monthlySavings" style="margin-top:12px;">Monthly savings rate ($)</label>
+        <input id="monthlySavings" type="number" min="0" step="50" />
+
+        <div class="save-row">
+          <button id="saveBtn">Save</button>
+          <span id="saveStatus" class="tiny"></span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="pill" id="statusPill">Loading...</div>
+
+        <div class="progress">
+          <div id="progressFill"></div>
+        </div>
+
+        <div class="stat">
+          <span>% complete</span>
+          <strong id="percentComplete">0%</strong>
+        </div>
+        <div class="stat">
+          <span>Projected move-out date</span>
+          <strong id="projectedDate">—</strong>
+        </div>
+        <div class="stat">
+          <span>Months remaining at current pace</span>
+          <strong id="monthsRemaining">—</strong>
+        </div>
+        <div class="stat">
+          <span>Months left to end of 2027</span>
+          <strong id="monthsToDeadline">—</strong>
+        </div>
+
+        <div class="message" id="message"></div>
+        <div class="tiny" id="paceNote"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const DATA_URL = "/data/moveout.json";
+const SAVE_URL = "/api/save-moveout";
+const DEADLINE = new Date("2027-12-31T23:59:59");
+
+const el = {
+  target: document.getElementById("targetSavings"),
+  current: document.getElementById("currentSavings"),
+  monthly: document.getElementById("monthlySavings"),
+  fill: document.getElementById("progressFill"),
+  percent: document.getElementById("percentComplete"),
+  projected: document.getElementById("projectedDate"),
+  monthsRemaining: document.getElementById("monthsRemaining"),
+  monthsToDeadline: document.getElementById("monthsToDeadline"),
+  message: document.getElementById("message"),
+  paceNote: document.getElementById("paceNote"),
+  pill: document.getElementById("statusPill"),
+  saveBtn: document.getElementById("saveBtn"),
+  saveStatus: document.getElementById("saveStatus"),
+};
+
+function monthsBetween(a, b) {
+  return Math.max(0, (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth()));
+}
+
+function addMonths(date, months) {
+  const d = new Date(date);
+  const day = d.getDate();
+  d.setDate(1);
+  d.setMonth(d.getMonth() + months);
+  const lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  d.setDate(Math.min(day, lastDay));
+  return d;
+}
+
+function formatDate(date) {
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+function getMessage(percent, onTrack) {
+  if (percent >= 100) return "Locked in. You hit the goal. Time to plan the move.";
+  if (percent >= 75) return "Final stretch. Keep the pace and finish strong.";
+  if (percent >= 50) return "Solid progress. Stay consistent and protect the momentum.";
+  if (percent >= 25) return "Good start. Small wins stack fast.";
+  return "Day one energy. Make the first miles count.";
+}
+
+function compute() {
+  const target = Number(el.target.value || 0);
+  const current = Number(el.current.value || 0);
+  const monthly = Number(el.monthly.value || 0);
+
+  const percent = target > 0 ? Math.min(100, (current / target) * 100) : 0;
+  el.fill.style.width = percent.toFixed(1) + "%";
+  el.percent.textContent = percent.toFixed(1) + "%";
+
+  const now = new Date();
+  const monthsToDeadline = monthsBetween(now, DEADLINE);
+  el.monthsToDeadline.textContent = monthsToDeadline.toString();
+
+  let monthsToGoal = "—";
+  let projectedText = "—";
+  let paceNote = "";
+  let onTrack = true;
+
+  if (current >= target && target > 0) {
+    monthsToGoal = "0";
+    projectedText = "Goal reached";
+  } else if (monthly > 0 && target > 0) {
+    const remaining = Math.max(0, target - current);
+    const months = Math.ceil(remaining / monthly);
+    monthsToGoal = months.toString();
+    const projected = addMonths(now, months);
+    projectedText = formatDate(projected);
+    onTrack = projected <= DEADLINE;
+    if (!onTrack) {
+      paceNote = "At this pace, you miss the 2027 deadline. Increase monthly savings or reduce target.";
+    } else {
+      paceNote = "On pace for the 2027 deadline.";
+    }
+  } else if (target > 0) {
+    paceNote = "Add a monthly savings rate to project a move-out date.";
+  }
+
+  el.projected.textContent = projectedText;
+  el.monthsRemaining.textContent = monthsToGoal;
+  el.message.textContent = getMessage(percent, onTrack);
+  el.paceNote.textContent = paceNote;
+
+  el.pill.textContent = onTrack ? "On Track" : "Behind Pace";
+  el.pill.style.borderColor = onTrack ? "rgba(0,255,136,0.4)" : "rgba(255,95,109,0.5)";
+  el.pill.style.background = onTrack ? "rgba(0,255,136,0.08)" : "rgba(255,95,109,0.08)";
+}
+
+async function loadData() {
+  try {
+    const res = await fetch(DATA_URL, { cache: "no-store" });
+    if (!res.ok) throw new Error("load failed");
+    const data = await res.json();
+    el.target.value = data.targetSavings ?? "";
+    el.current.value = data.currentSavings ?? "";
+    el.monthly.value = data.monthlySavings ?? "";
+    compute();
+  } catch (e) {
+    const local = localStorage.getItem("moveoutTracker");
+    if (local) {
+      const data = JSON.parse(local);
+      el.target.value = data.targetSavings ?? "";
+      el.current.value = data.currentSavings ?? "";
+      el.monthly.value = data.monthlySavings ?? "";
+      compute();
+    }
+  }
+}
+
+let saveTimer = null;
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveData, 500);
+}
+
+async function saveData() {
+  const payload = {
+    targetSavings: Number(el.target.value || 0),
+    currentSavings: Number(el.current.value || 0),
+    monthlySavings: Number(el.monthly.value || 0),
+    lastUpdated: new Date().toISOString().slice(0, 10),
+  };
+  localStorage.setItem("moveoutTracker", JSON.stringify(payload));
+  el.saveStatus.textContent = "Saving...";
+
+  try {
+    const res = await fetch(SAVE_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error("save failed");
+    el.saveStatus.textContent = "Saved";
+  } catch (e) {
+    el.saveStatus.textContent = "Saved locally";
+  }
+  setTimeout(() => { el.saveStatus.textContent = ""; }, 2000);
+}
+
+el.target.addEventListener("input", () => { compute(); scheduleSave(); });
+el.current.addEventListener("input", () => { compute(); scheduleSave(); });
+el.monthly.addEventListener("input", () => { compute(); scheduleSave(); });
+el.saveBtn.addEventListener("click", saveData);
+
+loadData();
+</script>
+</body>
+</html>

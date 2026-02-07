@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin | Matt Gibson Photography</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body class="admin-body">
+  <header class="admin-header">
+    <div class="container admin-header-inner">
+      <div>
+        <h1>Admin Panel</h1>
+        <p>Update content and gallery order in real time.</p>
+      </div>
+      <a class="btn ghost" href="/">Back to site</a>
+    </div>
+  </header>
+
+  <main class="admin-main">
+    <section class="section">
+      <div class="container admin-grid">
+        <div class="admin-card">
+          <h2>Hero + About</h2>
+          <form action="{{ url_for('admin_settings') }}" method="post" class="admin-form">
+            <label>
+              Tagline
+              <input type="text" name="tagline" value="{{ settings['tagline'] }}" required />
+            </label>
+            <label>
+              Bio
+              <textarea name="bio" rows="6" required>{{ settings['bio'] }}</textarea>
+            </label>
+            <button class="btn primary" type="submit">Save settings</button>
+          </form>
+        </div>
+
+        <div class="admin-card">
+          <h2>Services</h2>
+          <form action="{{ url_for('admin_services') }}" method="post" class="admin-form">
+            <div class="checkbox-grid">
+              {% for service in services %}
+              <label class="checkbox-item">
+                <input type="checkbox" name="service" value="{{ service['id'] }}" {% if service['enabled'] %}checked{% endif %} />
+                <span>{{ service['name'] }}</span>
+              </label>
+              {% endfor %}
+            </div>
+            <button class="btn primary" type="submit">Update services</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt">
+      <div class="container">
+        <div class="admin-card">
+          <h2>Gallery</h2>
+          <form action="{{ url_for('admin_add_photo') }}" method="post" class="admin-form inline">
+            <label class="grow">
+              Photo URL
+              <input type="url" name="url" placeholder="https://..." required />
+            </label>
+            <button class="btn primary" type="submit">Add photo</button>
+          </form>
+          <p class="admin-hint">Drag and drop to reorder. Changes save automatically.</p>
+          <div class="admin-gallery" id="adminGallery">
+            {% for photo in photos %}
+            <div class="admin-photo" draggable="true" data-id="{{ photo['id'] }}">
+              <img src="{{ photo['url'] }}" alt="Photo {{ loop.index }}" />
+              <form action="{{ url_for('admin_delete_photo', photo_id=photo['id']) }}" method="post">
+                <button class="btn danger" type="submit">Remove</button>
+              </form>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const gallery = document.getElementById('adminGallery');
+    let dragged = null;
+
+    const persistOrder = async () => {
+      const order = Array.from(gallery.querySelectorAll('[data-id]')).map(el => parseInt(el.dataset.id, 10));
+      await fetch('{{ url_for('admin_reorder') }}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order })
+      });
+    };
+
+    gallery.addEventListener('dragstart', (event) => {
+      dragged = event.target.closest('.admin-photo');
+      if (dragged) {
+        dragged.classList.add('dragging');
+      }
+    });
+
+    gallery.addEventListener('dragend', () => {
+      if (dragged) {
+        dragged.classList.remove('dragging');
+        dragged = null;
+        persistOrder();
+      }
+    });
+
+    gallery.addEventListener('dragover', (event) => {
+      event.preventDefault();
+      const target = event.target.closest('.admin-photo');
+      if (!target || target === dragged) return;
+      const rect = target.getBoundingClientRect();
+      const next = (event.clientY - rect.top) / rect.height > 0.5;
+      gallery.insertBefore(dragged, next ? target.nextSibling : target);
+    });
+  </script>
+</body>
+</html>

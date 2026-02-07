@@ -1,0 +1,41 @@
+# Flight Search Configuration
+# Copy this to config.yaml and fill in your API keys
+
+# Primary provider (amadeus, kiwi, or serpapi)
+default_provider: amadeus
+
+# Amadeus API (recommended)
+# Sign up: https://developers.amadeus.com
+amadeus:
+  api_key: YOUR_AMADEUS_API_KEY
+  api_secret: YOUR_AMADEUS_API_SECRET
+  # Use 'test' for free tier, 'production' for paid
+  environment: test
+
+# Kiwi.com Tequila API (great for budget carriers)  
+# Sign up: https://tequila.kiwi.com
+kiwi:
+  api_key: YOUR_KIWI_API_KEY
+  # Affiliate ID for booking links (optional, earns commission)
+  affiliate_id: null
+
+# SerpAPI for Google Flights data
+# Sign up: https://serpapi.com  
+serpapi:
+  api_key: YOUR_SERPAPI_KEY
+
+# Search defaults
+defaults:
+  currency: USD
+  max_results: 10
+  # Cabin class: economy, premium_economy, business, first
+  cabin_class: economy
+  # Include budget carriers (Ryanair, Spirit, etc.)
+  include_budget: true
+
+# Price alerts
+alerts:
+  # Where to store alert data
+  storage_path: ~/.flight_alerts.json
+  # Check frequency in hours (for cron job)
+  check_interval: 6

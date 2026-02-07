@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-02-06T23:25:03.827584",
+  "checks": {
+    "gmail": {
+      "status": "ok",
+      "message": "Gmail accessible"
+    },
+    "google_calendar": {
+      "status": "ok",
+      "message": "Calendar API working"
+    },
+    "whoop": {
+      "status": "ok",
+      "message": "Whoop refreshed"
+    }
+  },
+  "all_ok": true,
+  "alerts": []
+}

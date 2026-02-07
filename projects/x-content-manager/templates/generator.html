@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% set title = "Content Generator - X Content Manager" %}
+
+{% block content %}
+<section class="card">
+  <h2>Caption Generator</h2>
+  <form method="post" class="form">
+    <div class="field">
+      <label>Topic or photo description</label>
+      <input type="text" name="topic" value="{{ topic }}" placeholder="Golden hour beach session" />
+    </div>
+    <button type="submit" class="primary">Generate Ideas</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Suggestions</h2>
+  {% if suggestions %}
+    <ul class="list">
+      {% for suggestion in suggestions %}
+        <li>
+          <p>{{ suggestion }}</p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="muted">Enter a topic to get three caption options.</p>
+  {% endif %}
+</section>
+{% endblock %}

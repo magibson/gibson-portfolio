@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ title or "X Content Manager" }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">XM</div>
+      <div>
+        <h1>X Content Manager</h1>
+        <p>@mattgibsonpics</p>
+      </div>
+    </div>
+    <nav>
+      <a href="{{ url_for('dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('drafts') }}">Draft Queue</a>
+      <a href="{{ url_for('threads') }}">Thread Composer</a>
+      <a href="{{ url_for('generator') }}">Content Generator</a>
+    </nav>
+  </header>
+
+  <main>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash">
+          {% for message in messages %}
+            <span>{{ message }}</span>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <script>
+    function updateCounter(textarea) {
+      const max = parseInt(textarea.dataset.max, 10);
+      const counter = textarea.closest('.field').querySelector('.counter');
+      if (!counter) return;
+      const remaining = max - textarea.value.length;
+      counter.textContent = `${remaining} chars left`;
+      counter.classList.toggle('over', remaining < 0);
+    }
+
+    document.querySelectorAll('textarea[data-max]').forEach((textarea) => {
+      updateCounter(textarea);
+      textarea.addEventListener('input', () => updateCounter(textarea));
+    });
+  </script>
+</body>
+</html>

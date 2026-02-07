@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Matt Gibson Photography</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
+  <header class="hero">
+    <div class="container hero-inner">
+      <p class="hero-label">@mattgibsonpics</p>
+      <h1>Matt Gibson Photography</h1>
+      <p class="hero-tagline">{{ settings['tagline'] }}</p>
+      <div class="hero-actions">
+        <a class="btn primary" href="#contact">Book a session</a>
+        <a class="btn ghost" href="#gallery">View gallery</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="gallery" class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Gallery</h2>
+          <p>Selections from recent work across portraits, events, and real estate.</p>
+        </div>
+        <div class="gallery-grid">
+          {% for photo in photos %}
+          <figure class="gallery-item">
+            <img src="{{ photo['url'] }}" alt="Portfolio image {{ loop.index }}" loading="lazy" />
+          </figure>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="section alt">
+      <div class="container about-grid">
+        <div>
+          <h2>About Matt</h2>
+          <p class="about-text">{{ settings['bio'].replace('\n', '<br />') | safe }}</p>
+        </div>
+        <div class="about-card">
+          <h3>Based in New Jersey</h3>
+          <p>Available for travel across the Tri-State area for editorial, commercial, and private sessions.</p>
+          <div class="badge-row">
+            <span>Portraits</span>
+            <span>Events</span>
+            <span>Real Estate</span>
+            <span>Headshots</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="services" class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Services</h2>
+          <p>Custom packages tailored for individuals, teams, and brands.</p>
+        </div>
+        <div class="services-grid">
+          {% for service in services %}
+          <div class="service-card">
+            <h3>{{ service['name'] }}</h3>
+            <p>Elevated imagery designed to highlight your story with clarity and style.</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="section alt">
+      <div class="container contact-grid">
+        <div>
+          <h2>Let's work together</h2>
+          <p>Ready to plan your next shoot? Reach out with your ideas and timeline.</p>
+        </div>
+        <div class="contact-card">
+          <p class="contact-label">Email</p>
+          <a class="contact-link" href="mailto:hello@mattgibsonpics.com">hello@mattgibsonpics.com</a>
+          <p class="contact-label">Instagram</p>
+          <a class="contact-link" href="https://instagram.com/mattgibsonpics" target="_blank" rel="noreferrer">@mattgibsonpics</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>(c) 2026 Matt Gibson Photography. All rights reserved.</p>
+      <a class="footer-link" href="/admin">Admin</a>
+    </div>
+  </footer>
+</body>
+</html>

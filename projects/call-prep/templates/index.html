@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Call Prep Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-title">Call Prep Dashboard</div>
+      <div class="brand-sub">Mortgage Protection | Cold Call Preparation</div>
+    </div>
+    <div class="filters">
+      <label class="input-wrap">
+        <span>Search Name</span>
+        <input id="searchInput" type="text" placeholder="Type a name" autocomplete="off">
+      </label>
+      <label class="input-wrap">
+        <span>Filter City</span>
+        <select id="cityFilter">
+          <option value="">All Cities</option>
+          {% for city in cities %}
+          <option value="{{ city }}">{{ city }}</option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+  </header>
+
+  <main class="content">
+    <section class="lead-grid" id="leadGrid">
+      {% for lead in leads %}
+      <article class="lead-card" data-name="{{ lead.name|lower }}" data-city="{{ lead.city|lower }}">
+        <div class="lead-header">
+          <div class="lead-name">{{ lead.name }}</div>
+          {% if lead.primary_phone %}
+          <a class="call-btn" href="tel:{{ lead.primary_phone }}">Call {{ lead.primary_phone }}</a>
+          {% endif %}
+        </div>
+        <div class="lead-meta">
+          <div class="lead-line">{{ lead.address }}{% if lead.address and lead.city %}, {% endif %}{{ lead.city }}</div>
+          <div class="lead-line">
+            {% if lead.value %}<span>Value {{ "${:,.0f}".format(lead.value) }}</span>{% endif %}
+            {% if lead.beds %}<span>{{ lead.beds }} Beds</span>{% endif %}
+            {% if lead.baths %}<span>{{ lead.baths }} Baths</span>{% endif %}
+            {% if lead.sqft %}<span>{{ "{:,}".format(lead.sqft) }} SqFt</span>{% endif %}
+          </div>
+          {% if lead.months %}
+          <div class="lead-line">Months owned: {{ lead.months }}</div>
+          {% endif %}
+          {% if lead.phone_type %}
+          <div class="lead-line">Phone type: {{ lead.phone_type }}</div>
+          {% endif %}
+          {% if lead.alt_phone %}
+          <div class="lead-line">Alt: <a href="tel:{{ lead.alt_phone }}">{{ lead.alt_phone }}</a></div>
+          {% endif %}
+          {% if lead.email %}
+          <div class="lead-line">Email: <a href="mailto:{{ lead.email }}">{{ lead.email }}</a></div>
+          {% endif %}
+        </div>
+        <div class="talking-points">
+          <div class="talking-title">Personalized Talking Points</div>
+          <ul>
+            {% for point in lead.talking_points %}
+            <li>{{ point }}</li>
+            {% endfor %}
+          </ul>
+          <div class="opening-line">
+            <div class="opening-label">Opening line</div>
+            <div class="opening-text">{{ lead.opening_line }}</div>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </section>
+
+    <aside class="quick-panel">
+      <details open>
+        <summary>Quick Reference Panel</summary>
+        <div class="panel-content">
+          <div class="panel-section">
+            <div class="panel-title">Mortgage Protection Benefits</div>
+            <ul>
+              <li>Keep the family in the home if income is disrupted.</li>
+              <li>Coverage that tracks the mortgage balance.</li>
+              <li>Affordable monthly payments compared to term options.</li>
+              <li>Fast claims support to avoid missed payments.</li>
+            </ul>
+          </div>
+          <div class="panel-section">
+            <div class="panel-title">Common Objections & Responses</div>
+            <ul>
+              <li>"I already have coverage." → "Great — is it designed to pay the mortgage directly?"</li>
+              <li>"Not interested." → "Totally fair — quick question: would your family be okay with the payment if something happened?"</li>
+              <li>"Too expensive." → "Most plans are less than one utility bill — want a quick range?"</li>
+              <li>"Call me later." → "Happy to — what day is better, Tuesday or Thursday?"</li>
+            </ul>
+          </div>
+          <div class="panel-section">
+            <div class="panel-title">Closing Phrases</div>
+            <ul>
+              <li>"Let’s get you a quick quote so you can decide."</li>
+              <li>"If the payment is comfortable, do you want to lock it in?"</li>
+              <li>"Would you prefer a 15-year or 30-year style plan?"</li>
+              <li>"I can email the details — what’s the best address?"</li>
+            </ul>
+          </div>
+        </div>
+      </details>
+    </aside>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

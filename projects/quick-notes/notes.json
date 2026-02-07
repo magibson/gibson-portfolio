@@ -1,0 +1,28 @@
+{
+  "notes": [
+    {
+      "id": 1,
+      "text": "Finish OpenTable setup - Matt needs to run sudo apt install for browser deps",
+      "category": "followup",
+      "priority": "high",
+      "created": "2026-01-29T06:00:00",
+      "done": false
+    },
+    {
+      "id": 2,
+      "text": "Check xAI Grok Imagine API - is it free?",
+      "category": "followup",
+      "priority": "normal",
+      "created": "2026-01-29T06:00:00",
+      "done": false
+    },
+    {
+      "id": 3,
+      "text": "Fix Whoop integration - OAuth was broken on their end",
+      "category": "reminder",
+      "priority": "normal",
+      "created": "2026-01-29T06:00:00",
+      "done": false
+    }
+  ]
+}

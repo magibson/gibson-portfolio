@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% set title = "Thread - X Content Manager" %}
+
+{% block content %}
+<section class="card">
+  <div class="thread-header">
+    <h2>{{ thread.title }}</h2>
+    <a href="{{ url_for('threads') }}" class="button">Back to Threads</a>
+  </div>
+
+  <form method="post" action="{{ url_for('add_thread_item', thread_id=thread.id) }}" class="form">
+    <div class="field">
+      <label>Add tweet</label>
+      <textarea name="content" rows="3" maxlength="280" data-max="280" placeholder="Tweet text..."></textarea>
+      <div class="counter"></div>
+    </div>
+    <button type="submit" class="primary">Add to Thread</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Thread Items</h2>
+  {% if items %}
+    <ul class="list">
+      {% for item in items %}
+        <li>
+          <div>
+            <strong>Tweet {{ loop.index }}</strong>
+            <p>{{ item.content }}</p>
+          </div>
+          <div class="actions">
+            <form method="post" action="{{ url_for('move_thread_item', thread_id=thread.id, item_id=item.id, direction='up') }}">
+              <button type="submit">Up</button>
+            </form>
+            <form method="post" action="{{ url_for('move_thread_item', thread_id=thread.id, item_id=item.id, direction='down') }}">
+              <button type="submit">Down</button>
+            </form>
+            <form method="post" action="{{ url_for('delete_thread_item', thread_id=thread.id, item_id=item.id) }}">
+              <button type="submit" class="ghost">Remove</button>
+            </form>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="muted">No tweets yet. Start adding above.</p>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>Preview</h2>
+  {% if items %}
+    <div class="thread-preview">
+      {% for item in items %}
+        <div class="tweet">
+          <span class="pill">{{ loop.index }}</span>
+          <p>{{ item.content }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="muted">Thread preview will appear here.</p>
+  {% endif %}
+</section>
+{% endblock %}

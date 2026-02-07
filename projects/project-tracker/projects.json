@@ -1,0 +1,85 @@
+{
+  "projects": [
+    {
+      "name": "morning-dashboard",
+      "description": "JARVIS-style personal dashboard with weather, calendar, tasks, portfolio, packages",
+      "location": "/home/clawd/clawd/projects/morning-dashboard",
+      "status": "active",
+      "notes": "Accessible via Tailscale at http://100.83.250.65:8080",
+      "created": "2026-01-28T00:00:00",
+      "last_updated": "2026-01-29T02:55:00"
+    },
+    {
+      "name": "linkedin-generator",
+      "description": "Weekly LinkedIn content generator for financial advisors",
+      "location": "/home/clawd/clawd/projects/linkedin-generator",
+      "status": "active",
+      "notes": "Cron job runs Thursdays 7 AM Eastern",
+      "created": "2026-01-27T00:00:00",
+      "last_updated": "2026-01-28T23:26:00"
+    },
+    {
+      "name": "reservations",
+      "description": "Unified dinner reservation system (Resy API, OpenTable, Yelp)",
+      "location": "/home/clawd/clawd/integrations/reservations",
+      "status": "in-progress",
+      "notes": "Yelp configured \u2713. OpenTable needs browser deps (Matt to run sudo apt install). Resy not started.",
+      "created": "2026-01-28T16:15:00",
+      "last_updated": "2026-01-29T03:20:00"
+    },
+    {
+      "name": "apartment-finder",
+      "description": "Apartment search dashboard for Shrewsbury/Red Bank area",
+      "location": "/home/clawd/clawd/projects/apartment-finder",
+      "status": "active",
+      "notes": "Scrapes Apartments.com, Zillow, Craigslist. Has list/grid/map views.",
+      "created": "2026-01-28T00:00:00",
+      "last_updated": "2026-01-28T15:26:00"
+    },
+    {
+      "name": "warn-tracker",
+      "description": "WARN Act layoff tracker for prospecting (NJ/PA)",
+      "location": "/home/clawd/clawd/projects/warn-tracker",
+      "status": "active",
+      "notes": "Daily cron at 6 AM Eastern. Alerts for 100+ employee layoffs.",
+      "created": "2026-01-28T00:00:00",
+      "last_updated": "2026-01-28T17:14:00"
+    },
+    {
+      "name": "gibson-portfolio",
+      "description": "Matt's photography portfolio website",
+      "location": "/home/clawd/clawd/projects/gibson-portfolio",
+      "status": "active",
+      "notes": "Deployed on Netlify. Dev branch workflow. SEO optimized.",
+      "created": "2026-01-28T00:00:00",
+      "last_updated": "2026-01-29T00:00:00"
+    },
+    {
+      "name": "jarvis-voice",
+      "description": "Push-to-talk voice interface with cloned Jarvis voice",
+      "location": "Mac: jarvis-menubar.py / VPS: jarvis-voice-server-secure.py",
+      "status": "paused",
+      "notes": "Working but TTS disabled to save costs. Can reactivate later.",
+      "created": "2026-01-27T00:00:00",
+      "last_updated": "2026-01-27T23:00:00"
+    },
+    {
+      "name": "quick-notes",
+      "description": "Fast note capture CLI for ideas, reminders, follow-ups",
+      "location": "/home/clawd/clawd/projects/quick-notes",
+      "status": "active",
+      "notes": "Built overnight 2026-01-29",
+      "created": "2026-01-29T08:00:57.880631",
+      "last_updated": "2026-01-29T08:00:57.880649"
+    },
+    {
+      "name": "project-tracker",
+      "description": "CLI to track all active projects with status and notes",
+      "location": "/home/clawd/clawd/projects/project-tracker",
+      "status": "active",
+      "notes": "Built overnight 2026-01-29",
+      "created": "2026-01-29T08:01:01.768847",
+      "last_updated": "2026-01-29T08:01:01.768870"
+    }
+  ]
+}

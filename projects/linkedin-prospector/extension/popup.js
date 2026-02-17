@@ -1,4 +1,5 @@
 // Jarvis Prospector — Popup Script
+// Uses chrome.storage.local for state persistence across page reloads
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -43,7 +44,7 @@ async function checkServerConnection() {
   }
 }
 
-// Check current tab status
+// Check current tab status — polls storage-based state
 async function checkPageStatus() {
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -61,21 +62,54 @@ async function checkPageStatus() {
         $('#btnScrape').disabled = true;
         return;
       }
-      if (resp.isSearchPage) {
-        $('#pageStatus').textContent = resp.isScraping
-          ? `Scraping in progress... (${resp.leadsFound} leads)`
-          : 'Ready to scrape this search.';
-        $('#pageStatus').className = 'page-status ready';
-        $('#btnScrape').disabled = resp.isScraping;
-        if (resp.isScraping) {
-          $('#btnStop').style.display = '';
-          $('#btnScrape').style.display = 'none';
-        }
-      } else {
+
+      if (!resp.isSearchPage) {
         $('#pageStatus').textContent = 'This is not a search results page.';
         $('#pageStatus').className = 'page-status error';
         $('#btnScrape').disabled = true;
+        return;
       }
+
+      if (resp.isScraping) {
+        // Scrape in progress (multi-page, navigating between pages)
+        $('#pageStatus').textContent = `Scraping in progress... page ${resp.currentPage} of ${resp.totalPages} (${resp.leadsFound} leads so far)`;
+        $('#pageStatus').className = 'page-status ready';
+        $('#btnScrape').style.display = 'none';
+        $('#btnStop').style.display = '';
+        $('#progress').style.display = '';
+        const pct = Math.round(((resp.currentPage - 1) / resp.totalPages) * 100);
+        $('#progressFill').style.width = pct + '%';
+        $('#progressText').textContent = `Page ${resp.currentPage} of ${resp.totalPages}... (${resp.leadsFound} leads)`;
+        return;
+      }
+
+      if (resp.completed && resp.leads && resp.leads.length > 0) {
+        // Scrape completed — show results
+        collectedLeads = resp.leads;
+        if (resp.searchName) {
+          collectedLeads.forEach(l => l.search_name = resp.searchName);
+        }
+        $('#pageStatus').textContent = `Scrape complete! ${resp.totalLeads} leads ready.`;
+        $('#pageStatus').className = 'page-status ready';
+        $('#btnScrape').style.display = '';
+        $('#btnScrape').disabled = false;
+        $('#btnScrape').textContent = 'Scrape Again';
+        $('#btnStop').style.display = 'none';
+        $('#progress').style.display = 'none';
+        $('#stats').style.display = 'flex';
+        $('#statLeads').textContent = resp.totalLeads;
+        $('#btnSend').disabled = false;
+        return;
+      }
+
+      // Ready to scrape
+      $('#pageStatus').textContent = 'Ready to scrape this search.';
+      $('#pageStatus').className = 'page-status ready';
+      $('#btnScrape').style.display = '';
+      $('#btnScrape').disabled = false;
+      $('#btnScrape').textContent = 'Start Scraping';
+      $('#btnStop').style.display = 'none';
+      $('#progress').style.display = 'none';
     });
   } catch (err) {
     $('#pageStatus').textContent = 'Error checking page status.';
@@ -84,6 +118,9 @@ async function checkPageStatus() {
 }
 
 checkPageStatus();
+
+// Poll status every 2 seconds (since page reloads kill message listeners)
+const statusInterval = setInterval(checkPageStatus, 2000);
 
 // Start scraping
 $('#btnScrape').addEventListener('click', async () => {
@@ -97,10 +134,16 @@ $('#btnScrape').addEventListener('click', async () => {
   $('#stats').style.display = 'none';
   $('#sendResult').style.display = 'none';
   $('#btnSend').disabled = true;
+  $('#progressText').textContent = 'Starting scrape...';
+  $('#progressFill').style.width = '0%';
 
-  chrome.tabs.sendMessage(tab.id, {
-    type: 'START_SCRAPE',
-    maxPages: settings.maxPages
+  // Clear previous state first
+  chrome.tabs.sendMessage(tab.id, { type: 'CLEAR_STATE' }, () => {
+    chrome.tabs.sendMessage(tab.id, {
+      type: 'START_SCRAPE',
+      maxPages: settings.maxPages,
+      searchName: settings.searchName
+    });
   });
 });
 
@@ -109,34 +152,6 @@ $('#btnStop').addEventListener('click', async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab) return;
   chrome.tabs.sendMessage(tab.id, { type: 'STOP_SCRAPE' });
-});
-
-// Listen for messages from content script
-chrome.runtime.onMessage.addListener((msg) => {
-  if (msg.type === 'SCRAPE_PROGRESS') {
-    const d = msg.data;
-    const pct = Math.round((d.currentPage / d.totalPages) * 100);
-    $('#progressFill').style.width = pct + '%';
-    $('#progressText').textContent = `Scraping page ${d.currentPage} of ${d.totalPages}... (${d.leadsFound} leads found)`;
-  }
-
-  else if (msg.type === 'SCRAPE_COMPLETE') {
-    const d = msg.data;
-    collectedLeads = d.leads;
-
-    // Tag leads with search name
-    if (settings.searchName) {
-      collectedLeads.forEach(l => l.search_name = settings.searchName);
-    }
-
-    $('#btnScrape').style.display = '';
-    $('#btnScrape').disabled = false;
-    $('#btnStop').style.display = 'none';
-    $('#progress').style.display = 'none';
-    $('#stats').style.display = 'flex';
-    $('#statLeads').textContent = d.totalLeads;
-    $('#btnSend').disabled = d.totalLeads === 0;
-  }
 });
 
 // Send leads to server
@@ -164,6 +179,10 @@ $('#btnSend').addEventListener('click', async () => {
       $('#statDupes').textContent = data.duplicates || 0;
       $('#sendResult').textContent = `✓ Sent! ${data.new || 0} new leads added, ${data.duplicates || 0} duplicates skipped.`;
       $('#sendResult').className = 'send-result success';
+
+      // Clear scrape state after successful send
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (tab) chrome.tabs.sendMessage(tab.id, { type: 'CLEAR_STATE' });
     } else {
       throw new Error(data.error || 'Server error');
     }
@@ -177,5 +196,5 @@ $('#btnSend').addEventListener('click', async () => {
   $('#btnSend').textContent = 'Send to Jarvis';
 });
 
-// Refresh status periodically
+// Refresh server connection periodically
 setInterval(checkServerConnection, 30000);

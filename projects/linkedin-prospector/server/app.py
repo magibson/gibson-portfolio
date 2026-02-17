@@ -86,12 +86,55 @@ def row_to_dict(row):
 # ---------------------------------------------------------------------------
 
 SYSTEM_PROMPT = (
-    "You are writing a LinkedIn DM for Matt Gibson, a financial advisor at "
-    "New York Life in Monmouth County, NJ. Write a short, personalized connection "
-    "request or DM. Be casual, genuine, not salesy. Reference something specific "
-    "about the prospect (their role, company, job change, location). Goal is to "
-    "start a conversation, not pitch. No emojis. No hashtags."
+    "You are writing a LinkedIn message for Matt Gibson, a financial advisor at "
+    "New York Life in Monmouth County, NJ. Be casual, genuine, not salesy. "
+    "Goal is to start a conversation, not pitch. No emojis. No hashtags. "
+    "Keep it natural — like a real person reaching out, not a template."
 )
+
+# Search-specific instructions for message tailoring
+SEARCH_CONTEXT = {
+    'local job changes': (
+        "This prospect recently changed jobs. Congratulate them on the new role. "
+        "Mention that career transitions are a great time to review financial plans "
+        "(benefits, retirement rollover, etc.) but do NOT pitch — just open the door. "
+        "Keep it warm and congratulatory first."
+    ),
+    'job change': (
+        "This prospect recently changed jobs. Congratulate them on the new role. "
+        "Mention that career transitions are a great time to review financial plans "
+        "but do NOT pitch — just open the door."
+    ),
+    'federal employee': (
+        "This prospect works for a federal agency. With current government uncertainty, "
+        "many federal employees are reviewing their benefits. Reference FEGLI, TSP, or "
+        "FERS naturally. Be empathetic, not fear-mongering."
+    ),
+    'young families': (
+        "This prospect likely has a growing family. Reference the juggle of financial "
+        "priorities — protecting the family, saving for college, building wealth. "
+        "Be relatable and genuine."
+    ),
+    'high earner': (
+        "This prospect is a senior professional. Reference the complexity of financial "
+        "planning at their level — tax optimization, estate planning, retirement timeline. "
+        "Be peer-level, not salesy."
+    ),
+    'default': (
+        "Reference something specific about the prospect — their role, company, or location. "
+        "Find common ground. Keep it conversational."
+    )
+}
+
+def get_search_context(search_name):
+    """Match a search name to the appropriate messaging context."""
+    if not search_name:
+        return SEARCH_CONTEXT['default']
+    name_lower = search_name.lower()
+    for key, context in SEARCH_CONTEXT.items():
+        if key in name_lower:
+            return context
+    return SEARCH_CONTEXT['default']
 
 def generate_drafts(lead):
     """Generate connection request + follow-up DM for a lead using Gemini."""
@@ -105,10 +148,15 @@ def generate_drafts(lead):
         f"Connection: {lead['connection_degree']}"
     )
 
+    search_context = get_search_context(lead['search_name'])
+    
     drafts = {}
     for draft_type, max_chars in [('connection_request', 300), ('follow_up_dm', 500)]:
-        label = "connection request (under 300 characters)" if draft_type == 'connection_request' else "follow-up DM after they accept (under 500 characters)"
-        prompt = f"Write a {label} for this prospect:\n\n{lead_info}"
+        if draft_type == 'connection_request':
+            label = "LinkedIn connection request message (MUST be under 300 characters — this is a hard limit)"
+        else:
+            label = "follow-up DM to send after they accept the connection (under 500 characters)"
+        prompt = f"Context about this search: {search_context}\n\nWrite a {label} for this prospect:\n\n{lead_info}"
 
         try:
             resp = requests.post(GEMINI_URL, json={

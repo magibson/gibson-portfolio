@@ -203,42 +203,85 @@
 
   // Click to the next page
   async function goToNextPage() {
-    // Look for the "Next" button — try many selectors
+    // Scroll to bottom first so pagination is visible
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    await randomDelay(1000, 2000);
+
+    // Method 1: Find any element containing "Next" text in the pagination area
+    const allElements = document.querySelectorAll('button, a');
+    for (const el of allElements) {
+      const text = el.textContent.trim();
+      if (text === 'Next' || text === 'Next >' || text === 'Next›') {
+        if (!el.disabled && !el.classList.contains('disabled') && !el.getAttribute('aria-disabled')) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          await randomDelay(500, 1000);
+          el.click();
+          await randomDelay(3000, 6000);
+          await waitForResults();
+          return true;
+        }
+      }
+    }
+
+    // Method 2: Try specific selectors
     const selectors = [
       'button.artdeco-pagination__button--next',
       'button[aria-label="Next"]',
-      'button[aria-label="next"]',
       'button[class*="pagination__button--next"]',
-      // Sales Nav sometimes uses li > button
-      'li.artdeco-pagination__indicator--next button',
-      // Generic last button in pagination nav
-      'nav[aria-label*="pagination"] button:last-of-type',
-      'nav[aria-label*="Pagination"] button:last-of-type'
+      'li.artdeco-pagination__indicator--next button'
     ];
 
     for (const sel of selectors) {
       const btn = document.querySelector(sel);
-      if (btn && !btn.disabled && !btn.getAttribute('aria-disabled')) {
-        // Scroll to pagination area first (Sales Nav requires it visible)
+      if (btn && !btn.disabled) {
         btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
         await randomDelay(500, 1000);
         btn.click();
-        // Wait for page content to load
-        await randomDelay(3000, 5000);
-        // Wait for results to appear
+        await randomDelay(3000, 6000);
         await waitForResults();
         return true;
       }
     }
 
-    // Fallback: try incrementing page number in URL
+    // Method 3: Find the current active page number and click the next one
+    const pageButtons = document.querySelectorAll('button');
+    let foundActive = false;
+    for (const btn of pageButtons) {
+      const text = btn.textContent.trim();
+      if (foundActive && /^\d+$/.test(text)) {
+        // This is the next page number button
+        btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        await randomDelay(500, 1000);
+        btn.click();
+        await randomDelay(3000, 6000);
+        await waitForResults();
+        return true;
+      }
+      // Check if this is the active/selected page
+      if (/^\d+$/.test(text) && (
+        btn.classList.contains('active') || 
+        btn.classList.contains('selected') ||
+        btn.getAttribute('aria-current') === 'true' ||
+        btn.style.fontWeight === 'bold' ||
+        getComputedStyle(btn).fontWeight >= 600
+      )) {
+        foundActive = true;
+      }
+    }
+
+    // Method 4: Fallback — increment page in URL
     const url = new URL(window.location.href);
     const currentPage = parseInt(url.searchParams.get('page') || '1', 10);
-    url.searchParams.set('page', currentPage + 1);
-    window.location.href = url.toString();
-    await randomDelay(3000, 6000);
-    await waitForResults();
-    return true;
+    const totalPages = getTotalPages();
+    if (currentPage < totalPages) {
+      url.searchParams.set('page', currentPage + 1);
+      window.location.href = url.toString();
+      await randomDelay(4000, 7000);
+      await waitForResults();
+      return true;
+    }
+
+    return false;
   }
 
   // Wait for search results to load

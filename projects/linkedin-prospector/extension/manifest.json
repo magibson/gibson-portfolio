@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Jarvis Prospector",
+  "version": "1.0.0",
+  "description": "LinkedIn Sales Navigator lead scraping for Jarvis",
+  "permissions": ["activeTab", "storage", "scripting"],
+  "content_scripts": [
+    {
+      "matches": ["https://www.linkedin.com/sales/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Jarvis Prospector"
+  },
+  "icons": {
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

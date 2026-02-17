@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jarvis Prospector</title>
+<style>
+:root { --bg: #0f172a; --card: #1e293b; --border: #334155; --blue: #3b82f6; --green: #22c55e; --red: #ef4444; --yellow: #eab308; --text: #e2e8f0; --muted: #94a3b8; --dim: #64748b; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+h1 { font-size: 24px; color: var(--blue); }
+.header-actions { display: flex; gap: 8px; }
+.btn { padding: 8px 16px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.btn-blue { background: var(--blue); color: white; }
+.btn-blue:hover { background: #2563eb; }
+.btn-sm { padding: 4px 10px; font-size: 12px; border-radius: 6px; }
+.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+.btn-outline:hover { border-color: var(--blue); color: var(--blue); }
+
+/* Stats Cards */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.stat-card { background: var(--card); border-radius: 12px; padding: 16px; text-align: center; }
+.stat-card .num { font-size: 32px; font-weight: 700; color: var(--blue); }
+.stat-card .label { font-size: 12px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+
+/* Filters */
+.filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+.filters select, .filters input { padding: 6px 10px; background: var(--card); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 13px; }
+.filters select:focus, .filters input:focus { outline: none; border-color: var(--blue); }
+
+/* Lead Table */
+.table-wrap { background: var(--card); border-radius: 12px; overflow: hidden; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { background: #16213e; padding: 10px 12px; text-align: left; color: var(--dim); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; user-select: none; }
+th:hover { color: var(--blue); }
+td { padding: 10px 12px; border-top: 1px solid var(--border); }
+tr:hover { background: rgba(59,130,246,0.05); }
+.lead-name { color: var(--blue); font-weight: 600; cursor: pointer; }
+.lead-name:hover { text-decoration: underline; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+.badge-new { background: #1e3a5f; color: #60a5fa; }
+.badge-contacted { background: #3b3a1a; color: var(--yellow); }
+.badge-replied { background: #1a3b2a; color: var(--green); }
+.badge-meeting_set { background: #0d3320; color: #34d399; }
+.badge-not_interested { background: #3b1c1c; color: #f87171; }
+.score { display: inline-block; width: 36px; text-align: center; padding: 2px 0; border-radius: 6px; font-weight: 700; font-size: 12px; }
+.score-high { background: #0d3320; color: #34d399; }
+.score-med { background: #3b3a1a; color: var(--yellow); }
+.score-low { background: #3b1c1c; color: #f87171; }
+.msg-preview { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dim); font-size: 12px; }
+input[type=checkbox] { accent-color: var(--blue); }
+
+/* Expanded Lead Detail */
+.lead-detail { background: #16213e; padding: 16px; border-top: 1px solid var(--border); }
+.lead-detail h3 { margin-bottom: 8px; color: var(--blue); font-size: 14px; }
+.lead-detail .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; font-size: 13px; }
+.lead-detail .info-grid span.label { color: var(--dim); }
+.draft-box { background: var(--bg); border-radius: 8px; padding: 12px; margin-bottom: 8px; font-size: 13px; position: relative; white-space: pre-wrap; }
+.draft-box .copy-btn { position: absolute; top: 8px; right: 8px; }
+.draft-actions { display: flex; gap: 8px; margin-top: 8px; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .filters { flex-direction: column; }
+  table { font-size: 12px; }
+  .msg-preview { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>⚡ Jarvis Prospector</h1>
+    <div class="header-actions">
+      <button class="btn btn-outline" onclick="generateAllDrafts()">Generate All Drafts</button>
+      <button class="btn btn-blue" onclick="bulkAction('contacted')">Mark Selected Contacted</button>
+    </div>
+  </header>
+
+  <div class="stats" id="statsCards"></div>
+
+  <div class="filters">
+    <select id="filterStatus" onchange="loadLeads()">
+      <option value="">All Statuses</option>
+      <option value="new">New</option>
+      <option value="contacted">Contacted</option>
+      <option value="replied">Replied</option>
+      <option value="meeting_set">Meeting Set</option>
+      <option value="not_interested">Not Interested</option>
+    </select>
+    <input type="number" id="filterMinScore" placeholder="Min Score" min="0" max="100" style="width:90px" onchange="loadLeads()">
+    <input type="number" id="filterMaxScore" placeholder="Max Score" min="0" max="100" style="width:90px" onchange="loadLeads()">
+    <select id="filterSearch" onchange="loadLeads()"><option value="">All Searches</option></select>
+    <input type="date" id="filterDateFrom" onchange="loadLeads()">
+    <input type="date" id="filterDateTo" onchange="loadLeads()">
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="selectAll" onchange="toggleAll(this)"></th>
+          <th onclick="sortBy('score')">Score</th>
+          <th onclick="sortBy('name')">Name</th>
+          <th>Title</th>
+          <th>Company</th>
+          <th onclick="sortBy('status')">Status</th>
+          <th>Message</th>
+          <th onclick="sortBy('created_at')">Date</th>
+        </tr>
+      </thead>
+      <tbody id="leadsBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const API = '';
+let currentSort = 'created_at';
+let currentOrder = 'desc';
+let expandedId = null;
+let selectedIds = new Set();
+
+async function api(path, opts = {}) {
+  const r = await fetch(API + path, { headers: {'Content-Type':'application/json'}, ...opts });
+  return r.json();
+}
+
+async function loadStats() {
+  const d = await api('/api/dashboard');
+  document.getElementById('statsCards').innerHTML = `
+    <div class="stat-card"><div class="num">${d.total}</div><div class="label">Total Leads</div></div>
+    <div class="stat-card"><div class="num">${d.new_today}</div><div class="label">New Today</div></div>
+    <div class="stat-card"><div class="num">${d.contacted}</div><div class="label">Contacted</div></div>
+    <div class="stat-card"><div class="num">${d.meetings}</div><div class="label">Meetings Set</div></div>
+    <div class="stat-card"><div class="num">${d.response_rate}%</div><div class="label">Response Rate</div></div>
+  `;
+}
+
+async function loadSearches() {
+  const d = await api('/api/searches');
+  const sel = document.getElementById('filterSearch');
+  // Get unique search names from leads too
+  const leads = await api('/api/leads?limit=1000');
+  const names = new Set(leads.leads.map(l => l.search_name).filter(Boolean));
+  d.searches.forEach(s => names.add(s.name));
+  names.forEach(n => { const o = document.createElement('option'); o.value = n; o.textContent = n; sel.appendChild(o); });
+}
+
+async function loadLeads() {
+  const params = new URLSearchParams();
+  params.set('sort', currentSort);
+  params.set('order', currentOrder);
+  params.set('limit', '200');
+  const status = document.getElementById('filterStatus').value;
+  if (status) params.set('status', status);
+  const minS = document.getElementById('filterMinScore').value;
+  if (minS) params.set('min_score', minS);
+  const maxS = document.getElementById('filterMaxScore').value;
+  if (maxS) params.set('max_score', maxS);
+  const search = document.getElementById('filterSearch').value;
+  if (search) params.set('search_name', search);
+  const df = document.getElementById('filterDateFrom').value;
+  if (df) params.set('date_from', df);
+  const dt = document.getElementById('filterDateTo').value;
+  if (dt) params.set('date_to', dt);
+
+  const d = await api('/api/leads?' + params);
+  const body = document.getElementById('leadsBody');
+  body.innerHTML = '';
+  d.leads.forEach(l => {
+    const scoreClass = l.score >= 70 ? 'score-high' : l.score >= 40 ? 'score-med' : 'score-low';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="checkbox" data-id="${l.id}" onchange="toggleSelect(${l.id}, this)" ${selectedIds.has(l.id)?'checked':''}></td>
+      <td><span class="score ${scoreClass}">${l.score}</span></td>
+      <td><span class="lead-name" onclick="toggleDetail(${l.id})">${esc(l.name)}</span></td>
+      <td>${esc(l.title)}</td>
+      <td>${esc(l.company)}</td>
+      <td><span class="badge badge-${l.status}">${l.status}</span></td>
+      <td><div class="msg-preview">${esc(l.message_draft || '—')}</div></td>
+      <td style="color:var(--dim);font-size:12px">${l.created_at ? l.created_at.split('T')[0] : ''}</td>
+    `;
+    body.appendChild(tr);
+
+    if (expandedId === l.id) {
+      const detailTr = document.createElement('tr');
+      detailTr.innerHTML = `<td colspan="8">${renderDetail(l)}</td>`;
+      body.appendChild(detailTr);
+    }
+  });
+}
+
+function renderDetail(l) {
+  return `<div class="lead-detail">
+    <div class="info-grid">
+      <div><span class="label">Location:</span> ${esc(l.location)}</div>
+      <div><span class="label">Connection:</span> ${esc(l.connection_degree)}</div>
+      <div><span class="label">Time in Role:</span> ${esc(l.time_in_role)}</div>
+      <div><span class="label">Search:</span> ${esc(l.search_name)}</div>
+      <div><span class="label">Score Reason:</span> ${esc(l.score_reason)}</div>
+      <div><span class="label">LinkedIn:</span> <a href="${esc(l.linkedin_url)}" target="_blank" style="color:var(--blue)">${l.linkedin_url ? 'View Profile' : '—'}</a></div>
+    </div>
+    <h3>Connection Request</h3>
+    <div class="draft-box" id="draft1-${l.id}">${esc(l.message_draft || 'No draft yet.')}<button class="btn btn-sm btn-outline copy-btn" onclick="copyText('draft1-${l.id}')">Copy</button></div>
+    <h3>Follow-up DM</h3>
+    <div class="draft-box" id="draft2-${l.id}">${esc(l.message_draft_2 || 'No draft yet.')}<button class="btn btn-sm btn-outline copy-btn" onclick="copyText('draft2-${l.id}')">Copy</button></div>
+    <div class="draft-actions">
+      <button class="btn btn-sm btn-blue" onclick="generateDraft(${l.id})">Generate/Regenerate Drafts</button>
+      <select onchange="updateStatus(${l.id}, this.value)" style="padding:4px 8px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px">
+        <option value="">Change Status...</option>
+        <option value="new">New</option>
+        <option value="contacted">Contacted</option>
+        <option value="replied">Replied</option>
+        <option value="meeting_set">Meeting Set</option>
+        <option value="not_interested">Not Interested</option>
+      </select>
+    </div>
+    <div style="margin-top:8px">
+      <textarea placeholder="Notes..." style="width:100%;height:60px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px;font-size:13px;resize:vertical" onchange="updateNotes(${l.id}, this.value)">${esc(l.notes || '')}</textarea>
+    </div>
+  </div>`;
+}
+
+function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function sortBy(col) {
+  if (currentSort === col) currentOrder = currentOrder === 'desc' ? 'asc' : 'desc';
+  else { currentSort = col; currentOrder = 'desc'; }
+  loadLeads();
+}
+
+function toggleDetail(id) { expandedId = expandedId === id ? null : id; loadLeads(); }
+function toggleSelect(id, el) { el.checked ? selectedIds.add(id) : selectedIds.delete(id); }
+function toggleAll(el) { document.querySelectorAll('#leadsBody input[type=checkbox]').forEach(c => { c.checked = el.checked; const id = parseInt(c.dataset.id); el.checked ? selectedIds.add(id) : selectedIds.delete(id); }); }
+
+function copyText(elId) {
+  const el = document.getElementById(elId);
+  const text = el.textContent.replace('Copy', '').trim();
+  navigator.clipboard.writeText(text);
+}
+
+async function generateDraft(id) {
+  const d = await api(`/api/leads/${id}/draft`, { method: 'POST' });
+  expandedId = id;
+  loadLeads();
+  loadStats();
+}
+
+async function updateStatus(id, status) {
+  if (!status) return;
+  const body = { status };
+  if (status === 'contacted') body.contacted_at = new Date().toISOString();
+  await api(`/api/leads/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+  loadLeads(); loadStats();
+}
+
+async function updateNotes(id, notes) {
+  await api(`/api/leads/${id}`, { method: 'PUT', body: JSON.stringify({ notes }) });
+}
+
+async function bulkAction(status) {
+  if (selectedIds.size === 0) return alert('Select leads first');
+  const body = { ids: [...selectedIds], updates: { status } };
+  if (status === 'contacted') body.updates.contacted_at = new Date().toISOString();
+  await api('/api/leads/bulk', { method: 'PUT', body: JSON.stringify(body) });
+  selectedIds.clear();
+  loadLeads(); loadStats();
+}
+
+async function generateAllDrafts() {
+  if (!confirm('Generate AI drafts for all undrafted leads? This may take a while.')) return;
+  const d = await api('/api/generate-drafts', { method: 'POST' });
+  alert(`Generated drafts for ${d.generated} leads.`);
+  loadLeads();
+}
+
+// Init
+loadStats();
+loadSearches();
+loadLeads();
+</script>
+</body>
+</html>

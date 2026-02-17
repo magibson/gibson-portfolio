@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=400">
+  <title>Jarvis Prospector</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>⚡ Jarvis Prospector</h1>
+      <div id="serverStatus" class="status disconnected">● Disconnected</div>
+    </header>
+
+    <div id="pageStatus" class="page-status">
+      Checking page...
+    </div>
+
+    <div class="controls">
+      <button id="btnScrape" class="btn btn-primary" disabled>Start Scraping</button>
+      <button id="btnStop" class="btn btn-danger" style="display:none">Stop</button>
+      <button id="btnSend" class="btn btn-success" disabled>Send to Jarvis</button>
+    </div>
+
+    <div id="progress" class="progress" style="display:none">
+      <div class="progress-bar">
+        <div id="progressFill" class="progress-fill"></div>
+      </div>
+      <div id="progressText" class="progress-text">Scraping...</div>
+    </div>
+
+    <div id="stats" class="stats" style="display:none">
+      <div class="stat"><span class="stat-num" id="statLeads">0</span><span class="stat-label">Leads Found</span></div>
+      <div class="stat"><span class="stat-num" id="statNew">0</span><span class="stat-label">New</span></div>
+      <div class="stat"><span class="stat-num" id="statDupes">0</span><span class="stat-label">Duplicates</span></div>
+    </div>
+
+    <div id="sendResult" class="send-result" style="display:none"></div>
+
+    <details class="settings">
+      <summary>⚙ Settings</summary>
+      <div class="settings-body">
+        <label>API URL
+          <input type="text" id="apiUrl" value="http://100.83.250.65:8089">
+        </label>
+        <label>Max Pages (0 = all)
+          <input type="number" id="maxPages" value="0" min="0">
+        </label>
+        <label>Search Name (tag)
+          <input type="text" id="searchName" placeholder="e.g. NJ CPAs">
+        </label>
+        <button id="btnSaveSettings" class="btn btn-small">Save</button>
+      </div>
+    </details>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

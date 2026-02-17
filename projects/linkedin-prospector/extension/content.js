@@ -23,19 +23,46 @@
 
   // Get total number of pages from the pagination
   function getTotalPages() {
-    // Sales Nav pagination buttons
-    const pageButtons = document.querySelectorAll('button.artdeco-pagination__indicator--number span, li.artdeco-pagination__indicator--number button span');
-    if (pageButtons.length > 0) {
-      const last = pageButtons[pageButtons.length - 1];
-      return parseInt(last.textContent.trim(), 10) || 1;
+    // Try multiple pagination selectors for Sales Nav
+    const selectors = [
+      'button.artdeco-pagination__indicator--number span',
+      'li.artdeco-pagination__indicator--number button span',
+      'li.artdeco-pagination__indicator--number span',
+      '[class*="pagination"] li[class*="indicator--number"] span',
+      '[class*="pagination"] button[class*="indicator"] span',
+      // Sales Nav 2026 selectors
+      'button[aria-label*="Page"] span',
+      'ol[class*="pagination"] li button span',
+      'nav[aria-label*="pagination"] button span',
+      'nav[aria-label*="Pagination"] button span'
+    ];
+    
+    for (const sel of selectors) {
+      const buttons = document.querySelectorAll(sel);
+      if (buttons.length > 0) {
+        const last = buttons[buttons.length - 1];
+        const num = parseInt(last.textContent.trim(), 10);
+        if (num > 0) return num;
+      }
     }
-    // Try alternate selector
-    const pagItems = document.querySelectorAll('[class*="pagination"] li[class*="indicator--number"]');
-    if (pagItems.length > 0) {
-      const last = pagItems[pagItems.length - 1];
-      const num = last.textContent.trim();
-      return parseInt(num, 10) || 1;
+
+    // Fallback: check for "of X" text in pagination area  
+    const pagArea = document.querySelector('[class*="pagination"], nav[aria-label*="pagination"], nav[aria-label*="Pagination"]');
+    if (pagArea) {
+      const match = pagArea.textContent.match(/of\s+(\d+)/i);
+      if (match) return parseInt(match[1], 10);
     }
+
+    // Fallback: count from total results / 25 per page
+    const totalText = document.querySelector('[class*="search-results__total"], [class*="result-count"]');
+    if (totalText) {
+      const match = totalText.textContent.match(/(\d[\d,]*)/);
+      if (match) {
+        const total = parseInt(match[1].replace(/,/g, ''), 10);
+        return Math.ceil(total / 25);
+      }
+    }
+
     return 1;
   }
 
@@ -176,22 +203,42 @@
 
   // Click to the next page
   async function goToNextPage() {
-    // Look for the "Next" button
-    const nextBtn = document.querySelector(
-      'button.artdeco-pagination__button--next, ' +
-      'button[aria-label="Next"], ' +
-      '[class*="pagination"] button:last-child'
-    );
+    // Look for the "Next" button — try many selectors
+    const selectors = [
+      'button.artdeco-pagination__button--next',
+      'button[aria-label="Next"]',
+      'button[aria-label="next"]',
+      'button[class*="pagination__button--next"]',
+      // Sales Nav sometimes uses li > button
+      'li.artdeco-pagination__indicator--next button',
+      // Generic last button in pagination nav
+      'nav[aria-label*="pagination"] button:last-of-type',
+      'nav[aria-label*="Pagination"] button:last-of-type'
+    ];
 
-    if (nextBtn && !nextBtn.disabled) {
-      nextBtn.click();
-      // Wait for page content to load
-      await randomDelay(2000, 4000);
-      // Wait for results to appear
-      await waitForResults();
-      return true;
+    for (const sel of selectors) {
+      const btn = document.querySelector(sel);
+      if (btn && !btn.disabled && !btn.getAttribute('aria-disabled')) {
+        // Scroll to pagination area first (Sales Nav requires it visible)
+        btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        await randomDelay(500, 1000);
+        btn.click();
+        // Wait for page content to load
+        await randomDelay(3000, 5000);
+        // Wait for results to appear
+        await waitForResults();
+        return true;
+      }
     }
-    return false;
+
+    // Fallback: try incrementing page number in URL
+    const url = new URL(window.location.href);
+    const currentPage = parseInt(url.searchParams.get('page') || '1', 10);
+    url.searchParams.set('page', currentPage + 1);
+    window.location.href = url.toString();
+    await randomDelay(3000, 6000);
+    await waitForResults();
+    return true;
   }
 
   // Wait for search results to load

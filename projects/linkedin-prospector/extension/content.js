@@ -1,15 +1,18 @@
 // Jarvis Prospector — Content Script
-// URL-based pagination with chrome.storage.local for state persistence
+// Bulletproof URL-based pagination with chrome.storage.local
 
 (function () {
   'use strict';
 
   const STORAGE_KEY = 'jarvisScrapeState';
   const RESULTS_PER_PAGE = 25;
+  const MAX_WAIT_FOR_RESULTS_MS = 20000;
+  const POLL_INTERVAL_MS = 500;
+
+  console.log('[Jarvis] Content script LOADED. URL:', window.location.href, 'readyState:', document.readyState);
 
   function randomDelay(minMs = 2000, maxMs = 5000) {
-    const delay = Math.floor(Math.random() * (maxMs - minMs + 1)) + minMs;
-    return new Promise(resolve => setTimeout(resolve, delay));
+    return new Promise(resolve => setTimeout(resolve, Math.floor(Math.random() * (maxMs - minMs + 1)) + minMs));
   }
 
   function isSearchResultsPage() {
@@ -17,29 +20,13 @@
     return url.includes('/sales/search/people') || url.includes('/sales/search/company') || url.includes('/sales/lists/');
   }
 
-  // Auto-detect search name from the page
   function detectSearchName() {
-    // Look for saved search name (e.g., "Local Job Changes" shown in the sidebar/header)
-    const selectors = [
-      'h1', '.search-results-container h1', '[class*="search-title"]',
-      '[class*="saved-search"] span', '.artdeco-hoverable-trigger span',
-      'button[class*="saved-search"] span'
-    ];
+    const selectors = ['h1', '.search-results-container h1', '[class*="search-title"]', '[class*="saved-search"] span'];
     for (const sel of selectors) {
       const els = document.querySelectorAll(sel);
       for (const el of els) {
         const t = el.textContent.trim();
-        if (t && t.length > 2 && t.length < 60 && !t.includes('results') && !t.includes('Search')) {
-          return t;
-        }
-      }
-    }
-    // Fallback: check for text near "Save search" or filter labels
-    const allSpans = document.querySelectorAll('span, div');
-    for (const el of allSpans) {
-      const t = el.textContent.trim();
-      if (t.match(/^(Local Job Changes|Federal Employee|Young Families|High Earner)/i)) {
-        return t;
+        if (t && t.length > 2 && t.length < 60 && !t.includes('results') && !t.includes('Search')) return t;
       }
     }
     return '';
@@ -56,70 +43,111 @@
     return target ? target.textContent.trim() : '';
   }
 
-  // Detect total pages from the page content
   function detectTotalPages() {
-    // Method 1: Look for total results count text like "64 results" or "1-25 of 64"
     const allText = document.body.innerText;
 
-    // Match "X results" pattern
+    // "X results"
     let match = allText.match(/(\d[\d,]*)\s+results?/i);
     if (match) {
       const total = parseInt(match[1].replace(/,/g, ''), 10);
+      console.log('[Jarvis] detectTotalPages: found "X results" =', total);
       if (total > 0) return Math.ceil(total / RESULTS_PER_PAGE);
     }
 
-    // Match "of X" pattern (e.g., "1-25 of 64")
+    // "of X"
     match = allText.match(/of\s+(\d[\d,]*)/i);
     if (match) {
       const total = parseInt(match[1].replace(/,/g, ''), 10);
+      console.log('[Jarvis] detectTotalPages: found "of X" =', total);
       if (total > 0) return Math.ceil(total / RESULTS_PER_PAGE);
     }
 
-    // Method 2: Find highest page number in pagination buttons
+    // Pagination buttons
     const buttons = document.querySelectorAll('button, a');
     let maxPage = 1;
     for (const btn of buttons) {
       const t = btn.textContent.trim();
       if (/^\d+$/.test(t)) {
         const n = parseInt(t, 10);
-        // Only consider reasonable page numbers (< 100) near pagination area
         if (n > maxPage && n < 100) {
           const parent = btn.closest('nav, [class*="pagination"], ol, ul');
           if (parent) maxPage = n;
         }
       }
     }
-    if (maxPage > 1) return maxPage;
+    if (maxPage > 1) {
+      console.log('[Jarvis] detectTotalPages: pagination buttons max =', maxPage);
+      return maxPage;
+    }
 
+    console.log('[Jarvis] detectTotalPages: could not detect, returning 1');
     return 1;
   }
 
-  function waitForResults(timeoutMs = 15000) {
+  // Robust wait: polls for result elements, uses MutationObserver as backup
+  function waitForResults(timeoutMs = MAX_WAIT_FOR_RESULTS_MS) {
     return new Promise((resolve) => {
-      const start = Date.now();
-      const check = () => {
-        const results = document.querySelectorAll(
-          'li.artdeco-list__item, [data-view-name="search-results-lead-card"], ol.artdeco-list li, .search-results__result-list li'
-        );
-        if (results.length > 0 || Date.now() - start > timeoutMs) {
-          resolve(results.length > 0);
-        } else {
-          setTimeout(check, 500);
-        }
+      const SELECTORS = 'li.artdeco-list__item, [data-view-name="search-results-lead-card"], ol.artdeco-list li, .search-results__result-list li';
+
+      const getResults = () => document.querySelectorAll(SELECTORS);
+
+      // Check immediately
+      if (getResults().length > 0) {
+        console.log('[Jarvis] waitForResults: results already present:', getResults().length);
+        resolve(true);
+        return;
+      }
+
+      let resolved = false;
+      const done = (found) => {
+        if (resolved) return;
+        resolved = true;
+        if (observer) observer.disconnect();
+        clearTimeout(timer);
+        clearInterval(poller);
+        resolve(found);
       };
-      check();
+
+      // Polling
+      const poller = setInterval(() => {
+        const r = getResults();
+        if (r.length > 0) {
+          console.log('[Jarvis] waitForResults: poll found', r.length, 'results');
+          done(true);
+        }
+      }, POLL_INTERVAL_MS);
+
+      // MutationObserver backup
+      let observer = null;
+      try {
+        observer = new MutationObserver(() => {
+          const r = getResults();
+          if (r.length > 0) {
+            console.log('[Jarvis] waitForResults: MutationObserver found', r.length, 'results');
+            done(true);
+          }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+      } catch (e) {
+        console.warn('[Jarvis] MutationObserver failed:', e);
+      }
+
+      // Timeout
+      const timer = setTimeout(() => {
+        const r = getResults();
+        console.log('[Jarvis] waitForResults: TIMEOUT after', timeoutMs, 'ms. Results found:', r.length);
+        done(r.length > 0);
+      }, timeoutMs);
     });
   }
 
   function scrapeCurrentPage() {
     const leads = [];
     const resultCards = document.querySelectorAll(
-      'li.artdeco-list__item, ' +
-      '[data-view-name="search-results-lead-card"], ' +
-      'ol.artdeco-list li, ' +
-      '.search-results__result-list li, ' +
-      '[class*="search-results"] li[class*="artdeco"]'
+      'li.artdeco-list__item, [data-view-name="search-results-lead-card"], ol.artdeco-list li, .search-results__result-list li, [class*="search-results"] li[class*="artdeco"]'
     );
+
+    console.log('[Jarvis] scrapeCurrentPage: found', resultCards.length, 'cards');
 
     resultCards.forEach(card => {
       try {
@@ -154,16 +182,13 @@
         );
         if (profileLink) {
           profileUrl = profileLink.href || '';
-          if (profileUrl && !profileUrl.startsWith('http')) {
-            profileUrl = 'https://www.linkedin.com' + profileUrl;
-          }
+          if (profileUrl && !profileUrl.startsWith('http')) profileUrl = 'https://www.linkedin.com' + profileUrl;
         }
 
         const degree =
           getText(card, '.artdeco-entity-lockup__degree, [class*="degree-icon"] + span, .result-lockup__badge span') ||
           (() => {
-            const badges = card.querySelectorAll('span');
-            for (const b of badges) {
+            for (const b of card.querySelectorAll('span')) {
               const t = b.textContent.trim();
               if (/^(1st|2nd|3rd|Out of Network)$/i.test(t)) return t;
             }
@@ -171,31 +196,22 @@
           })();
 
         const timeInRole = (() => {
-          const spans = card.querySelectorAll('span, dd');
-          for (const s of spans) {
+          for (const s of card.querySelectorAll('span, dd')) {
             const t = s.textContent.trim();
-            if (/\d+\s*(yr|year|mo|month)/i.test(t) && /in\s*(role|position|current)/i.test(t)) return t;
-            if (/^\d+\s*(yr|year|mo|month)/i.test(t)) return t;
+            if (/\d+\s*(yr|year|mo|month)/i.test(t)) return t;
           }
           return '';
         })();
 
         const img = card.querySelector('img[src*="profile"], img.artdeco-entity-lockup__image, img[class*="presence"]');
-        const profileImageUrl = img ? img.src : '';
-
-        const tags = [];
-        card.querySelectorAll('[class*="tag"], [class*="badge"], [class*="label"]').forEach(el => {
-          const t = el.textContent.trim();
-          if (t && t.length < 30) tags.push(t);
-        });
 
         leads.push({
           name, title, company, location,
           linkedin_url: profileUrl,
           connection_degree: degree,
           time_in_role: timeInRole,
-          profile_image_url: profileImageUrl,
-          tags: tags.join(', '),
+          profile_image_url: img ? img.src : '',
+          tags: '',
           scraped_at: new Date().toISOString()
         });
       } catch (err) {
@@ -203,125 +219,156 @@
       }
     });
 
+    console.log('[Jarvis] scrapeCurrentPage: extracted', leads.length, 'leads with names');
     return leads;
   }
 
   function navigateToPage(pageNum) {
     const url = new URL(window.location.href);
-    url.searchParams.set('page', pageNum);
-    window.location.href = url.toString();
+    url.searchParams.set('page', String(pageNum));
+    const target = url.toString();
+    console.log('[Jarvis] Navigating to:', target);
+    window.location.href = target;
   }
 
-  // Get current scrape state from storage
   function getState() {
     return new Promise(resolve => {
-      chrome.storage.local.get([STORAGE_KEY], result => {
-        resolve(result[STORAGE_KEY] || null);
-      });
+      chrome.storage.local.get([STORAGE_KEY], result => resolve(result[STORAGE_KEY] || null));
     });
   }
 
   function setState(state) {
+    console.log('[Jarvis] setState:', JSON.stringify({ ...state, leads: `[${(state.leads || []).length} leads]` }));
     return new Promise(resolve => {
       chrome.storage.local.set({ [STORAGE_KEY]: state }, resolve);
     });
   }
 
   function clearState() {
-    return new Promise(resolve => {
-      chrome.storage.local.remove([STORAGE_KEY], resolve);
-    });
+    return new Promise(resolve => chrome.storage.local.remove([STORAGE_KEY], resolve));
   }
 
-  // Continue a multi-page scrape (called on page load if scrape is in progress)
+  // Continue a multi-page scrape after page reload
   async function continueScrape() {
     const state = await getState();
-    if (!state || !state.inProgress) return;
+    if (!state || !state.inProgress) {
+      console.log('[Jarvis] continueScrape: no active state, aborting');
+      return;
+    }
 
-    console.log(`[Jarvis] Continuing scrape: page ${state.currentPage} of ${state.totalPages}`);
+    // Check shouldStop
+    if (state.shouldStop) {
+      console.log('[Jarvis] continueScrape: shouldStop flag set, finalizing');
+      await setState({
+        inProgress: false, completed: true,
+        leads: state.leads || [], totalPages: state.totalPages,
+        totalLeads: (state.leads || []).length, searchName: state.searchName
+      });
+      return;
+    }
 
-    await waitForResults(10000);
-    await randomDelay(1500, 3000); // Extra settle time for Sales Nav to fully render
+    const expectedPage = state.currentPage;
+    const actualPage = getCurrentPageFromUrl();
+    console.log('[Jarvis] continueScrape: expected page', expectedPage, 'actual URL page', actualPage);
 
+    // Verify we're on the right page
+    if (actualPage !== expectedPage) {
+      console.warn('[Jarvis] Page mismatch! Expected', expectedPage, 'got', actualPage, '- navigating to correct page');
+      navigateToPage(expectedPage);
+      return;
+    }
+
+    // Wait for results with generous timeout
+    console.log('[Jarvis] continueScrape: waiting for results (up to', MAX_WAIT_FOR_RESULTS_MS, 'ms)...');
+    const found = await waitForResults(MAX_WAIT_FOR_RESULTS_MS);
+
+    if (!found) {
+      console.warn('[Jarvis] continueScrape: NO results found after waiting. Stopping.');
+      await setState({
+        inProgress: false, completed: true,
+        leads: state.leads || [], totalPages: state.totalPages,
+        totalLeads: (state.leads || []).length, searchName: state.searchName
+      });
+      return;
+    }
+
+    // Extra settle time for Sales Nav's lazy rendering
+    console.log('[Jarvis] continueScrape: results detected, waiting 3s for full render...');
+    await new Promise(r => setTimeout(r, 3000));
+
+    // Scrape
     const pageLeads = scrapeCurrentPage();
     const allLeads = (state.leads || []).concat(pageLeads);
 
-    console.log(`[Jarvis] Page ${state.currentPage}: scraped ${pageLeads.length} leads (total: ${allLeads.length})`);
+    console.log('[Jarvis] continueScrape: page', expectedPage, 'scraped', pageLeads.length, 'leads. Total:', allLeads.length);
 
-    // Update state with new leads
-    const nextPage = state.currentPage + 1;
+    const nextPage = expectedPage + 1;
 
-    // Stop if: past total pages, user stopped, OR no results on this page (we've gone past the end)
-    if (nextPage > state.totalPages || state.shouldStop || pageLeads.length === 0) {
-      // Done! Save final results and clear in-progress flag
+    // Re-check shouldStop (might have been set during our wait)
+    const freshState = await getState();
+    const shouldStop = freshState && freshState.shouldStop;
+
+    if (nextPage > state.totalPages || shouldStop || pageLeads.length === 0) {
+      console.log('[Jarvis] Scrape COMPLETE.', allLeads.length, 'total leads.',
+        nextPage > state.totalPages ? '(past last page)' : '',
+        shouldStop ? '(stopped by user)' : '',
+        pageLeads.length === 0 ? '(empty page)' : '');
+
       await setState({
-        inProgress: false,
-        completed: true,
-        leads: allLeads,
-        totalPages: state.totalPages,
-        totalLeads: allLeads.length,
-        maxPages: state.maxPages,
-        searchName: state.searchName
+        inProgress: false, completed: true,
+        leads: allLeads, totalPages: state.totalPages,
+        totalLeads: allLeads.length, searchName: state.searchName
       });
-      console.log(`[Jarvis] Scrape complete! ${allLeads.length} leads across ${state.totalPages} pages`);
     } else {
-      // Save progress and navigate to next page
+      // Save progress and navigate
       await setState({
         ...state,
         currentPage: nextPage,
         leads: allLeads
       });
 
-      // Random delay before navigating (human-like)
       const delay = Math.floor(Math.random() * 3000) + 2000;
-      console.log(`[Jarvis] Waiting ${delay}ms before navigating to page ${nextPage}...`);
+      console.log('[Jarvis] Waiting', delay, 'ms before navigating to page', nextPage);
       await new Promise(r => setTimeout(r, delay));
 
       navigateToPage(nextPage);
     }
   }
 
-  // Start a new multi-page scrape
+  // Start a new scrape
   async function startScrape(maxPages = 0, searchName = '') {
-    await waitForResults();
-    await randomDelay(1000, 2000); // Extra settle time
-    
-    // Auto-detect search name if not provided
-    if (!searchName) {
-      searchName = detectSearchName();
-      console.log('[Jarvis] Auto-detected search name:', searchName);
+    console.log('[Jarvis] startScrape called. maxPages:', maxPages, 'searchName:', searchName);
+
+    // Clear any old state first
+    await clearState();
+
+    // Wait for results
+    const found = await waitForResults(MAX_WAIT_FOR_RESULTS_MS);
+    if (!found) {
+      console.warn('[Jarvis] startScrape: no results found on page');
+      await setState({ inProgress: false, completed: true, leads: [], totalPages: 0, totalLeads: 0, searchName });
+      return;
     }
 
-    // Detect total pages — try hard
+    // Extra settle
+    await new Promise(r => setTimeout(r, 2000));
+
+    if (!searchName) searchName = detectSearchName();
+
     let totalPages = detectTotalPages();
     const currentPage = getCurrentPageFromUrl();
-    
-    // If detection failed, use maxPages or default to 10 (will stop when no results found)
-    if (totalPages <= 1 && maxPages > 0) {
-      totalPages = maxPages;
-    } else if (totalPages <= 1) {
-      // Couldn't detect — try a generous default, continueScrape will stop when page is empty
-      totalPages = 20;
-    }
+
+    if (totalPages <= 1 && maxPages > 0) totalPages = maxPages;
+    else if (totalPages <= 1) totalPages = 20; // generous default, stops on empty page
 
     const pagesToScrape = maxPages > 0 ? Math.min(maxPages, totalPages) : totalPages;
+    console.log('[Jarvis] startScrape: currentPage', currentPage, 'totalPages', totalPages, 'pagesToScrape', pagesToScrape);
 
-    console.log(`[Jarvis] Starting scrape: page ${currentPage}, detected total: ${totalPages}, scraping: ${pagesToScrape}`);
-
-    // Scrape current page
     const pageLeads = scrapeCurrentPage();
-    console.log(`[Jarvis] Page ${currentPage}: scraped ${pageLeads.length} leads`);
+    console.log('[Jarvis] startScrape: page', currentPage, 'scraped', pageLeads.length, 'leads');
 
     if (pageLeads.length === 0) {
-      // No results on this page — we're done
-      await setState({
-        inProgress: false,
-        completed: true,
-        leads: [],
-        totalPages: 0,
-        totalLeads: 0,
-        searchName
-      });
+      await setState({ inProgress: false, completed: true, leads: [], totalPages: 0, totalLeads: 0, searchName });
       return;
     }
 
@@ -329,47 +376,36 @@
     const nextPage = currentPage + 1;
 
     if (nextPage > endPage) {
-      // Single page
-      await setState({
-        inProgress: false,
-        completed: true,
-        leads: pageLeads,
-        totalPages: 1,
-        totalLeads: pageLeads.length,
-        searchName
-      });
-      console.log(`[Jarvis] Single page scrape complete: ${pageLeads.length} leads`);
+      // Single page only
+      await setState({ inProgress: false, completed: true, leads: pageLeads, totalPages: 1, totalLeads: pageLeads.length, searchName });
+      console.log('[Jarvis] Single page scrape complete:', pageLeads.length, 'leads');
       return;
     }
 
+    // Multi-page: save state and navigate
     await setState({
-      inProgress: true,
-      completed: false,
-      shouldStop: false,
-      currentPage: nextPage,
-      totalPages: endPage,
-      leads: pageLeads,
-      maxPages,
-      searchName,
+      inProgress: true, completed: false, shouldStop: false,
+      currentPage: nextPage, totalPages: endPage,
+      leads: pageLeads, maxPages, searchName,
       startedAt: new Date().toISOString()
     });
 
-    // Random delay then navigate
     const delay = Math.floor(Math.random() * 3000) + 2000;
-    console.log(`[Jarvis] Waiting ${delay}ms before navigating to page ${nextPage}...`);
+    console.log('[Jarvis] Waiting', delay, 'ms before navigating to page', nextPage);
     await new Promise(r => setTimeout(r, delay));
 
     navigateToPage(nextPage);
   }
 
-  // Listen for messages from popup
+  // Message listener
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    console.log('[Jarvis] Message received:', msg.type);
+
     if (msg.type === 'START_SCRAPE') {
       if (!isSearchResultsPage()) {
         sendResponse({ status: 'not_search_page' });
         return;
       }
-      // Check if already in progress
       getState().then(state => {
         if (state && state.inProgress) {
           sendResponse({ status: 'already_scraping' });
@@ -381,17 +417,18 @@
       return true;
     }
 
-    else if (msg.type === 'STOP_SCRAPE') {
+    if (msg.type === 'STOP_SCRAPE') {
       getState().then(async state => {
         if (state && state.inProgress) {
           await setState({ ...state, shouldStop: true });
+          console.log('[Jarvis] Stop requested');
         }
         sendResponse({ status: 'stopping' });
       });
       return true;
     }
 
-    else if (msg.type === 'GET_STATUS') {
+    if (msg.type === 'GET_STATUS') {
       getState().then(state => {
         sendResponse({
           isSearchPage: isSearchResultsPage(),
@@ -408,12 +445,12 @@
       return true;
     }
 
-    else if (msg.type === 'CLEAR_STATE') {
+    if (msg.type === 'CLEAR_STATE') {
       clearState().then(() => sendResponse({ status: 'cleared' }));
       return true;
     }
 
-    else if (msg.type === 'SCRAPE_CURRENT_PAGE_ONLY') {
+    if (msg.type === 'SCRAPE_CURRENT_PAGE_ONLY') {
       const leads = scrapeCurrentPage();
       sendResponse({ leads });
     }
@@ -421,16 +458,33 @@
     return true;
   });
 
-  // On load: check if we need to continue a multi-page scrape
-  if (isSearchResultsPage()) {
+  // ON LOAD: check for in-progress scrape to continue
+  // Use a robust approach: wait for document to be fully loaded, then check state
+  function initOnLoad() {
+    if (!isSearchResultsPage()) {
+      console.log('[Jarvis] Not a search results page, skipping auto-resume');
+      return;
+    }
+
+    console.log('[Jarvis] Search results page detected. Checking for in-progress scrape...');
+
     getState().then(state => {
-      console.log('[Jarvis] Page load. URL:', window.location.href, 'State:', JSON.stringify(state));
+      console.log('[Jarvis] Current state:', state ? JSON.stringify({ ...state, leads: `[${(state.leads || []).length}]` }) : 'null');
       if (state && state.inProgress) {
-        console.log('[Jarvis] Resuming multi-page scrape...');
-        continueScrape();
+        console.log('[Jarvis] IN-PROGRESS scrape found! Resuming in 1s...');
+        // Small delay to let the page start rendering
+        setTimeout(() => continueScrape(), 1000);
+      } else {
+        console.log('[Jarvis] No in-progress scrape.');
       }
     });
   }
 
-  console.log('[Jarvis Prospector] Content script loaded on Sales Navigator');
+  // document_idle should mean DOM is ready, but be safe
+  if (document.readyState === 'complete') {
+    initOnLoad();
+  } else {
+    window.addEventListener('load', initOnLoad);
+  }
+
 })();

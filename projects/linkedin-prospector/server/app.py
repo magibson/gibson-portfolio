@@ -87,23 +87,29 @@ def row_to_dict(row):
 
 SYSTEM_PROMPT = (
     "You are writing a LinkedIn message for Matt Gibson, a financial advisor at "
-    "New York Life in Monmouth County, NJ. Be casual, genuine, not salesy. "
-    "Goal is to start a conversation, not pitch. No emojis. No hashtags. "
-    "Keep it natural — like a real person reaching out, not a template."
+    "New York Life in Monmouth County, NJ. "
+    "Rules: "
+    "- ONLY output the message text. No quotes, no labels, no 'Option 1:', no explanations. "
+    "- Be casual and genuine. Not salesy. Not corporate. "
+    "- Write like a real person, not a template. "
+    "- No emojis. No hashtags. No 'I hope this finds you well.' "
+    "- Connection requests MUST be under 300 characters (LinkedIn hard limit)."
 )
 
 # Search-specific instructions for message tailoring
 SEARCH_CONTEXT = {
     'local job changes': (
-        "This prospect recently changed jobs. Congratulate them on the new role. "
-        "Mention that career transitions are a great time to review financial plans "
-        "(benefits, retirement rollover, etc.) but do NOT pitch — just open the door. "
-        "Keep it warm and congratulatory first."
+        "This prospect RECENTLY CHANGED JOBS. This is the key detail. "
+        "Congratulate them on the new role at their new company BY NAME. "
+        "Then naturally mention that you help people going through career transitions "
+        "make sure their financial plan (benefits, retirement, insurance) transitions with them. "
+        "Keep it short and warm. The connection request should be like: "
+        "'Congrats on the new role at [Company]! I work with professionals going through career transitions "
+        "to make sure their financial plans keep up with the change. Would love to connect.'"
     ),
     'job change': (
-        "This prospect recently changed jobs. Congratulate them on the new role. "
-        "Mention that career transitions are a great time to review financial plans "
-        "but do NOT pitch — just open the door."
+        "This prospect recently changed jobs. Congratulate them on the new role by name. "
+        "Mention you help people in career transitions review their financial plans."
     ),
     'federal employee': (
         "This prospect works for a federal agency. With current government uncertainty, "
@@ -112,17 +118,15 @@ SEARCH_CONTEXT = {
     ),
     'young families': (
         "This prospect likely has a growing family. Reference the juggle of financial "
-        "priorities — protecting the family, saving for college, building wealth. "
-        "Be relatable and genuine."
+        "priorities — protecting the family, saving for college, building wealth."
     ),
     'high earner': (
         "This prospect is a senior professional. Reference the complexity of financial "
-        "planning at their level — tax optimization, estate planning, retirement timeline. "
-        "Be peer-level, not salesy."
+        "planning at their level — tax optimization, estate planning, retirement timeline."
     ),
     'default': (
         "Reference something specific about the prospect — their role, company, or location. "
-        "Find common ground. Keep it conversational."
+        "Find common ground."
     )
 }
 

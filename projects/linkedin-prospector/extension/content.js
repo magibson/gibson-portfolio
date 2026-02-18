@@ -17,6 +17,34 @@
     return url.includes('/sales/search/people') || url.includes('/sales/search/company') || url.includes('/sales/lists/');
   }
 
+  // Auto-detect search name from the page
+  function detectSearchName() {
+    // Look for saved search name (e.g., "Local Job Changes" shown in the sidebar/header)
+    const selectors = [
+      'h1', '.search-results-container h1', '[class*="search-title"]',
+      '[class*="saved-search"] span', '.artdeco-hoverable-trigger span',
+      'button[class*="saved-search"] span'
+    ];
+    for (const sel of selectors) {
+      const els = document.querySelectorAll(sel);
+      for (const el of els) {
+        const t = el.textContent.trim();
+        if (t && t.length > 2 && t.length < 60 && !t.includes('results') && !t.includes('Search')) {
+          return t;
+        }
+      }
+    }
+    // Fallback: check for text near "Save search" or filter labels
+    const allSpans = document.querySelectorAll('span, div');
+    for (const el of allSpans) {
+      const t = el.textContent.trim();
+      if (t.match(/^(Local Job Changes|Federal Employee|Young Families|High Earner)/i)) {
+        return t;
+      }
+    }
+    return '';
+  }
+
   function getCurrentPageFromUrl() {
     const url = new URL(window.location.href);
     return parseInt(url.searchParams.get('page') || '1', 10);
@@ -257,6 +285,12 @@
   async function startScrape(maxPages = 0, searchName = '') {
     await waitForResults();
     await randomDelay(1000, 2000); // Extra settle time
+    
+    // Auto-detect search name if not provided
+    if (!searchName) {
+      searchName = detectSearchName();
+      console.log('[Jarvis] Auto-detected search name:', searchName);
+    }
 
     // Detect total pages — try hard
     let totalPages = detectTotalPages();

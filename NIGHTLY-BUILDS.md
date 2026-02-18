@@ -4,6 +4,213 @@
 
 ---
 
+## 2026-02-18 — Jarvis Prospector Polish + Pagination Fix 🎯
+
+**Location:** `~/clawd/projects/linkedin-prospector/` | **Port:** 8089
+
+Continued building and polishing the LinkedIn Sales Navigator lead generation system Matt and I started together tonight.
+
+**What I fixed/improved overnight:**
+
+1. **Bulletproof Pagination** — Third attempt, new approach: MutationObserver to detect when Sales Nav finishes rendering, 20-second timeout with 500ms polling, 3-second settle time after results appear, page mismatch detection with re-navigation. Extensive console logging for debugging.
+
+2. **Dashboard Status Flow** — Updated lead statuses to match Matt's workflow: new → contacted → connected (then moves to Salesforce). "Connected" is the handoff point.
+
+3. **Campaign Lead Counts** — Dashboard campaign cards now show accurate lead counts, refresh on filter.
+
+**Still needs testing with Matt:**
+- Pagination across all 3 pages (64 leads)
+- Campaign URL integration (Matt needs to paste his Sales Nav saved search URLs)
+
+---
+
+## 2026-02-17 — Prospecting Dial Tracker 📞
+
+**Location:** `~/clawd/projects/dial-tracker/` | **Port:** 8099
+
+Built a dial tracking tool that maps directly to Matt's NYL weekly metrics: 25 new names, 50 dials, 4 appointments set.
+
+**Features:**
+- **Log a Dial** — Quick form: prospect name, phone, outcome (6 options), notes. One-tap logging for between-call speed.
+- **Weekly Dashboard** — Three progress bars (names/dials/appointments) with color coding: red <50%, yellow 50-80%, green >80%. Daily breakdown table with per-day dials, appointments, and conversion rate.
+- **Dial Log** — Filterable/searchable table of all dials. Filter by outcome, search by name.
+- **Prospect List** — Unique prospects with total dial count, last contact date, and last outcome. Track who you've already called.
+- **8-Week Trend** — Chart.js bar chart showing dials and appointments over the last 8 weeks. See the trajectory.
+- **All-Time Stats** — Total dials, appointments, conversion rate, average dials/day, best performing day of week.
+- **Full REST API** — `/api/dials`, `/api/weekly-stats`, `/api/weekly-history`, `/api/prospects`, `/api/stats`
+- 5 sample dials pre-loaded so it looks good immediately.
+- Dark theme, blue accents, mobile-first, single-file Flask + SQLite.
+
+**Why this:** "More meetings booked = everything else gets easier" — that's the lever. Matt needs to hit 50 dials/week to generate 4 appointments, but there's been no way to track progress during the week. This tool makes the invisible visible: open it Monday morning, log dials as you go, watch the bars fill up. The weekly trend chart shows whether the discipline is building over time. Pairs with the Habit Tracker (which tracks "did you dial today?") but goes deeper — tracking outcomes, conversion rates, and individual prospects.
+
+**Service:** Running on port 8099. Service file at `/tmp/dial-tracker.service`.
+
+---
+
+## 2026-02-16 — Daily Habits Tracker 🔥
+
+**Location:** `~/clawd/projects/habit-tracker/` | **Port:** 8098
+
+Built a habit tracker to help Matt build consistency with exercise, eating, prospecting, and photography posting. Directly supports Goal #2 (health) and the "more meetings = everything easier" lever.
+
+**Features:**
+- **Daily Check-In** — Today's applicable habits with tap-to-toggle checkboxes, completion percentage bar, and streak counters (current + best ever). Streak = consecutive days with ≥80% completion.
+- **Weekly Heatmap** — 4-week color-coded grid (red→yellow→green by completion %). Click any day to check in retroactively (missed yesterday? No problem).
+- **Stats Dashboard** — 8-week completion trend line (Chart.js), best/worst day of week, per-habit breakdown with percentage bars, monthly total completions.
+- **Habit Management** — Add/edit/delete habits with emoji, category (Health/Fitness/Work/Personal/Finance), and frequency (daily/weekdays/custom days with day picker).
+- **8 pre-loaded habits** tailored to Matt: Exercise, Healthy Eating, Water, Prospecting Dials (weekdays only), Photo Content (Mon/Wed/Fri), Review Finances (Sunday), Read 20 min, Sleep Before Midnight.
+- **Full REST API** — `/api/habits`, `/api/toggle`, `/api/day/<date>`, `/api/streak`, `/api/heatmap`, `/api/stats`
+- Dark theme, blue accents, mobile-friendly, single-file Flask + SQLite.
+
+**Why this:** Matt's said multiple times he struggles with discipline and routine. A habit tracker makes the invisible visible — check boxes, watch streaks grow, feel the pull of not wanting to break the chain. The pre-loaded habits match his actual goals: the prospecting dials are weekdays-only (matching NYL metrics), photo content is 3x/week (matching the content calendar's template), and health habits are daily. Combined with the content calendar (port 8097), this creates a daily accountability system.
+
+**Service:** Running on port 8098. Service file at `/tmp/habit-tracker.service`.
+
+---
+
+## 2026-02-15 — Content Calendar & Posting Planner 📸
+
+**Location:** `~/clawd/projects/content-calendar/` | **Port:** 8097
+
+Built a content calendar for planning and tracking Instagram posts for @mattgibsonpics. Matt's been building a content strategy (drone reveals, raw vs edited, travel posts) but had no tool to plan posts consistently week over week.
+
+**Features:**
+- **Monthly Calendar View** — Grid with color-coded post chips (gray=draft, blue=scheduled, green=posted, red=missed). Click any day to add/edit a post.
+- **Post Editor Modal** — Type (8 options: Drone Reveal, Raw vs Edited, Landscape, Travel, BTS, Collab, Carousel, Story), platform (IG Reel/Post/Story, TikTok), caption with 2200 char counter, hashtag field, status, notes. Shows best posting times.
+- **Content Ideas Bank** — Store ideas with title, type, description, and inspiration link. "Schedule This" converts an idea into a calendar post. Mark ideas as used.
+- **Stats Dashboard** — Posts this week/month, posting streak (consecutive weeks with 3+ posts), type distribution bar + pie charts (Chart.js), upcoming scheduled posts list.
+- **Weekly Template** — One-click "Apply Template to Week" fills the calendar with a suggested posting cadence: Monday (Drone Reveal), Wednesday (Raw vs Edited), Friday (Travel/BTS), Sunday (Story).
+- **5 pre-seeded ideas** from Matt's actual content strategy: NJ Coastline drone reveal, Burano Italy colors, Bermuda sunset timelapse, Hartshorne Woods aerial, editing workflow BTS.
+- Dark theme, mobile-friendly, RESTful API, single-file Flask + SQLite.
+
+**Why this:** Matt's #4 goal is growing @mattgibsonpics. He has 5 years of photo backlog and a solid content strategy but no system for planning posts consistently. This tool turns strategy into a weekly habit — open the calendar, see what's due, plan ahead. The weekly template removes decision fatigue (just click "Apply Template" each week and fill in the details). The ideas bank ensures those "oh I should post that" moments don't get lost.
+
+**Service:** Running on port 8097. Service file at `/tmp/content-calendar.service`.
+
+---
+
+## 2026-02-14 — Client Touchpoint Tracker 🤝
+
+**Location:** `~/clawd/projects/client-touchpoints/` | **Port:** 8096
+
+Built a relationship management tool for tracking client birthdays, anniversaries, and life events. Financial advisors grow through consistent touches — this ensures no client falls through the cracks.
+
+**Features:**
+- **Client List** with next-touchpoint-due sorting, status badges (overdue/due soon/good), and search
+- **Auto-generated touchpoints** from client dates: birthday (7d lead), spouse birthday, kid birthdays, wedding anniversary, policy anniversary (14d lead — annual review opportunity)
+- **Dashboard** with Overdue / This Week / This Month panels, each with suggested actions ("Send birthday text", "Schedule annual review call", etc.)
+- **Mark Done** with optional notes — builds a touchpoint history log per client
+- **Custom touchpoints** — add one-time or annual reminders per client (golf outing, referral follow-up, etc.)
+- **Client profiles** with spouse, kids (add/remove), policy dates, notes
+- **Full API** — GET /api/clients, POST /api/clients, GET /api/upcoming?days=7, POST /api/touchpoints/<id>/complete
+- **3 demo clients** pre-loaded so it looks good immediately
+- Dark theme, blue accents, mobile-friendly, print-ready
+
+**Why this:** Matt's bottleneck is building relationships at scale. As his book grows from 10 to 300 clients, he can't remember every birthday and policy anniversary. This tool does it for him — open the dashboard each morning, see who needs a call or text. The policy anniversary reminders are especially valuable: perfect excuse for an annual review (upsell opportunity). Pairs with the Meeting Prep tool for a full client lifecycle workflow.
+
+**Service:** Running on port 8096. Service file at `/tmp/client-touchpoints.service`.
+
+---
+
+## 2026-02-13 — Meeting Prep Tool 📋
+
+**Location:** `~/clawd/projects/meeting-prep/` | **Port:** 8095
+
+Built a meeting preparation tool for Matt's prospect meetings. Enter basic prospect info, get a complete prep sheet with personalized talking points.
+
+**Features:**
+- **Input form:** Name, age, marital status, kids, income range, occupation, concerns (7 checkboxes), meeting type, notes
+- **Ice Breaker Ideas** — 3-4 personalized conversation starters based on occupation and life situation
+- **Discovery Questions** — 8-10 targeted fact-finding questions tailored to age, family, and stated concerns
+- **NYL Product Recommendations** — Rule-based engine covering 15 products (Term, Whole, VUL, Custom Whole, IRA, Roth, 401k Rollover, 529, Mutual Funds, Annuities, Disability, LTC, Key Person, Buy-Sell, SEP IRA) with selling points for each
+- **Red Flags & Objection Handlers** — Common pushbacks for the prospect's profile with scripted responses
+- **Follow-Up Checklist** — Pre-filled action items based on the meeting
+- **Saved Preps** — All prep sheets stored in SQLite, searchable, each with unique URL (`/prep/<id>`)
+- **Print-ready** — CSS @media print formatting for clean printouts
+- Dark theme, mobile-friendly, single-file Flask + SQLite
+
+**Why this:** Matt's bottleneck is booking and running meetings. This tool makes every meeting more productive — walk in prepared with the right questions, the right products, and ready responses to objections. No more winging it.
+
+**Service:** Running on port 8095. Service file at `/tmp/meeting-prep.service`.
+
+---
+
+## 2026-02-12 — Prospecting Pipeline Tracker 🎯
+
+**Location:** `~/clawd/projects/prospect-pipeline/` | **Port:** 8094
+
+Built a kanban-style CRM for tracking leads through the sales pipeline. Directly supports Matt's #1 priority: booking more meetings.
+
+**Features:**
+- **5-stage kanban board:** New Lead → Contacted → Meeting Set → Met → Client/Won
+- **Lead cards** with source badges, days-in-stage counter, and last activity indicator
+- **Follow-up alerts:** Yellow border at 3+ days inactive, red at 7+ days — no lead goes cold
+- **Activity logging** per lead (call, email, LinkedIn, meeting, note) with timestamps
+- **Dashboard stats:** Total leads, conversion rate, avg days to close, stale lead counts
+- **Source breakdown** doughnut chart (Chart.js) — see which channels produce
+- **Quick stage transitions** — arrow buttons to advance/retreat leads without opening
+- **Source filter** — focus on one channel at a time
+- **CSV export** — dump everything for Salesforce import or review
+- **Full REST API** — GET/POST/PUT/DELETE for leads, activities, and stats
+- Dark theme, mobile-friendly, single-file Flask + SQLite
+
+**Why this:** Matt's working on lead gen systems today. This gives him a place to actually track the leads those systems produce — from first contact to closed client. The follow-up alerts ensure nothing slips through the cracks.
+
+**Service:** Running on port 8094 (nohup). Service file at `/tmp/prospect-pipeline.service` (needs sudo for systemd).
+
+---
+
+## 2026-02-10 — NYL Weekly Metrics Tracker 📊
+
+**Location:** `~/clawd/projects/advisor-metrics/` | **Port:** 8093
+
+Built a weekly activity tracker for Matt's New York Life prospecting metrics. Directly targets his #1 bottleneck: booking more appointments.
+
+**Features:**
+- **Progress bars** vs weekly targets (25 names, 50 dials, 4 appointments) with color coding
+- **Pace indicator** — projects end-of-week numbers based on current rate
+- **8-week trend chart** (Chart.js) to see patterns
+- **Streak counter** — consecutive weeks hitting all 3 targets
+- **Running averages** across all logged weeks
+- **Quick-entry form** — log numbers in seconds, auto-upserts per week
+- **API endpoints** for programmatic access (can integrate with morning briefing)
+- Dark theme, mobile-friendly, single-file Flask app
+
+**Service:** `/tmp/advisor-metrics.service`
+
+---
+
+## 2026-02-08 — Daily Glance Dashboard
+
+**Location:** `~/clawd/projects/daily-glance/` | **Port:** 8092
+
+Minimal daily briefing dashboard with three rendering modes:
+- `/` — Dark theme web view with blue accents, auto-refreshes every 15min
+- `/trmnl` — Black & white e-ink-optimized view for TRMNL devices
+- `/api` — JSON endpoint for webhook integration
+
+**Data:** Weather (wttr.in), Alpaca portfolio P/L, placeholder health/tasks, key dates, rotating scripture quotes. Systemd service at `/tmp/daily-glance.service`.
+
+---
+
+## 2026-02-08 - Trading Command Center Dashboard 📊
+
+**Status:** ✅ Complete
+**Location:** ~/clawd/projects/trading-dashboard/
+**Port:** 8091
+**Service file:** /tmp/trading-dashboard.service
+
+Built a polished Trading Command Center for Matt's trading challenge:
+- **Live Alpaca integration** — Portfolio value, positions with P/L, account stats
+- **Benchmark comparison** — Tracks VOO performance vs our portfolio since Jan 31
+- **AI Hedge Fund Signals** — Bullish/Bearish indicators with confidence bars (AMD 65%, NVDA 75%, VST 70%)
+- **Key Dates** — Countdown to NVDA earnings (Feb 25), VST earnings (Feb 26), challenge end (Feb 28)
+- **Challenge Stats** — Days remaining, return %, winning/losing vs benchmark
+- Dark theme with blue accents, mobile-friendly, auto-refresh during market hours
+- Flask backend pulling real-time data from Alpaca paper trading API
+
+---
+
 ## 2026-02-07 - Move-Out Savings Tracker 🏠
 
 **Status:** ✅ Complete
@@ -468,3 +675,21 @@ cd ~/clawd/projects/lead-tracker && ./start.sh
 ---
 
 *"Every night it has built itself a new tool to surprise me."* — Alex Finn on his Clawdbot Henry
+
+## 2026-02-07: Voice Status Dashboard
+
+**What:** Dashboard to monitor and control Jarvis voice calling
+**Why:** Spent hours debugging voice issues tonight - needed visibility
+**Port:** 8090
+**Location:** `~/clawd/projects/voice-dashboard/`
+
+Features:
+- Real-time status of ngrok tunnel + voice server
+- Phone number display for inbound calls
+- "Call Me" button for outbound
+- Recent call history
+
+Also set up tonight:
+- Retell Jarvis agent with tools (trading, calendar, health, email)
+- Voice: cartesia-Brian
+- ngrok stable URL: https://unrepugnant-uncrushable-gregoria.ngrok-free.dev

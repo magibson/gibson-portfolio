@@ -5,14 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Jarvis Prospector</title>
 <style>
-:root { --bg: #0f172a; --card: #1e293b; --border: #334155; --blue: #3b82f6; --green: #22c55e; --red: #ef4444; --yellow: #eab308; --text: #e2e8f0; --muted: #94a3b8; --dim: #64748b; }
+:root {
+  --bg: #0f172a; --card: #1e293b; --border: #334155;
+  --blue: #3b82f6; --green: #22c55e; --red: #ef4444;
+  --yellow: #eab308; --purple: #a855f7;
+  --text: #e2e8f0; --muted: #94a3b8; --dim: #64748b;
+}
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+.container { max-width: 1300px; margin: 0 auto; padding: 20px; }
 header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
 h1 { font-size: 24px; color: var(--blue); }
 h2 { font-size: 18px; color: var(--text); margin-bottom: 12px; }
-.header-actions { display: flex; gap: 8px; }
+.header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .btn { padding: 8px 16px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
 .btn-blue { background: var(--blue); color: white; }
 .btn-blue:hover { background: #2563eb; }
@@ -23,6 +28,8 @@ h2 { font-size: 18px; color: var(--text); margin-bottom: 12px; }
 .btn-green:hover { background: #16a34a; }
 .btn-red { background: var(--red); color: white; }
 .btn-red:hover { background: #dc2626; }
+.btn-teal { background: #0d9488; color: white; }
+.btn-teal:hover { background: #0f766e; }
 
 /* Stats Cards */
 .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 24px; }
@@ -52,6 +59,7 @@ h2 { font-size: 18px; color: var(--text); margin-bottom: 12px; }
 .camp-status-paused { background: #3b3a1a; color: var(--yellow); }
 .campaign-card .camp-actions { display: flex; gap: 4px; margin-top: 8px; }
 .camp-filters { font-size: 11px; color: var(--muted); background: var(--bg); padding: 6px 8px; border-radius: 6px; margin-top: 6px; line-height: 1.4; }
+.camp-has-template { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 8px; background: #3b2d14; color: var(--yellow); margin-left: 6px; vertical-align: middle; }
 
 /* Filters */
 .filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
@@ -63,41 +71,104 @@ h2 { font-size: 18px; color: var(--text); margin-bottom: 12px; }
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
 th { background: #16213e; padding: 10px 12px; text-align: left; color: var(--dim); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; user-select: none; }
 th:hover { color: var(--blue); }
-td { padding: 10px 12px; border-top: 1px solid var(--border); }
-tr:hover { background: rgba(59,130,246,0.05); }
+td { padding: 8px 12px; border-top: 1px solid var(--border); vertical-align: top; }
+tr:hover td { background: rgba(59,130,246,0.05) !important; }
+
+/* Row color coding by status */
+tr.row-new td          { background: rgba(148,163,184,0.04); }
+tr.row-pending td      { background: rgba(234,179,8,0.08); }
+tr.row-contacted td    { background: rgba(59,130,246,0.08); }
+tr.row-connected td    { background: rgba(34,197,94,0.09); }
+tr.row-meeting td      { background: rgba(168,85,247,0.1); }
+tr.row-closed td       { background: rgba(100,116,139,0.06); }
+/* legacy statuses */
+tr.row-replied td      { background: rgba(34,197,94,0.07); }
+tr.row-meeting_set td  { background: rgba(168,85,247,0.1); }
+tr.row-not_interested td { background: rgba(100,116,139,0.06); }
+
 .lead-name { color: var(--blue); font-weight: 600; cursor: pointer; }
 .lead-name:hover { text-decoration: underline; }
-.badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
-.badge-new { background: #1e3a5f; color: #60a5fa; }
-.badge-contacted { background: #3b3a1a; color: var(--yellow); }
-.badge-replied { background: #1a3b2a; color: var(--green); }
-.badge-meeting_set { background: #0d3320; color: #34d399; }
+
+/* Badges */
+.badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.badge-new          { background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+.badge-pending      { background: #3b3a1a; color: var(--yellow); }
+.badge-contacted    { background: #1e3a5f; color: #60a5fa; }
+.badge-connected    { background: #1a3b2a; color: var(--green); }
+.badge-meeting      { background: #2d1a4a; color: #c084fc; }
+.badge-closed       { background: #1e1e2e; color: var(--dim); }
+/* legacy */
+.badge-replied      { background: #1a3b2a; color: var(--green); }
+.badge-meeting_set  { background: #0d3320; color: #34d399; }
 .badge-not_interested { background: #3b1c1c; color: #f87171; }
+
 .score { display: inline-block; width: 36px; text-align: center; padding: 2px 0; border-radius: 6px; font-weight: 700; font-size: 12px; }
 .score-high { background: #0d3320; color: #34d399; }
-.score-med { background: #3b3a1a; color: var(--yellow); }
-.score-low { background: #3b1c1c; color: #f87171; }
-.msg-preview { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dim); font-size: 12px; }
+.score-med  { background: #3b3a1a; color: var(--yellow); }
+.score-low  { background: #3b1c1c; color: #f87171; }
+.msg-preview { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dim); font-size: 12px; }
 input[type=checkbox] { accent-color: var(--blue); }
+
+/* Quick Status Buttons */
+.quick-status { display: flex; gap: 3px; margin-top: 4px; flex-wrap: nowrap; }
+.qs-btn {
+  width: 22px; height: 22px; border: 1px solid transparent; border-radius: 4px;
+  font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center; padding: 0;
+  background: rgba(255,255,255,0.05); color: var(--dim);
+}
+.qs-btn:hover { transform: scale(1.15); }
+.qs-btn.qs-active { border-color: currentColor; opacity: 1; }
+.qs-new     { color: #94a3b8; }  .qs-new.qs-active     { background: #1e293b; }
+.qs-pending { color: var(--yellow); } .qs-pending.qs-active { background: #3b3a1a; }
+.qs-contacted { color: #60a5fa; } .qs-contacted.qs-active { background: #1e3a5f; }
+.qs-connected { color: var(--green); } .qs-connected.qs-active { background: #1a3b2a; }
+.qs-meeting { color: #c084fc; } .qs-meeting.qs-active { background: #2d1a4a; }
+.qs-closed  { color: var(--dim); }  .qs-closed.qs-active  { background: #1e1e2e; }
 
 /* Expanded Lead Detail */
 .lead-detail { background: #16213e; padding: 16px; border-top: 1px solid var(--border); }
 .lead-detail h3 { margin-bottom: 8px; color: var(--blue); font-size: 14px; }
 .lead-detail .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; font-size: 13px; }
 .lead-detail .info-grid span.label { color: var(--dim); }
-.draft-box { background: var(--bg); border-radius: 8px; padding: 12px; margin-bottom: 8px; font-size: 13px; position: relative; white-space: pre-wrap; }
-.draft-box .copy-btn { position: absolute; top: 8px; right: 8px; }
-.draft-actions { display: flex; gap: 8px; margin-top: 8px; }
+
+/* Draft boxes */
+.draft-box {
+  background: var(--bg); border-radius: 8px; padding: 12px 12px 10px 12px;
+  margin-bottom: 8px; font-size: 13px; white-space: pre-wrap; position: relative;
+  border: 1px solid var(--border); line-height: 1.5;
+}
+.draft-box .draft-text { display: block; padding-right: 70px; }
+.copy-row { display: flex; gap: 6px; margin-top: 8px; }
+.copy-btn-big {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border);
+  background: transparent; color: var(--muted); font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s;
+}
+.copy-btn-big:hover { border-color: var(--blue); color: var(--blue); background: rgba(59,130,246,0.08); }
+.copy-btn-big.copied { border-color: var(--green); color: var(--green); background: rgba(34,197,94,0.08); }
+
+/* Campaign template section */
+.template-section { background: #1a1a10; border: 1px solid #3d3a14; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+.template-section h4 { font-size: 13px; color: var(--yellow); margin-bottom: 6px; }
+.template-section .template-note { font-size: 11px; color: var(--dim); margin-bottom: 8px; }
+.template-box { background: #11110a; border: 1px solid #3d3a14; border-radius: 6px; padding: 10px; margin-bottom: 6px; font-size: 12px; color: var(--muted); white-space: pre-wrap; line-height: 1.5; }
+.template-label { font-size: 11px; font-weight: 700; color: #a68c30; margin-bottom: 4px; }
+
+.draft-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; align-items: center; }
 
 /* Toast */
-.toast { position: fixed; bottom: 20px; right: 20px; background: var(--green); color: white; padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; opacity: 0; transition: opacity 0.3s; z-index: 999; }
+.toast { position: fixed; bottom: 20px; right: 20px; background: var(--green); color: white; padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; opacity: 0; transition: opacity 0.3s; z-index: 999; pointer-events: none; }
 .toast.show { opacity: 1; }
+.toast.error { background: var(--red); }
 
 @media (max-width: 768px) {
   .filters { flex-direction: column; }
   table { font-size: 12px; }
   .msg-preview { display: none; }
   .campaign-grid { grid-template-columns: 1fr; }
+  .quick-status { display: none; }
 }
 </style>
 </head>
@@ -106,6 +177,7 @@ input[type=checkbox] { accent-color: var(--blue); }
   <header>
     <h1>⚡ Jarvis Prospector</h1>
     <div class="header-actions">
+      <button class="btn btn-teal" onclick="exportCSV()">⬇ Export CSV</button>
       <button class="btn btn-outline" onclick="generateAllDrafts()">Generate All Drafts</button>
       <button class="btn btn-blue" onclick="bulkAction('contacted')">Mark Selected Contacted</button>
     </div>
@@ -125,10 +197,14 @@ input[type=checkbox] { accent-color: var(--blue); }
     <select id="filterStatus" onchange="loadLeads()">
       <option value="">All Statuses</option>
       <option value="new">New</option>
+      <option value="pending">Pending</option>
       <option value="contacted">Contacted</option>
-      <option value="replied">Replied</option>
-      <option value="meeting_set">Meeting Set</option>
-      <option value="not_interested">Not Interested</option>
+      <option value="connected">Connected</option>
+      <option value="meeting">Meeting</option>
+      <option value="closed">Closed</option>
+      <option value="replied">Replied (legacy)</option>
+      <option value="meeting_set">Meeting Set (legacy)</option>
+      <option value="not_interested">Not Interested (legacy)</option>
     </select>
     <input type="number" id="filterMinScore" placeholder="Min Score" min="0" max="100" style="width:90px" onchange="loadLeads()">
     <input type="number" id="filterMaxScore" placeholder="Max Score" min="0" max="100" style="width:90px" onchange="loadLeads()">
@@ -141,14 +217,14 @@ input[type=checkbox] { accent-color: var(--blue); }
     <table>
       <thead>
         <tr>
-          <th><input type="checkbox" id="selectAll" onchange="toggleAll(this)"></th>
-          <th onclick="sortBy('score')">Score</th>
+          <th style="width:32px"><input type="checkbox" id="selectAll" onchange="toggleAll(this)"></th>
+          <th onclick="sortBy('score')" style="width:52px">Score</th>
           <th onclick="sortBy('name')">Name</th>
           <th>Title</th>
           <th>Company</th>
-          <th onclick="sortBy('status')">Status</th>
+          <th onclick="sortBy('status')" style="width:160px">Status</th>
           <th>Message</th>
-          <th onclick="sortBy('created_at')">Date</th>
+          <th onclick="sortBy('created_at')" style="width:90px">Date</th>
         </tr>
       </thead>
       <tbody id="leadsBody"></tbody>
@@ -164,21 +240,24 @@ let currentSort = 'created_at';
 let currentOrder = 'desc';
 let expandedId = null;
 let selectedIds = new Set();
-let activeCampaignId = null; // null = all leads
+let activeCampaignId = null;
 let campaigns = [];
+let leadsData = {};   // id → lead object (for clipboard access without HTML-decode issues)
 
 async function api(path, opts = {}) {
   const r = await fetch(API + path, { headers: {'Content-Type':'application/json'}, ...opts });
   return r.json();
 }
 
-function showToast(msg) {
+function showToast(msg, type = '') {
   const t = document.getElementById('toast');
   t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2000);
+  t.className = 'toast show' + (type ? ' ' + type : '');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2200);
 }
 
+// ---- Stats ----
 async function loadStats() {
   const d = await api('/api/dashboard');
   document.getElementById('statsCards').innerHTML = `
@@ -190,6 +269,7 @@ async function loadStats() {
   `;
 }
 
+// ---- Campaigns ----
 async function loadCampaigns() {
   const d = await api('/api/campaigns');
   campaigns = d.campaigns || [];
@@ -198,7 +278,6 @@ async function loadCampaigns() {
 
 function renderCampaigns() {
   const grid = document.getElementById('campaignGrid');
-  // "All Leads" card
   let html = `<div class="campaign-card all-leads ${activeCampaignId === null ? 'active-filter' : ''}" onclick="filterByCampaign(null)">
     <div class="camp-name">All Leads</div>
     <div class="camp-desc">Show leads from all campaigns</div>
@@ -207,8 +286,9 @@ function renderCampaigns() {
   campaigns.forEach(c => {
     const statusClass = c.status === 'active' ? 'camp-status-active' : 'camp-status-paused';
     const hasUrl = c.sales_nav_url && c.sales_nav_url.trim();
+    const hasTemplate = c.connection_template || c.followup_template;
     html += `<div class="campaign-card ${activeCampaignId === c.id ? 'active-filter' : ''}" onclick="filterByCampaign(${c.id})">
-      <div class="camp-name">${esc(c.name)}</div>
+      <div class="camp-name">${esc(c.name)}${hasTemplate ? '<span class="camp-has-template">📝 Templates</span>' : ''}</div>
       <div class="camp-desc">${esc(c.description)}</div>
       <div class="camp-meta">
         <div><span class="camp-leads">${c.leads_count}</span> <span class="camp-leads-label">leads</span></div>
@@ -232,12 +312,10 @@ function filterByCampaign(id) {
 
 function copyUrl(campId) {
   const c = campaigns.find(x => x.id === campId);
-  if (c && c.sales_nav_url) {
-    navigator.clipboard.writeText(c.sales_nav_url);
-    showToast('URL copied!');
-  }
+  if (c && c.sales_nav_url) { navigator.clipboard.writeText(c.sales_nav_url); showToast('URL copied!'); }
 }
 
+// ---- Searches ----
 async function loadSearches() {
   const d = await api('/api/searches');
   const sel = document.getElementById('filterSearch');
@@ -247,6 +325,7 @@ async function loadSearches() {
   names.forEach(n => { const o = document.createElement('option'); o.value = n; o.textContent = n; sel.appendChild(o); });
 }
 
+// ---- Leads ----
 async function loadLeads() {
   const params = new URLSearchParams();
   params.set('sort', currentSort);
@@ -269,31 +348,85 @@ async function loadLeads() {
   const d = await api('/api/leads?' + params);
   const body = document.getElementById('leadsBody');
   body.innerHTML = '';
+
   d.leads.forEach(l => {
+    leadsData[l.id] = l;  // store raw for clipboard use
+
     const scoreClass = l.score >= 70 ? 'score-high' : l.score >= 40 ? 'score-med' : 'score-low';
+    const statusKey = (l.status || 'new').replace(/\W/g,'_');
+    const hasDraft = !!(l.message_draft && l.message_draft.trim());
+
+    // Quick-status buttons
+    const statuses = [
+      {key:'new', label:'N', title:'New'},
+      {key:'pending', label:'P', title:'Pending'},
+      {key:'contacted', label:'C', title:'Contacted'},
+      {key:'connected', label:'✓', title:'Connected'},
+      {key:'meeting', label:'M', title:'Meeting'},
+      {key:'closed', label:'✗', title:'Closed'},
+    ];
+    const qsBtns = statuses.map(s =>
+      `<button class="qs-btn qs-${s.key} ${l.status===s.key?'qs-active':''}"
+        onclick="quickStatus(event,${l.id},'${s.key}')"
+        title="${s.title}">${s.label}</button>`
+    ).join('');
+
     const tr = document.createElement('tr');
+    tr.className = `row-${statusKey}`;
     tr.innerHTML = `
       <td><input type="checkbox" data-id="${l.id}" onchange="toggleSelect(${l.id}, this)" ${selectedIds.has(l.id)?'checked':''}></td>
       <td><span class="score ${scoreClass}">${l.score}</span></td>
       <td><span class="lead-name" onclick="toggleDetail(${l.id})">${esc(l.name)}</span></td>
-      <td>${esc(l.title)}</td>
-      <td>${esc(l.company)}</td>
-      <td><span class="badge badge-${l.status}">${l.status}</span></td>
-      <td><div class="msg-preview">${esc(l.message_draft || '—')}</div></td>
+      <td style="font-size:12px;color:var(--muted)">${esc(l.title)}</td>
+      <td style="font-size:12px;color:var(--muted)">${esc(l.company)}</td>
+      <td>
+        <span class="badge badge-${l.status||'new'}">${l.status||'new'}</span>
+        <div class="quick-status">${qsBtns}</div>
+      </td>
+      <td><div class="msg-preview">${hasDraft ? esc(l.message_draft) : '<span style="color:var(--dim);font-style:italic">no draft</span>'}</div></td>
       <td style="color:var(--dim);font-size:12px">${l.created_at ? l.created_at.split('T')[0] : ''}</td>
     `;
     body.appendChild(tr);
 
     if (expandedId === l.id) {
       const detailTr = document.createElement('tr');
-      detailTr.innerHTML = `<td colspan="8">${renderDetail(l)}</td>`;
+      detailTr.innerHTML = `<td colspan="8" style="padding:0">${renderDetail(l)}</td>`;
       body.appendChild(detailTr);
     }
   });
 }
 
 function renderDetail(l) {
-  const campName = l.campaign_id ? (campaigns.find(c => c.id === l.campaign_id) || {}).name || `#${l.campaign_id}` : '—';
+  const campaign = l.campaign_id ? campaigns.find(c => c.id === l.campaign_id) : null;
+  const campName = campaign ? campaign.name : (l.campaign_id ? `#${l.campaign_id}` : '—');
+
+  // WARN / campaign template section
+  let templateSection = '';
+  if (campaign && (campaign.connection_template || campaign.followup_template)) {
+    templateSection = `
+      <div class="template-section">
+        <h4>📋 Campaign Templates — ${esc(campaign.name)}</h4>
+        <p class="template-note">Pre-drafted outreach for this campaign. Copy and paste into LinkedIn, personalizing [Name] and any placeholders.</p>
+        ${campaign.connection_template ? `
+          <div class="template-label">🔗 Connection Request:</div>
+          <div class="template-box">${esc(campaign.connection_template)}</div>
+          <div style="margin-bottom:10px">
+            <button class="copy-btn-big" onclick="copyTemplate(${campaign.id},'connection',this)">📋 Copy Connection Request</button>
+          </div>
+        ` : ''}
+        ${campaign.followup_template ? `
+          <div class="template-label">💬 Follow-up DM:</div>
+          <div class="template-box">${esc(campaign.followup_template)}</div>
+          <div style="margin-bottom:4px">
+            <button class="copy-btn-big" onclick="copyTemplate(${campaign.id},'followup',this)">📋 Copy Follow-up DM</button>
+          </div>
+        ` : ''}
+      </div>`;
+  }
+
+  const connDraft = l.message_draft || '';
+  const followDraft = l.message_draft_2 || '';
+
   return `<div class="lead-detail">
     <div class="info-grid">
       <div><span class="label">Location:</span> ${esc(l.location)}</div>
@@ -304,53 +437,100 @@ function renderDetail(l) {
       <div><span class="label">Score Reason:</span> ${esc(l.score_reason)}</div>
       <div><span class="label">LinkedIn:</span> <a href="${esc(l.linkedin_url)}" target="_blank" style="color:var(--blue)">${l.linkedin_url ? 'View Profile' : '—'}</a></div>
     </div>
-    <h3>Connection Request</h3>
-    <div class="draft-box" id="draft1-${l.id}">${esc(l.message_draft || 'No draft yet.')}<button class="btn btn-sm btn-outline copy-btn" onclick="copyText('draft1-${l.id}')">Copy</button></div>
-    <h3>Follow-up DM</h3>
-    <div class="draft-box" id="draft2-${l.id}">${esc(l.message_draft_2 || 'No draft yet.')}<button class="btn btn-sm btn-outline copy-btn" onclick="copyText('draft2-${l.id}')">Copy</button></div>
+
+    ${templateSection}
+
+    <h3>AI-Generated Connection Request</h3>
+    <div class="draft-box">
+      <span class="draft-text">${connDraft ? esc(connDraft) : '<em style="color:var(--dim)">No draft yet — click Generate below.</em>'}</span>
+      ${connDraft ? `<div class="copy-row"><button class="copy-btn-big" onclick="copyDraft(${l.id},'connection',this)">📋 Copy Connection Request</button></div>` : ''}
+    </div>
+
+    <h3>AI-Generated Follow-up DM</h3>
+    <div class="draft-box">
+      <span class="draft-text">${followDraft ? esc(followDraft) : '<em style="color:var(--dim)">No draft yet.</em>'}</span>
+      ${followDraft ? `<div class="copy-row"><button class="copy-btn-big" onclick="copyDraft(${l.id},'followup',this)">📋 Copy Follow-up DM</button></div>` : ''}
+    </div>
+
     <div class="draft-actions">
-      <button class="btn btn-sm btn-blue" onclick="generateDraft(${l.id})">Generate/Regenerate Drafts</button>
+      <button class="btn btn-sm btn-blue" onclick="generateDraft(${l.id})">🤖 Generate/Regenerate Drafts</button>
       <select onchange="updateStatus(${l.id}, this.value)" style="padding:4px 8px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px">
-        <option value="">Change Status...</option>
-        <option value="new">New</option>
-        <option value="contacted">Contacted</option>
-        <option value="replied">Replied</option>
-        <option value="meeting_set">Meeting Set</option>
-        <option value="not_interested">Not Interested</option>
+        <option value="">Change Status…</option>
+        <option value="new"${l.status==='new'?' selected':''}>New</option>
+        <option value="pending"${l.status==='pending'?' selected':''}>Pending</option>
+        <option value="contacted"${l.status==='contacted'?' selected':''}>Contacted</option>
+        <option value="connected"${l.status==='connected'?' selected':''}>Connected</option>
+        <option value="meeting"${l.status==='meeting'?' selected':''}>Meeting</option>
+        <option value="closed"${l.status==='closed'?' selected':''}>Closed</option>
+        <option value="replied"${l.status==='replied'?' selected':''}>Replied (legacy)</option>
+        <option value="meeting_set"${l.status==='meeting_set'?' selected':''}>Meeting Set (legacy)</option>
+        <option value="not_interested"${l.status==='not_interested'?' selected':''}>Not Interested (legacy)</option>
       </select>
     </div>
     <div style="margin-top:8px">
-      <textarea placeholder="Notes..." style="width:100%;height:60px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px;font-size:13px;resize:vertical" onchange="updateNotes(${l.id}, this.value)">${esc(l.notes || '')}</textarea>
+      <textarea placeholder="Notes…" style="width:100%;height:60px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px;font-size:13px;resize:vertical" onchange="updateNotes(${l.id}, this.value)">${esc(l.notes || '')}</textarea>
     </div>
   </div>`;
 }
 
-function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function esc(s) {
+  if (!s) return '';
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
 
+// ---- Copy functions ----
+function copyDraft(leadId, type, btnEl) {
+  const lead = leadsData[leadId];
+  if (!lead) return;
+  const text = type === 'connection' ? lead.message_draft : lead.message_draft_2;
+  if (!text || !text.trim()) { showToast('No draft to copy'); return; }
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('✓ Copied!');
+    if (btnEl) { btnEl.classList.add('copied'); btnEl.textContent = '✓ Copied!'; setTimeout(() => { btnEl.classList.remove('copied'); btnEl.textContent = type === 'connection' ? '📋 Copy Connection Request' : '📋 Copy Follow-up DM'; }, 2000); }
+  });
+}
+
+function copyTemplate(campId, type, btnEl) {
+  const camp = campaigns.find(c => c.id === campId);
+  if (!camp) return;
+  const text = type === 'connection' ? camp.connection_template : camp.followup_template;
+  if (!text || !text.trim()) { showToast('No template to copy'); return; }
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('✓ Template copied!');
+    if (btnEl) { btnEl.classList.add('copied'); const orig = btnEl.textContent; btnEl.textContent = '✓ Copied!'; setTimeout(() => { btnEl.classList.remove('copied'); btnEl.textContent = orig; }, 2000); }
+  });
+}
+
+// ---- Quick status ----
+async function quickStatus(event, id, status) {
+  event.stopPropagation();
+  const body = { status };
+  if (status === 'contacted') body.contacted_at = new Date().toISOString();
+  await api(`/api/leads/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+  if (leadsData[id]) leadsData[id].status = status;
+  showToast(`→ ${status}`);
+  loadLeads(); loadStats();
+}
+
+// ---- Sort / Select ----
 function sortBy(col) {
   if (currentSort === col) currentOrder = currentOrder === 'desc' ? 'asc' : 'desc';
   else { currentSort = col; currentOrder = 'desc'; }
   loadLeads();
 }
-
 function toggleDetail(id) { expandedId = expandedId === id ? null : id; loadLeads(); }
 function toggleSelect(id, el) { el.checked ? selectedIds.add(id) : selectedIds.delete(id); }
-function toggleAll(el) { document.querySelectorAll('#leadsBody input[type=checkbox]').forEach(c => { c.checked = el.checked; const id = parseInt(c.dataset.id); el.checked ? selectedIds.add(id) : selectedIds.delete(id); }); }
-
-function copyText(elId) {
-  const el = document.getElementById(elId);
-  const text = el.textContent.replace('Copy', '').trim();
-  navigator.clipboard.writeText(text);
-  showToast('Copied!');
+function toggleAll(el) {
+  document.querySelectorAll('#leadsBody input[type=checkbox]').forEach(c => {
+    c.checked = el.checked;
+    const id = parseInt(c.dataset.id);
+    el.checked ? selectedIds.add(id) : selectedIds.delete(id);
+  });
 }
 
-async function generateDraft(id) {
-  const d = await api(`/api/leads/${id}/draft`, { method: 'POST' });
-  expandedId = id;
-  loadLeads();
-  loadStats();
-}
-
+// ---- Status / Notes ----
 async function updateStatus(id, status) {
   if (!status) return;
   const body = { status };
@@ -358,11 +538,18 @@ async function updateStatus(id, status) {
   await api(`/api/leads/${id}`, { method: 'PUT', body: JSON.stringify(body) });
   loadLeads(); loadStats();
 }
-
 async function updateNotes(id, notes) {
   await api(`/api/leads/${id}`, { method: 'PUT', body: JSON.stringify({ notes }) });
 }
 
+// ---- Draft generation ----
+async function generateDraft(id) {
+  showToast('Generating…');
+  const d = await api(`/api/leads/${id}/draft`, { method: 'POST' });
+  if (leadsData[id]) { leadsData[id].message_draft = d.connection_request; leadsData[id].message_draft_2 = d.follow_up_dm; }
+  expandedId = id;
+  loadLeads(); loadStats();
+}
 async function bulkAction(status) {
   if (selectedIds.size === 0) return alert('Select leads first');
   const body = { ids: [...selectedIds], updates: { status } };
@@ -371,12 +558,26 @@ async function bulkAction(status) {
   selectedIds.clear();
   loadLeads(); loadStats();
 }
-
 async function generateAllDrafts() {
   if (!confirm('Generate AI drafts for all undrafted leads? This may take a while.')) return;
+  showToast('Generating…');
   const d = await api('/api/generate-drafts', { method: 'POST' });
-  alert(`Generated drafts for ${d.generated} leads.`);
+  showToast(`✓ Generated drafts for ${d.generated} leads`);
   loadLeads();
+}
+
+// ---- CSV Export ----
+function exportCSV() {
+  const params = new URLSearchParams();
+  if (activeCampaignId !== null) params.set('campaign_id', activeCampaignId);
+  const url = '/api/leads/export?' + params.toString();
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  showToast('⬇ Downloading CSV…');
 }
 
 // Init

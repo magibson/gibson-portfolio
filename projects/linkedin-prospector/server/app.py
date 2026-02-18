@@ -5,11 +5,13 @@ Runs on port 8089.
 """
 
 import os
+import io
+import csv
 import json
 import sqlite3
 import requests
 from datetime import datetime, date
-from flask import Flask, request, jsonify, render_template, g
+from flask import Flask, request, jsonify, render_template, g, Response
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -602,6 +604,65 @@ def bulk_update():
     db.execute(f"UPDATE leads SET {', '.join(sets)} WHERE id IN ({placeholders})", params)
     db.commit()
     return jsonify({'status': 'ok', 'updated': len(ids)})
+
+
+# ---------------------------------------------------------------------------
+# CSV Export
+# ---------------------------------------------------------------------------
+
+@app.route('/api/leads/export')
+def export_leads_csv():
+    """Download leads as CSV, optionally filtered by campaign_id."""
+    db = get_db()
+    query = '''
+        SELECT l.name, l.title, l.company, l.location, l.status,
+               l.message_draft AS connection_request,
+               l.message_draft_2 AS followup_dm,
+               COALESCE(c.name, '') AS campaign_name,
+               l.scraped_at
+        FROM leads l
+        LEFT JOIN campaigns c ON l.campaign_id = c.id
+        WHERE 1=1
+    '''
+    params = []
+    campaign_id = request.args.get('campaign_id')
+    if campaign_id:
+        query += ' AND l.campaign_id = ?'
+        params.append(int(campaign_id))
+    query += ' ORDER BY l.created_at DESC'
+
+    rows = db.execute(query, params).fetchall()
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['Name', 'Title', 'Company', 'Location', 'Status',
+                     'Connection Request', 'Follow-up DM', 'Campaign', 'Scraped At'])
+    for row in rows:
+        writer.writerow([
+            row['name'] or '',
+            row['title'] or '',
+            row['company'] or '',
+            row['location'] or '',
+            row['status'] or '',
+            row['connection_request'] or '',
+            row['followup_dm'] or '',
+            row['campaign_name'] or '',
+            row['scraped_at'] or '',
+        ])
+
+    # Build a safe filename
+    filename = 'leads_export.csv'
+    if campaign_id:
+        camp = db.execute('SELECT name FROM campaigns WHERE id = ?', (int(campaign_id),)).fetchone()
+        if camp:
+            safe = ''.join(c if c.isalnum() or c in '-_' else '_' for c in camp['name'])
+            filename = f'leads_{safe}.csv'
+
+    return Response(
+        output.getvalue(),
+        mimetype='text/csv',
+        headers={'Content-Disposition': f'attachment; filename="{filename}"'}
+    )
 
 
 if __name__ == '__main__':

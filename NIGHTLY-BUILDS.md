@@ -4,6 +4,24 @@
 
 ---
 
+## 2026-02-18 — Advisory Council + Food Journal
+
+**Built:**
+- **FA Advisory Council** (`~/clawd/scripts/fa-council.py`) — Simulates 4 expert AI personas (Compliance Officer, Sales Coach, Market Analyst, Veteran Advisor) who each respond to a question in their own voice using Gemini 1.5 Flash. Formatted report sent to Matt via Telegram. Usage: `python3 ~/clawd/scripts/fa-council.py "Your question here"`
+- **Food Journal** (`~/clawd/scripts/food-log.py`) — Natural language food logging via Gemini. Parses meal descriptions into structured JSON (meals, calories, health score), saves to `~/clawd/data/health/food-log.json`. Usage: `python3 ~/clawd/scripts/food-log.py "eggs and coffee for breakfast, sandwich for lunch"`
+- **Morning briefing integration** — `jarvis-daily-briefing.py` now reads last 3 days of food logs and shows a trend line (avg score, avg calories, commentary)
+
+**Telegram shortcut:**
+- Text "food: [what you ate]" or "ate: [food]" and I'll log it via food-log.py
+
+**Files:**
+- `~/clawd/scripts/fa-council.py` — Council runner
+- `~/clawd/scripts/food-log.py` — Food logger + `get_food_trend()` module function
+- `~/clawd/data/health/food-log.json` — Persistent food log
+- `~/clawd/jarvis-daily-briefing.py` — Updated with food trend
+
+---
+
 ## 2026-02-18 — AI Caption & Hashtag Generator 📸✨
 
 **Location:** `~/clawd/projects/photo-caption-gen/` | **Port:** 8100 | **Service:** `jarvis-captions.service`

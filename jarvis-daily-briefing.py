@@ -37,6 +37,38 @@ def get_whoop_data():
     except Exception as e:
         return f"💪 Recovery: Error - {e}"
 
+def get_food_trend():
+    """Get 3-day food log trend summary"""
+    try:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location(
+            "food_log", "/home/clawd/clawd/scripts/food-log.py"
+        )
+        food_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(food_module)
+        return food_module.get_food_trend(days=3)
+    except Exception:
+        pass
+    # Fallback: read JSON directly
+    try:
+        import json
+        from datetime import datetime, timezone, timedelta
+        log_path = os.path.expanduser("~/clawd/data/health/food-log.json")
+        if not os.path.exists(log_path):
+            return "🍽️ Food: No logs yet — text me 'food: [what you ate]' to start"
+        with open(log_path) as f:
+            log = json.load(f)
+        entries = sorted(log.get("entries", []), key=lambda e: e.get("date", ""), reverse=True)[:3]
+        if not entries:
+            return "🍽️ Food: No recent entries"
+        scores = [e.get("daily_score", 0) for e in entries if e.get("daily_score")]
+        avg_score = round(sum(scores) / len(scores), 1) if scores else 0
+        avg_cal = round(sum(e.get("daily_calories_est", 0) for e in entries) / len(entries))
+        comment = "great streak 💪" if avg_score >= 8 else "solid, keep it up" if avg_score >= 6 else "room to improve" if avg_score >= 4 else "time to clean it up"
+        return f"🍽️ Food: {len(entries)}-day avg score {avg_score}/10, ~{avg_cal}cal/day — {comment}"
+    except Exception as e:
+        return f"🍽️ Food: Error reading log — {e}"
+
 def create_jarvis_briefing():
     """Generate full Jarvis-style morning briefing"""
     
@@ -45,6 +77,7 @@ def create_jarvis_briefing():
     # Get data from existing systems
     drone_status = get_drone_conditions()
     whoop_status = get_whoop_data()
+    food_trend = get_food_trend()
     
     # Create Jarvis-style briefing text
     briefing_text = f"""Good morning, Mr. Gibson.
@@ -56,6 +89,9 @@ Weather and Drone Conditions:
 
 Health and Recovery:
 {whoop_status}
+
+Nutrition:
+{food_trend}
 
 Financial Markets:
 S&P 500 futures showing mixed signals this morning. I'll monitor throughout the day.
@@ -112,7 +148,8 @@ def main():
     
     print("\n🔄 Integration Status:")
     print("✅ Drone weather system")
-    print("✅ Whoop health data")  
+    print("✅ Whoop health data")
+    print("✅ Food journal trend (food-log.py)")
     print("✅ Daily briefing format")
     print("🔄 TTS integration (ready for voice output)")
 

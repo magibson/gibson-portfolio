@@ -212,8 +212,8 @@
 
     console.log(`[Jarvis] Continuing scrape: page ${state.currentPage} of ${state.totalPages}`);
 
-    await waitForResults();
-    await randomDelay(1000, 2000); // Extra settle time
+    await waitForResults(10000);
+    await randomDelay(1500, 3000); // Extra settle time for Sales Nav to fully render
 
     const pageLeads = scrapeCurrentPage();
     const allLeads = (state.leads || []).concat(pageLeads);
@@ -223,7 +223,8 @@
     // Update state with new leads
     const nextPage = state.currentPage + 1;
 
-    if (nextPage > state.totalPages || state.shouldStop) {
+    // Stop if: past total pages, user stopped, OR no results on this page (we've gone past the end)
+    if (nextPage > state.totalPages || state.shouldStop || pageLeads.length === 0) {
       // Done! Save final results and clear in-progress flag
       await setState({
         inProgress: false,
@@ -255,46 +256,55 @@
   // Start a new multi-page scrape
   async function startScrape(maxPages = 0, searchName = '') {
     await waitForResults();
+    await randomDelay(1000, 2000); // Extra settle time
 
-    const totalPages = detectTotalPages();
-    const pagesToScrape = maxPages > 0 ? Math.min(maxPages, totalPages) : totalPages;
+    // Detect total pages — try hard
+    let totalPages = detectTotalPages();
     const currentPage = getCurrentPageFromUrl();
-
-    console.log(`[Jarvis] Starting scrape: page ${currentPage}, total pages: ${pagesToScrape}`);
-
-    if (pagesToScrape <= 1) {
-      // Single page — just scrape and done
-      const leads = scrapeCurrentPage();
-      await setState({
-        inProgress: false,
-        completed: true,
-        leads,
-        totalPages: 1,
-        totalLeads: leads.length,
-        searchName
-      });
-      console.log(`[Jarvis] Single page scrape complete: ${leads.length} leads`);
-      return;
+    
+    // If detection failed, use maxPages or default to 10 (will stop when no results found)
+    if (totalPages <= 1 && maxPages > 0) {
+      totalPages = maxPages;
+    } else if (totalPages <= 1) {
+      // Couldn't detect — try a generous default, continueScrape will stop when page is empty
+      totalPages = 20;
     }
 
-    // Multi-page: scrape current page, save state, navigate
+    const pagesToScrape = maxPages > 0 ? Math.min(maxPages, totalPages) : totalPages;
+
+    console.log(`[Jarvis] Starting scrape: page ${currentPage}, detected total: ${totalPages}, scraping: ${pagesToScrape}`);
+
+    // Scrape current page
     const pageLeads = scrapeCurrentPage();
     console.log(`[Jarvis] Page ${currentPage}: scraped ${pageLeads.length} leads`);
 
-    const startPage = currentPage;
-    const endPage = startPage + pagesToScrape - 1;
+    if (pageLeads.length === 0) {
+      // No results on this page — we're done
+      await setState({
+        inProgress: false,
+        completed: true,
+        leads: [],
+        totalPages: 0,
+        totalLeads: 0,
+        searchName
+      });
+      return;
+    }
+
+    const endPage = currentPage + pagesToScrape - 1;
     const nextPage = currentPage + 1;
 
     if (nextPage > endPage) {
-      // Already on last page
+      // Single page
       await setState({
         inProgress: false,
         completed: true,
         leads: pageLeads,
-        totalPages: pagesToScrape,
+        totalPages: 1,
         totalLeads: pageLeads.length,
         searchName
       });
+      console.log(`[Jarvis] Single page scrape complete: ${pageLeads.length} leads`);
       return;
     }
 
@@ -379,7 +389,13 @@
 
   // On load: check if we need to continue a multi-page scrape
   if (isSearchResultsPage()) {
-    continueScrape();
+    getState().then(state => {
+      console.log('[Jarvis] Page load. URL:', window.location.href, 'State:', JSON.stringify(state));
+      if (state && state.inProgress) {
+        console.log('[Jarvis] Resuming multi-page scrape...');
+        continueScrape();
+      }
+    });
   }
 
   console.log('[Jarvis Prospector] Content script loaded on Sales Navigator');

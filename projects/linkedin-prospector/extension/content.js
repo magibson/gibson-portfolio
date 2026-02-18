@@ -141,6 +141,23 @@
     });
   }
 
+  // Scroll to bottom and back to trigger lazy-loaded results
+  async function scrollToLoadAllResults() {
+    console.log('[Jarvis] Scrolling to load all results...');
+    const delay = ms => new Promise(r => setTimeout(r, ms));
+    const scrollHeight = document.body.scrollHeight;
+    // Scroll down in increments
+    for (let y = 0; y <= scrollHeight; y += 400) {
+      window.scrollTo(0, y);
+      await delay(150);
+    }
+    await delay(800);
+    // Scroll back to top
+    window.scrollTo(0, 0);
+    await delay(500);
+    console.log('[Jarvis] Scroll complete');
+  }
+
   function scrapeCurrentPage() {
     const leads = [];
     const resultCards = document.querySelectorAll(
@@ -296,6 +313,9 @@
     console.log('[Jarvis] continueScrape: results detected, waiting 3s for full render...');
     await new Promise(r => setTimeout(r, 3000));
 
+    // Scroll to trigger lazy-loaded results before scraping
+    await scrollToLoadAllResults();
+
     // Scrape
     const pageLeads = scrapeCurrentPage();
     const allLeads = (state.leads || []).concat(pageLeads);
@@ -363,6 +383,9 @@
 
     const pagesToScrape = maxPages > 0 ? Math.min(maxPages, totalPages) : totalPages;
     console.log('[Jarvis] startScrape: currentPage', currentPage, 'totalPages', totalPages, 'pagesToScrape', pagesToScrape);
+
+    // Scroll to load lazy results before first page scrape
+    await scrollToLoadAllResults();
 
     const pageLeads = scrapeCurrentPage();
     console.log('[Jarvis] startScrape: page', currentPage, 'scraped', pageLeads.length, 'leads');

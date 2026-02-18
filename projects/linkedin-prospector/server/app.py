@@ -70,10 +70,73 @@ def init_db():
             created_at TEXT DEFAULT (datetime('now'))
         );
 
+        CREATE TABLE IF NOT EXISTS campaigns (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            description TEXT DEFAULT '',
+            filters_description TEXT DEFAULT '',
+            sales_nav_url TEXT DEFAULT '',
+            message_context TEXT DEFAULT '',
+            connection_template TEXT DEFAULT '',
+            followup_template TEXT DEFAULT '',
+            status TEXT DEFAULT 'active',
+            leads_count INTEGER DEFAULT 0,
+            created_at TEXT DEFAULT (datetime('now')),
+            updated_at TEXT DEFAULT (datetime('now'))
+        );
+
         CREATE INDEX IF NOT EXISTS idx_leads_status ON leads(status);
         CREATE INDEX IF NOT EXISTS idx_leads_score ON leads(score);
         CREATE INDEX IF NOT EXISTS idx_leads_search ON leads(search_name);
     ''')
+
+    # Migrate: add campaign_id to leads if missing
+    cursor = db.execute("PRAGMA table_info(leads)")
+    cols = [row[1] for row in cursor.fetchall()]
+    if 'campaign_id' not in cols:
+        db.execute('ALTER TABLE leads ADD COLUMN campaign_id INTEGER DEFAULT NULL')
+
+    # Create index for campaign_id
+    db.execute('CREATE INDEX IF NOT EXISTS idx_leads_campaign ON leads(campaign_id)')
+
+    db.commit()
+
+    # Seed default campaigns if table is empty
+    count = db.execute('SELECT COUNT(*) FROM campaigns').fetchone()[0]
+    if count == 0:
+        now = datetime.utcnow().isoformat()
+        campaigns = [
+            ("Local Job Changes",
+             "People who recently changed jobs in our area — warm intro opportunity",
+             "Changed jobs in past 90 days, Geography: NJ + PA, 2nd/3rd degree connections",
+             "",
+             "This prospect recently changed jobs. Congratulate them on the new role at their new company BY NAME. Mention you help people going through career transitions make sure their financial plan transitions with them.",
+             "", "", "active", now, now),
+            ("Federal Employees at Risk",
+             "Federal agency workers facing government uncertainty — FEGLI/TSP/FERS angle",
+             "Current company: IRS, EPA, VA, SSA, Dept of Education, HHS, USAID. Geography: NJ + PA.",
+             "",
+             "This prospect works for a federal agency during a time of government uncertainty. Be empathetic. Reference FEGLI, TSP, or FERS naturally. Offer to help them understand their options.",
+             "", "", "active", now, now),
+            ("Young Families — Monmouth County",
+             "Working professionals with growing families — protection + education planning",
+             "5-15 years experience, Manager+, Monmouth County NJ, posted in last 30 days",
+             "",
+             "This prospect is a working professional with a growing family. Reference the juggle of priorities — protecting the family, saving for kids' education, building wealth. Be relatable.",
+             "", "", "active", now, now),
+            ("High Earners Approaching Retirement",
+             "Senior professionals nearing retirement — complex planning needs",
+             "20+ years experience, Director/VP/C-suite, Monmouth County, company 200+",
+             "",
+             "Senior professional approaching retirement. Reference the complexity at their level — 401k rollover, tax optimization, estate planning. Be peer-level, not salesy.",
+             "", "", "active", now, now),
+        ]
+        db.executemany('''INSERT INTO campaigns
+            (name, description, filters_description, sales_nav_url, message_context,
+             connection_template, followup_template, status, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', campaigns)
+        db.commit()
+
     db.close()
 
 init_db()
@@ -96,7 +159,7 @@ SYSTEM_PROMPT = (
     "- Connection requests MUST be under 300 characters (LinkedIn hard limit)."
 )
 
-# Search-specific instructions for message tailoring
+# Search-specific instructions for message tailoring (legacy fallback)
 SEARCH_CONTEXT = {
     'local job changes': (
         "This prospect RECENTLY CHANGED JOBS. This is the key detail. "
@@ -140,6 +203,21 @@ def get_search_context(search_name):
             return context
     return SEARCH_CONTEXT['default']
 
+def get_campaign_context(campaign_id):
+    """Look up campaign and return (message_context, connection_template, followup_template) or None."""
+    if not campaign_id:
+        return None
+    try:
+        db = sqlite3.connect(DB_PATH)
+        db.row_factory = sqlite3.Row
+        row = db.execute('SELECT * FROM campaigns WHERE id = ?', (campaign_id,)).fetchone()
+        db.close()
+        if row:
+            return dict(row)
+        return None
+    except:
+        return None
+
 def generate_drafts(lead):
     """Generate connection request + follow-up DM for a lead using Gemini."""
     lead_info = (
@@ -152,15 +230,28 @@ def generate_drafts(lead):
         f"Connection: {lead['connection_degree']}"
     )
 
-    search_context = get_search_context(lead['search_name'])
-    
+    # Try campaign context first, fall back to search name matching
+    campaign = get_campaign_context(lead.get('campaign_id'))
+    if campaign and campaign.get('message_context'):
+        search_context = campaign['message_context']
+    else:
+        search_context = get_search_context(lead['search_name'])
+
     drafts = {}
     for draft_type, max_chars in [('connection_request', 300), ('follow_up_dm', 500)]:
         if draft_type == 'connection_request':
             label = "LinkedIn connection request message (MUST be under 300 characters — this is a hard limit)"
+            # Include connection template example if available
+            template_hint = ''
+            if campaign and campaign.get('connection_template'):
+                template_hint = f"\n\nHere's an example of the tone/style to use (don't copy verbatim, adapt it): {campaign['connection_template']}"
         else:
             label = "follow-up DM to send after they accept the connection (under 500 characters)"
-        prompt = f"Context about this search: {search_context}\n\nWrite a {label} for this prospect:\n\n{lead_info}"
+            template_hint = ''
+            if campaign and campaign.get('followup_template'):
+                template_hint = f"\n\nHere's an example of the tone/style to use (don't copy verbatim, adapt it): {campaign['followup_template']}"
+
+        prompt = f"Context about this search: {search_context}{template_hint}\n\nWrite a {label} for this prospect:\n\n{lead_info}"
 
         try:
             resp = requests.post(GEMINI_URL, json={
@@ -207,6 +298,18 @@ def score_lead(lead):
         return 50, 'Auto-scored (default)'
 
 # ---------------------------------------------------------------------------
+# Helper: update campaign lead counts
+# ---------------------------------------------------------------------------
+
+def update_campaign_lead_counts():
+    """Recalculate leads_count for all campaigns."""
+    db = get_db()
+    db.execute('''UPDATE campaigns SET leads_count = (
+        SELECT COUNT(*) FROM leads WHERE leads.campaign_id = campaigns.id
+    )''')
+    db.commit()
+
+# ---------------------------------------------------------------------------
 # API Routes
 # ---------------------------------------------------------------------------
 
@@ -229,12 +332,78 @@ def api_dashboard():
         'meetings': meetings, 'replied': replied, 'response_rate': response_rate
     })
 
+# ---------------------------------------------------------------------------
+# Campaign API
+# ---------------------------------------------------------------------------
+
+@app.route('/api/campaigns', methods=['GET'])
+def list_campaigns():
+    db = get_db()
+    update_campaign_lead_counts()
+    rows = db.execute('SELECT * FROM campaigns ORDER BY created_at DESC').fetchall()
+    return jsonify({'campaigns': [row_to_dict(r) for r in rows]})
+
+@app.route('/api/campaigns', methods=['POST'])
+def create_campaign():
+    data = request.json
+    db = get_db()
+    now = datetime.utcnow().isoformat()
+    db.execute('''INSERT INTO campaigns (name, description, filters_description, sales_nav_url,
+        message_context, connection_template, followup_template, status, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+        (data.get('name', ''), data.get('description', ''), data.get('filters_description', ''),
+         data.get('sales_nav_url', ''), data.get('message_context', ''),
+         data.get('connection_template', ''), data.get('followup_template', ''),
+         data.get('status', 'active'), now, now))
+    db.commit()
+    return jsonify({'status': 'ok', 'id': db.execute('SELECT last_insert_rowid()').fetchone()[0]})
+
+@app.route('/api/campaigns/<int:campaign_id>', methods=['PUT'])
+def update_campaign(campaign_id):
+    data = request.json
+    db = get_db()
+    allowed = {'name', 'description', 'filters_description', 'sales_nav_url',
+               'message_context', 'connection_template', 'followup_template', 'status'}
+    sets = []
+    params = []
+    for key, val in data.items():
+        if key in allowed:
+            sets.append(f'{key} = ?')
+            params.append(val)
+    if not sets:
+        return jsonify({'error': 'No valid fields'}), 400
+    sets.append("updated_at = datetime('now')")
+    params.append(campaign_id)
+    db.execute(f"UPDATE campaigns SET {', '.join(sets)} WHERE id = ?", params)
+    db.commit()
+    return jsonify({'status': 'ok'})
+
+@app.route('/api/campaigns/<int:campaign_id>', methods=['DELETE'])
+def delete_campaign(campaign_id):
+    db = get_db()
+    db.execute('DELETE FROM campaigns WHERE id = ?', (campaign_id,))
+    # Unlink leads (don't delete them)
+    db.execute('UPDATE leads SET campaign_id = NULL WHERE campaign_id = ?', (campaign_id,))
+    db.commit()
+    return jsonify({'status': 'ok'})
+
+@app.route('/api/campaigns/<int:campaign_id>/leads', methods=['GET'])
+def campaign_leads(campaign_id):
+    db = get_db()
+    rows = db.execute('SELECT * FROM leads WHERE campaign_id = ? ORDER BY created_at DESC', (campaign_id,)).fetchall()
+    return jsonify({'leads': [row_to_dict(r) for r in rows]})
+
+# ---------------------------------------------------------------------------
+# Leads API
+# ---------------------------------------------------------------------------
+
 @app.route('/api/leads', methods=['POST'])
 def receive_leads():
     """Receive scraped leads from the Chrome extension."""
     data = request.json
     leads = data.get('leads', [])
     search_name = data.get('search_name', '')
+    campaign_id = data.get('campaign_id')
     db = get_db()
     new_count = 0
     dupe_count = 0
@@ -246,14 +415,15 @@ def receive_leads():
         try:
             db.execute('''
                 INSERT INTO leads (linkedin_url, name, title, company, location,
-                    connection_degree, time_in_role, profile_image_url, search_name, scraped_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    connection_degree, time_in_role, profile_image_url, search_name, campaign_id, scraped_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
                 url, lead.get('name', ''), lead.get('title', ''),
                 lead.get('company', ''), lead.get('location', ''),
                 lead.get('connection_degree', ''), lead.get('time_in_role', ''),
                 lead.get('profile_image_url', ''),
                 lead.get('search_name', search_name),
+                campaign_id,
                 lead.get('scraped_at', datetime.utcnow().isoformat())
             ))
             new_count += 1
@@ -261,6 +431,8 @@ def receive_leads():
             dupe_count += 1
 
     db.commit()
+    if campaign_id:
+        update_campaign_lead_counts()
     return jsonify({'status': 'ok', 'new': new_count, 'duplicates': dupe_count, 'total_received': len(leads)})
 
 @app.route('/api/leads', methods=['GET'])
@@ -278,6 +450,11 @@ def list_leads():
     if search:
         query += ' AND search_name = ?'
         params.append(search)
+
+    campaign_id = request.args.get('campaign_id')
+    if campaign_id:
+        query += ' AND campaign_id = ?'
+        params.append(int(campaign_id))
 
     min_score = request.args.get('min_score')
     if min_score:
@@ -327,7 +504,7 @@ def update_lead(lead_id):
     db = get_db()
     data = request.json
     allowed = {'status', 'notes', 'contacted_at', 'score', 'score_reason',
-               'message_draft', 'message_draft_2', 'search_name'}
+               'message_draft', 'message_draft_2', 'search_name', 'campaign_id'}
     sets = []
     params = []
     for key, val in data.items():

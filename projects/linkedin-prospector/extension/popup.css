@@ -35,6 +35,42 @@ h1 {
 .status.connected { background: #0d3320; color: #34d399; }
 .status.disconnected { background: #3b1c1c; color: #f87171; }
 
+/* Campaign Selector */
+.campaign-selector {
+  background: #16213e;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.selector-label {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+.campaign-selector select {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  background: #0f172a;
+  color: #e0e0e0;
+  font-size: 13px;
+}
+.campaign-selector select:focus { outline: none; border-color: #2563eb; }
+.btn-open-search {
+  background: #2563eb !important;
+  color: white !important;
+  white-space: nowrap;
+  flex: none;
+}
+.btn-open-search:hover { background: #1d4ed8 !important; }
+
 .page-status {
   background: #16213e;
   border-radius: 8px;

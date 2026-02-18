@@ -4,6 +4,8 @@
 const $ = (sel) => document.querySelector(sel);
 
 let collectedLeads = [];
+let campaigns = [];
+let selectedCampaign = null;
 let settings = {
   apiUrl: 'http://100.83.250.65:8089',
   maxPages: 0,
@@ -11,7 +13,7 @@ let settings = {
 };
 
 // Load saved settings
-chrome.storage.local.get(['jarvisSettings'], (result) => {
+chrome.storage.local.get(['jarvisSettings', 'jarvisSelectedCampaignId'], (result) => {
   if (result.jarvisSettings) {
     settings = { ...settings, ...result.jarvisSettings };
     $('#apiUrl').value = settings.apiUrl;
@@ -19,6 +21,7 @@ chrome.storage.local.get(['jarvisSettings'], (result) => {
     $('#searchName').value = settings.searchName || '';
   }
   checkServerConnection();
+  loadCampaigns(result.jarvisSelectedCampaignId || null);
 });
 
 // Save settings
@@ -28,7 +31,62 @@ $('#btnSaveSettings').addEventListener('click', () => {
   settings.searchName = $('#searchName').value;
   chrome.storage.local.set({ jarvisSettings: settings });
   checkServerConnection();
+  loadCampaigns();
 });
+
+// Campaign selector change
+$('#campaignSelect').addEventListener('change', () => {
+  const val = $('#campaignSelect').value;
+  selectedCampaign = val ? campaigns.find(c => c.id === parseInt(val)) : null;
+  chrome.storage.local.set({ jarvisSelectedCampaignId: val ? parseInt(val) : null });
+  updateCampaignUI();
+});
+
+// Open search button
+$('#btnOpenSearch').addEventListener('click', () => {
+  if (selectedCampaign && selectedCampaign.sales_nav_url) {
+    chrome.tabs.create({ url: selectedCampaign.sales_nav_url });
+  }
+});
+
+async function loadCampaigns(restoreId) {
+  try {
+    const resp = await fetch(settings.apiUrl + '/api/campaigns', { signal: AbortSignal.timeout(5000) });
+    if (!resp.ok) return;
+    const data = await resp.json();
+    campaigns = (data.campaigns || []).filter(c => c.status === 'active');
+    const sel = $('#campaignSelect');
+    sel.innerHTML = '<option value="">— No Campaign —</option>';
+    campaigns.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = `${c.name} (${c.leads_count} leads)`;
+      sel.appendChild(opt);
+    });
+    // Restore previous selection
+    if (restoreId) {
+      sel.value = restoreId;
+      selectedCampaign = campaigns.find(c => c.id === parseInt(restoreId)) || null;
+    }
+    updateCampaignUI();
+  } catch {
+    // Server not reachable — campaigns won't load
+  }
+}
+
+function updateCampaignUI() {
+  const btn = $('#btnOpenSearch');
+  if (selectedCampaign && selectedCampaign.sales_nav_url && selectedCampaign.sales_nav_url.trim()) {
+    btn.style.display = '';
+  } else {
+    btn.style.display = 'none';
+  }
+  // Auto-set search name from campaign
+  if (selectedCampaign) {
+    $('#searchName').value = selectedCampaign.name;
+    settings.searchName = selectedCampaign.name;
+  }
+}
 
 // Check if server is reachable
 async function checkServerConnection() {
@@ -44,7 +102,7 @@ async function checkServerConnection() {
   }
 }
 
-// Check current tab status — polls storage-based state
+// Check current tab status
 async function checkPageStatus() {
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -71,7 +129,6 @@ async function checkPageStatus() {
       }
 
       if (resp.isScraping) {
-        // Scrape in progress (multi-page, navigating between pages)
         $('#pageStatus').textContent = `Scraping in progress... page ${resp.currentPage} of ${resp.totalPages} (${resp.leadsFound} leads so far)`;
         $('#pageStatus').className = 'page-status ready';
         $('#btnScrape').style.display = 'none';
@@ -84,7 +141,6 @@ async function checkPageStatus() {
       }
 
       if (resp.completed && resp.leads && resp.leads.length > 0) {
-        // Scrape completed — show results
         collectedLeads = resp.leads;
         if (resp.searchName) {
           collectedLeads.forEach(l => l.search_name = resp.searchName);
@@ -102,7 +158,6 @@ async function checkPageStatus() {
         return;
       }
 
-      // Ready to scrape
       $('#pageStatus').textContent = 'Ready to scrape this search.';
       $('#pageStatus').className = 'page-status ready';
       $('#btnScrape').style.display = '';
@@ -118,8 +173,6 @@ async function checkPageStatus() {
 }
 
 checkPageStatus();
-
-// Poll status every 2 seconds (since page reloads kill message listeners)
 const statusInterval = setInterval(checkPageStatus, 2000);
 
 // Start scraping
@@ -137,12 +190,13 @@ $('#btnScrape').addEventListener('click', async () => {
   $('#progressText').textContent = 'Starting scrape...';
   $('#progressFill').style.width = '0%';
 
-  // Clear previous state first
+  const searchName = selectedCampaign ? selectedCampaign.name : settings.searchName;
+
   chrome.tabs.sendMessage(tab.id, { type: 'CLEAR_STATE' }, () => {
     chrome.tabs.sendMessage(tab.id, {
       type: 'START_SCRAPE',
       maxPages: settings.maxPages,
-      searchName: settings.searchName
+      searchName: searchName
     });
   });
 });
@@ -162,14 +216,20 @@ $('#btnSend').addEventListener('click', async () => {
   $('#btnSend').textContent = 'Sending...';
   $('#sendResult').style.display = 'none';
 
+  const searchName = selectedCampaign ? selectedCampaign.name : settings.searchName;
+  const payload = {
+    leads: collectedLeads,
+    search_name: searchName
+  };
+  if (selectedCampaign) {
+    payload.campaign_id = selectedCampaign.id;
+  }
+
   try {
     const resp = await fetch(settings.apiUrl + '/api/leads', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        leads: collectedLeads,
-        search_name: settings.searchName
-      })
+      body: JSON.stringify(payload)
     });
 
     const data = await resp.json();
@@ -180,9 +240,10 @@ $('#btnSend').addEventListener('click', async () => {
       $('#sendResult').textContent = `✓ Sent! ${data.new || 0} new leads added, ${data.duplicates || 0} duplicates skipped.`;
       $('#sendResult').className = 'send-result success';
 
-      // Clear scrape state after successful send
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
       if (tab) chrome.tabs.sendMessage(tab.id, { type: 'CLEAR_STATE' });
+      // Refresh campaign list to update counts
+      loadCampaigns(selectedCampaign ? selectedCampaign.id : null);
     } else {
       throw new Error(data.error || 'Server error');
     }

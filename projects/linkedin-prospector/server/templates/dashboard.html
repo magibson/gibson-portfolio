@@ -11,6 +11,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
 header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
 h1 { font-size: 24px; color: var(--blue); }
+h2 { font-size: 18px; color: var(--text); margin-bottom: 12px; }
 .header-actions { display: flex; gap: 8px; }
 .btn { padding: 8px 16px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
 .btn-blue { background: var(--blue); color: white; }
@@ -18,12 +19,39 @@ h1 { font-size: 24px; color: var(--blue); }
 .btn-sm { padding: 4px 10px; font-size: 12px; border-radius: 6px; }
 .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--muted); }
 .btn-outline:hover { border-color: var(--blue); color: var(--blue); }
+.btn-green { background: var(--green); color: white; }
+.btn-green:hover { background: #16a34a; }
+.btn-red { background: var(--red); color: white; }
+.btn-red:hover { background: #dc2626; }
 
 /* Stats Cards */
 .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 24px; }
 .stat-card { background: var(--card); border-radius: 12px; padding: 16px; text-align: center; }
 .stat-card .num { font-size: 32px; font-weight: 700; color: var(--blue); }
 .stat-card .label { font-size: 12px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+
+/* Campaign Cards */
+.campaigns-section { margin-bottom: 24px; }
+.campaigns-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.campaign-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.campaign-card {
+  background: var(--card); border-radius: 12px; padding: 16px; cursor: pointer;
+  border: 2px solid transparent; transition: all 0.2s; position: relative;
+}
+.campaign-card:hover { border-color: var(--blue); }
+.campaign-card.active-filter { border-color: var(--blue); background: #16213e; }
+.campaign-card.all-leads { border-style: dashed; border-color: var(--border); }
+.campaign-card.all-leads:hover { border-color: var(--blue); }
+.campaign-card .camp-name { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.campaign-card .camp-desc { font-size: 12px; color: var(--dim); margin-bottom: 8px; line-height: 1.4; }
+.campaign-card .camp-meta { display: flex; justify-content: space-between; align-items: center; }
+.campaign-card .camp-leads { font-size: 20px; font-weight: 700; color: var(--blue); }
+.campaign-card .camp-leads-label { font-size: 11px; color: var(--dim); }
+.campaign-card .camp-status { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+.camp-status-active { background: #0d3320; color: #34d399; }
+.camp-status-paused { background: #3b3a1a; color: var(--yellow); }
+.campaign-card .camp-actions { display: flex; gap: 4px; margin-top: 8px; }
+.camp-filters { font-size: 11px; color: var(--muted); background: var(--bg); padding: 6px 8px; border-radius: 6px; margin-top: 6px; line-height: 1.4; }
 
 /* Filters */
 .filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
@@ -61,11 +89,15 @@ input[type=checkbox] { accent-color: var(--blue); }
 .draft-box .copy-btn { position: absolute; top: 8px; right: 8px; }
 .draft-actions { display: flex; gap: 8px; margin-top: 8px; }
 
-/* Responsive */
+/* Toast */
+.toast { position: fixed; bottom: 20px; right: 20px; background: var(--green); color: white; padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; opacity: 0; transition: opacity 0.3s; z-index: 999; }
+.toast.show { opacity: 1; }
+
 @media (max-width: 768px) {
   .filters { flex-direction: column; }
   table { font-size: 12px; }
   .msg-preview { display: none; }
+  .campaign-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -80,6 +112,14 @@ input[type=checkbox] { accent-color: var(--blue); }
   </header>
 
   <div class="stats" id="statsCards"></div>
+
+  <!-- Campaigns Section -->
+  <div class="campaigns-section">
+    <div class="campaigns-header">
+      <h2>📋 Campaigns</h2>
+    </div>
+    <div class="campaign-grid" id="campaignGrid"></div>
+  </div>
 
   <div class="filters">
     <select id="filterStatus" onchange="loadLeads()">
@@ -116,16 +156,27 @@ input[type=checkbox] { accent-color: var(--blue); }
   </div>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
 const API = '';
 let currentSort = 'created_at';
 let currentOrder = 'desc';
 let expandedId = null;
 let selectedIds = new Set();
+let activeCampaignId = null; // null = all leads
+let campaigns = [];
 
 async function api(path, opts = {}) {
   const r = await fetch(API + path, { headers: {'Content-Type':'application/json'}, ...opts });
   return r.json();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
 }
 
 async function loadStats() {
@@ -139,10 +190,57 @@ async function loadStats() {
   `;
 }
 
+async function loadCampaigns() {
+  const d = await api('/api/campaigns');
+  campaigns = d.campaigns || [];
+  renderCampaigns();
+}
+
+function renderCampaigns() {
+  const grid = document.getElementById('campaignGrid');
+  // "All Leads" card
+  let html = `<div class="campaign-card all-leads ${activeCampaignId === null ? 'active-filter' : ''}" onclick="filterByCampaign(null)">
+    <div class="camp-name">All Leads</div>
+    <div class="camp-desc">Show leads from all campaigns</div>
+  </div>`;
+
+  campaigns.forEach(c => {
+    const statusClass = c.status === 'active' ? 'camp-status-active' : 'camp-status-paused';
+    const hasUrl = c.sales_nav_url && c.sales_nav_url.trim();
+    html += `<div class="campaign-card ${activeCampaignId === c.id ? 'active-filter' : ''}" onclick="filterByCampaign(${c.id})">
+      <div class="camp-name">${esc(c.name)}</div>
+      <div class="camp-desc">${esc(c.description)}</div>
+      <div class="camp-meta">
+        <div><span class="camp-leads">${c.leads_count}</span> <span class="camp-leads-label">leads</span></div>
+        <span class="camp-status ${statusClass}">${c.status}</span>
+      </div>
+      ${c.filters_description ? `<div class="camp-filters">🔍 ${esc(c.filters_description)}</div>` : ''}
+      <div class="camp-actions" onclick="event.stopPropagation()">
+        ${hasUrl ? `<button class="btn btn-sm btn-outline" onclick="copyUrl(${c.id})">Copy URL</button>` : ''}
+        ${hasUrl ? `<button class="btn btn-sm btn-outline" onclick="window.open('${esc(c.sales_nav_url)}','_blank')">Open Search</button>` : ''}
+      </div>
+    </div>`;
+  });
+  grid.innerHTML = html;
+}
+
+function filterByCampaign(id) {
+  activeCampaignId = id;
+  renderCampaigns();
+  loadLeads();
+}
+
+function copyUrl(campId) {
+  const c = campaigns.find(x => x.id === campId);
+  if (c && c.sales_nav_url) {
+    navigator.clipboard.writeText(c.sales_nav_url);
+    showToast('URL copied!');
+  }
+}
+
 async function loadSearches() {
   const d = await api('/api/searches');
   const sel = document.getElementById('filterSearch');
-  // Get unique search names from leads too
   const leads = await api('/api/leads?limit=1000');
   const names = new Set(leads.leads.map(l => l.search_name).filter(Boolean));
   d.searches.forEach(s => names.add(s.name));
@@ -154,6 +252,7 @@ async function loadLeads() {
   params.set('sort', currentSort);
   params.set('order', currentOrder);
   params.set('limit', '200');
+  if (activeCampaignId !== null) params.set('campaign_id', activeCampaignId);
   const status = document.getElementById('filterStatus').value;
   if (status) params.set('status', status);
   const minS = document.getElementById('filterMinScore').value;
@@ -194,12 +293,14 @@ async function loadLeads() {
 }
 
 function renderDetail(l) {
+  const campName = l.campaign_id ? (campaigns.find(c => c.id === l.campaign_id) || {}).name || `#${l.campaign_id}` : '—';
   return `<div class="lead-detail">
     <div class="info-grid">
       <div><span class="label">Location:</span> ${esc(l.location)}</div>
       <div><span class="label">Connection:</span> ${esc(l.connection_degree)}</div>
       <div><span class="label">Time in Role:</span> ${esc(l.time_in_role)}</div>
       <div><span class="label">Search:</span> ${esc(l.search_name)}</div>
+      <div><span class="label">Campaign:</span> ${esc(campName)}</div>
       <div><span class="label">Score Reason:</span> ${esc(l.score_reason)}</div>
       <div><span class="label">LinkedIn:</span> <a href="${esc(l.linkedin_url)}" target="_blank" style="color:var(--blue)">${l.linkedin_url ? 'View Profile' : '—'}</a></div>
     </div>
@@ -240,6 +341,7 @@ function copyText(elId) {
   const el = document.getElementById(elId);
   const text = el.textContent.replace('Copy', '').trim();
   navigator.clipboard.writeText(text);
+  showToast('Copied!');
 }
 
 async function generateDraft(id) {
@@ -279,6 +381,7 @@ async function generateAllDrafts() {
 
 // Init
 loadStats();
+loadCampaigns();
 loadSearches();
 loadLeads();
 </script>

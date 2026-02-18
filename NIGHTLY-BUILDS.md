@@ -4,6 +4,70 @@
 
 ---
 
+## 2026-02-18 — AI Caption & Hashtag Generator 📸✨
+
+**Location:** `~/clawd/projects/photo-caption-gen/` | **Port:** 8100 | **Service:** `jarvis-captions.service`
+
+The problem: Matt has 5 years of photo backlog and wants to grow @mattgibsonpics, but writing captions is the friction that stops consistent posting. You can have a perfect shot edited and ready — and still not post it because the caption feels like work.
+
+This removes that friction entirely.
+
+**What it does:**
+- Describe your photo (location, mood, type), hit Generate → Gemini 2.0 Flash produces 5 captions in different styles:
+  - **Storytelling** — 3-5 sentences, personal narrative ("There's something about golden hour at Barnegat Light...")
+  - **Minimal** — 1-10 words, punchy ("Barnegat Light bathed in gold. ✨")
+  - **Question** — Drives engagement, ends with a comment prompt
+  - **Factual** — Interesting info about the location/subject ("Old Barney stands 163 feet tall...")
+  - **Poetic** — Lyrical, 2-3 lines of imagery
+
+- **30 Hashtags in 3 tiers** — Niche (1K-50K posts, purple), Mid (50K-500K, blue), Large (500K+, gray). Best practice for Instagram reach: mix all three. One-tap "Copy All 30 Tags."
+
+- **Copy shortcuts:**
+  - 📋 Copy caption alone
+  - 📋 Copy caption + all hashtags (ready to paste into Instagram)
+  - 📋 Copy Best Caption + All Tags (one-tap, grab and go)
+
+- **History tab** — Every generation saved. Come back next week for a photo you shot months ago, it's all there.
+
+- **Save to Content Calendar** — Push any caption to port 8097 with a date picker. Plans out the week in seconds.
+
+**Tested:** Live Gemini API call worked first try. Generated genuinely good captions for a Barnegat Lighthouse drone shot — the Factual caption even knew the nickname "Old Barney" and the lighthouse height. The Minimal was perfect: *"Barnegat Light bathed in gold. ✨"*
+
+**Why this over another FA tool:** Matt already has Dial Tracker, Habit Tracker, Meeting Prep, Prospect Pipeline, LinkedIn Prospector, WARN pipeline, Client Touchpoints — the FA stack is built. Photography was the gap. The bottleneck isn't taking photos (5 years of backlog), it's posting them. Caption writer's block is real and this solves it.
+
+**Committed:** 7694a2b | pushed to JARVIS-workspace main
+
+---
+
+## 2026-02-18 — WARN-to-Prospector Pipeline 🚨→📁
+
+**Files:** `~/clawd/projects/warn-tracker/notify.py`, `~/clawd/projects/warn-tracker/layoff_outreach.py`
+
+### What was built
+Full pipeline connecting the WARN Act tracker to the LinkedIn Prospector system:
+
+**1. `layoff_outreach.py` (new)**
+- Calls Gemini API to generate empathetic, layoff-specific outreach messages
+- Produces `connection_request` (≤300 chars) and `followup_dm` (≤500 chars)
+- 401k rollover focus, no hard selling, human tone
+- Fallback templates if Gemini fails
+- CLI test mode: `python3 layoff_outreach.py --test "Acme Corp" 250 "Monmouth County, NJ"`
+
+**2. `notify.py` (updated)**
+- Generates LinkedIn Sales Navigator people search URL (URL-encoded company name)
+- Inserts campaign into Prospector DB (`campaigns` table) with:
+  - name: "WARN - [Company] - [Date]"
+  - description: employees/date/target pitch angles
+  - `sales_nav_url`, `message_context`, `connection_template`, `followup_template`
+- Dedupes: won't create duplicate campaigns
+- Sends enriched notification (company, location, count, Sales Nav URL, "Campaign created", "Outreach drafted")
+- DB schema already had all needed columns — no migrations needed
+
+**Tested:** Dry-run with Acme Corp (250 employees, Red Bank NJ) — campaign id=5 created successfully
+**Committed:** b1a90eb | pushed to JARVIS-workspace main
+
+---
+
 ## 2026-02-18 — Jarvis Prospector Polish + Pagination Fix 🎯
 
 **Location:** `~/clawd/projects/linkedin-prospector/` | **Port:** 8089

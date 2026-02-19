@@ -4,6 +4,75 @@
 
 ---
 
+## 2026-02-19 — FA Script Practice Tool 🎯
+
+**Location:** `/home/clawd/projects/script-practice/` | **Port:** 8101 | **Service:** `jarvis-script-practice.service`
+
+You're about to start running the LinkedIn Prospector in real calls and office outreach. The tools to track leads, draft messages, and manage campaigns are all built. What's been missing: a place to PRACTICE the actual conversation before it counts.
+
+This is an AI role-play coach. You pick a scenario, the AI plays a realistic prospect (complete with objections, skepticism, and personality), and at the end you get honest coaching feedback with a score out of 10.
+
+**5 Scenarios:**
+
+| Scenario | Prospect | Goal |
+|---|---|---|
+| 📞 Cold Call | Dave Kowalski, 42, construction foreman | Get him to agree to a 20-min meeting |
+| 🤝 Discovery Meeting | Jennifer & Mark Santos (referred) | Uncover situation, close on 2nd meeting |
+| 💸 Cost Objection | Brian Tully, 35, balking at $180/mo premium | Reframe value, keep sale moving |
+| 🤔 "I Need to Think About It" | Carol Diaz, 55, hiding real objection | Find the real blocker, get a commitment |
+| 🌟 Asking for Referrals | Tom Graber, happy client | Get 2-3 warm names with permission |
+
+**What makes it good:**
+- **Prospects feel real.** Dave ("New York Life? Never heard of ya") responds like an actual skeptical homeowner, not a chatbot. He warms up if you're genuine, resists if you pitch hard.
+- **Mid-session hints.** Hit "💡 Hint" and get a coach whispering in your ear based on exactly where the conversation is ("Dave seems concerned about time — try reframing the 20 minutes as a quick value exchange...")
+- **Coaching feedback that references your actual words.** Scores 1-10. Calls out specific lines you said and what you should have said instead. One key takeaway. A script you can steal.
+- **Session history.** Every practice session saved. Come back and review what you said and how the AI coached you.
+
+**Tested live:** Dave scored the test conversation a 4/10, caught two real weaknesses — weak opening hook and not handling the mortgage insurance misconception. The coaching was specific and actionable, not generic.
+
+**Tech:** Flask + SQLite + Gemini 2.0 Flash (costs fractions of a cent per session). Dark theme, mobile-friendly, responsive chat interface.
+
+---
+
+## 2026-02-18/19 — Prospector Dashboard: Office-Ready Improvements 🚀
+
+**Context:** Matt tests the LinkedIn Prospector in the office tomorrow. Dashboard lives at port 8089, used to scrape and manage Sales Navigator leads.
+
+**Built:**
+
+### 1. One-click copy buttons for outreach messages
+- Each lead's expanded detail view now has prominent **"📋 Copy Connection Request"** and **"📋 Copy Follow-up DM"** buttons
+- Uses raw text stored in `leadsData` JS object (no HTML-entity decode issues)
+- Button flashes "✓ Copied!" feedback for 2 seconds after clicking
+- Works in BOTH the AI-generated draft section AND the campaign template section
+
+### 2. Inline quick-status buttons + row color coding
+- Every row in the leads table now has **N P C ✓ M ✗** buttons (New/Pending/Contacted/Connected/Meeting/Closed)
+- One click updates status instantly without opening the lead detail
+- Rows are color-coded by status: new=gray, pending=yellow, contacted=blue, connected=green, meeting=purple, closed=dim
+- New status vocabulary: `new → pending → contacted → connected → meeting → closed`
+- Legacy statuses (replied, meeting_set, not_interested) still supported in detail dropdown
+
+### 3. Export to CSV button
+- "⬇ Export CSV" button in the header (teal, hard to miss)
+- Downloads filtered by current campaign (or all leads if viewing All Leads)
+- Columns: Name, Title, Company, Location, Status, Connection Request, Follow-up DM, Campaign, Scraped At
+- Backend route: `GET /api/leads/export?campaign_id=<id>` — clean filename includes campaign name
+
+### 4. WARN campaign templates visible in lead detail
+- When viewing a lead under a WARN campaign (BMS, JP Morgan, Amazon Fresh, etc.), the campaign's `connection_template` and `followup_template` are shown in a **yellow-highlighted template section** at the top of the lead detail
+- Campaign cards in the grid now show a **"📝 Templates"** badge if pre-drafted outreach exists
+- Templates have their own copy buttons so Matt can grab the text in one click
+
+**Files changed:**
+- `~/clawd/projects/linkedin-prospector/server/app.py` — Added CSV export route + `import csv, io, Response`
+- `~/clawd/projects/linkedin-prospector/server/templates/dashboard.html` — Full dashboard rewrite
+
+**Service:** Restarted `jarvis-prospector` (user systemd) — verified 200 on `/` and `/api/leads/export`
+**Git:** Committed + pushed to `magibson/JARVIS-workspace` — commit `9580bf9`
+
+---
+
 ## 2026-02-18 — Advisory Council + Food Journal
 
 **Built:**
@@ -775,3 +844,14 @@ Also set up tonight:
 - Retell Jarvis agent with tools (trading, calendar, health, email)
 - Voice: cartesia-Brian
 - ngrok stable URL: https://unrepugnant-uncrushable-gregoria.ngrok-free.dev
+
+## Feb 19, 2026 — Realtor Outreach Infrastructure
+
+**What:** Researched and compiled 25 active Monmouth County real estate agents with phone numbers, brokerage info, and priority tiers. Drafted the outreach email template (drone angle, free first shoot offer, $299/$350 pricing). Built full tracking sheet.
+
+**File:** `~/clawd/projects/photography/realtor-outreach.md`
+
+**Status:** Ready to send the moment Matt finishes the house portfolio shoot this weekend. Just needs the email account credentials.
+
+**Sources:** Health & Life Magazine Monmouth Top Agents 2025, Grok X search for active agents
+

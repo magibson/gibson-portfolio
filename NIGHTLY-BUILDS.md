@@ -4,6 +4,105 @@
 
 ---
 
+## 2026-02-21 — Kalshi Weather Paper Trading Eval Dashboard 🌦️
+
+**Location:** `~/clawd/projects/kalshi-weather-eval/app.py` | **Port:** 8104 | **Service:** `jarvis-kalshi-eval.service`
+
+The weather paper trading experiment ends Feb 24. Built a full evaluation dashboard to analyze the results and decide whether to go live with real money.
+
+**What it shows:**
+
+### Hero Stats (top)
+- **Total P&L** — $64.00 (green)
+- **Win Rate** — 32.6% (expected low for cheap YES contracts — size/EV is what matters)
+- **ROI** — **412.6%** on $15.51 wagered 🤯
+
+### Charts
+- **P&L by City** — Horizontal bar chart, green/red by direction. Denver dominates, NYC and Austin are red.
+- **Daily P&L + Cumulative** — Line chart showing daily gains and running total. Feb 17 was the monster day (+$47).
+- **Edge % vs Outcome** — Scatter plot (green=win, red=loss) showing higher-edge bets produce bigger wins when they hit.
+
+### Analysis Tables
+- **Win Rate by City** — Denver: 3/7 wins but $66.76 P&L (+8878% ROI). The model is best calibrated there.
+- **Model Calibration** — Probability buckets (0-10%, 10-20%, etc.) comparing predicted vs actual win rate. Shows where the model is under/overconfident.
+- **Top 5 Best Trades** — The Feb 17 Denver T50 YES at 1¢/contract that returned 99x
+- **Top 5 Worst Trades** — Max loss was -62¢. The position sizing is naturally capped (penny contracts).
+
+### Verdict Card
+**"Strong YES — the edge is real"** — ROI > 20%, triggered the green verdict. Recommendations: start live with $25-50 max/day per city, focus on Denver + Chicago first, run 4-6 more weeks before scaling.
+
+**Data:** Reads fresh from `data/kalshi/weather-paper-trades.json` on every page load — will update automatically as remaining 10 unscored trades get settled through Feb 24.
+
+**Added to Jarvis Hub** — Shows up under 💹 Markets & Finance as "Kalshi Weather Eval".
+
+**Built with:** Codex CLI (spec), manual write (sandbox was read-only)
+
+---
+
+## 2026-02-21 — Instagram Growth Strategy Generator 📸
+
+**Location:** `~/clawd/projects/instagram-strategy/instagram_strategy.py`
+**Output:** `~/clawd/data/instagram/weekly_strategy.json`
+
+Built a weekly Instagram content strategy script for @mattgibsonpics. It:
+- Pulls **live trending photography aesthetics + hashtags from X** via Grok (with 24h cache)
+- Generates a **7-day content calendar** with: day/time, content type (photo/reel/carousel), concrete post concept + X trend twist, caption angle, and 7-8 hashtags
+- Includes **top 10 trending hashtags** this week and **3 growth tips** tailored to current trends
+- Saves everything to JSON; run `python3 instagram_strategy.py` anytime (or add `--refresh` to force fresh Grok pull)
+- Optimal posting times baked in per day (research-backed for photography accounts)
+
+Tonight's live results via Grok:
+- Trending aesthetics: tilt-shift miniature, cinematic noir spotlight, bright sunlight realism, NYC street retro, wildlife close-ups, luxury editorial
+- Top hashtags: #naturephotography, #photography, #streetphotography, #photooftheday, etc.
+- Calendar starts Sat Feb 21 and covers through Fri Feb 27
+
+**To run:** `cd ~/clawd/projects/instagram-strategy && python3 instagram_strategy.py`
+
+---
+
+## 2026-02-20 — Jarvis Hub 🏠
+
+**Location:** `/home/clawd/projects/jarvis-hub/` | **Port:** 8102 | **Service:** `jarvis-hub.service`
+
+20+ tools spread across different ports with no single place to find them. Tonight that changes.
+
+**Jarvis Hub** is a central command dashboard — one URL (`100.83.250.65:8102`) that shows every Jarvis tool, its live status, and key metrics at a glance.
+
+**What it shows:**
+
+### Live Metrics Bar (top of page — always fresh)
+- **📞 Weekly Dials** — Current count vs 50 target, color-coded (red/yellow/green), pulls live from `dial-tracker` SQLite
+- **🎯 Appointments** — This week vs 4 target, color shifts red when behind
+- **🔥 Habit Streak** — Consecutive days ≥80% complete, today's completion X/8
+- **💇 Hair Protocol** — Day # of program, today's habits done/total
+- **🎰 Kalshi Portfolio** — Total balance ($226), P&L ($+1.07), position count (44), from latest snapshot
+- **⚡ Tools Online** — Live count of up/down services, color-coded by health
+
+### Tool Cards (19 tools in 5 categories)
+- **🏦 Financial Advisory** — Dashboard, Dial Tracker, Prospect Pipeline, LinkedIn Prospector, Meeting Prep, Client Touchpoints, Script Practice, Call Prep, Advisor Metrics
+- **📸 Photography** — Caption Generator, Content Calendar, Photo Portfolio, X Content Manager
+- **💹 Markets & Finance** — Trading Dashboard, Daily Glance, Move-Out Tracker
+- **💪 Health** — Health Dashboard, Habit Tracker
+- **🎙️ Voice & System** — Voice Dashboard
+
+Each card shows: emoji icon, name, description, port number, and a live green/red status dot. Clicking opens the tool directly.
+
+### Smart Features
+- **Search** — Type to filter tools instantly (searches name + description + port)
+- **Status auto-refresh** — Pings every port every 30 seconds
+- **Metrics auto-refresh** — Pulls fresh SQLite/JSON data every 60 seconds
+- **Down tools dimmed** — Cards for offline services show at 55% opacity so it's obvious at a glance what's not running
+- **Live clock** — Shows current ET time in header
+
+### Bonus Fix
+Fixed a long-standing port collision: `jarvis-portfolio.service` and `jarvis-prospector.service` were both configured for port 8089. Portfolio kept failing silently. Moved portfolio to **port 8103** — both services now running cleanly.
+
+**Tested:** All endpoints working. Metrics pulling real data: 5 dials logged, Kalshi at $226.16 (+$1.07 P&L, 44 positions), Hair Protocol Day 1, 8 active habits.
+
+**Tech:** Flask (single-file), vanilla JS async fetch, systemd user service.
+
+---
+
 ## 2026-02-19 — FA Script Practice Tool 🎯
 
 **Location:** `/home/clawd/projects/script-practice/` | **Port:** 8101 | **Service:** `jarvis-script-practice.service`
@@ -855,3 +954,30 @@ Also set up tonight:
 
 **Sources:** Health & Life Magazine Monmouth Top Agents 2025, Grok X search for active agents
 
+
+## 2026-02-20 (Thu night)
+**Fix: tools-discovery-nightly timeout**
+- Script was running 3 Grok queries at 25s each + agent startup, hitting 180s cron limit
+- Fix: reduced to 2 queries at 20s each (max Grok time now 40s)
+- Cron timeout bumped from 180s to 300s as safety net
+- Had been failing 2 consecutive days — should clear tonight
+
+---
+## 2026-02-19 Night — Fix: tools-discovery-nightly timeout
+
+**Problem:** Cron timing out (180s limit) 2 days in a row.
+**Root cause:** 2 sequential Grok calls with 20s timeouts inside a 180s cron window — not enough buffer for isolated agent startup overhead.
+**Fix:** Reduced to 1 query, bumped per-request timeout to 45s, bumped cron timeout to 300s.
+
+## Feb 20, 2026 — Hair Protocol Tracker
+
+**What:** Built a habit tracker for Matt's new hair loss protocol. Tracks daily checklist (Hims pill, minoxidil AM/PM, Nizoral, dermaroll, Vitamin D), shows streaks, and sends a 9 PM ET reminder if habits are incomplete.
+
+**How to use:**
+- Log habits: text "hair: pill minoxidil-am vitamind"
+- Check status: text "hair status" or "how's my hair protocol?"
+- Auto-reminder fires 9 PM ET if anything's missed
+
+**Files:** `~/clawd/scripts/hair-tracker.py`, data at `~/clawd/data/health/hair-tracker.json`
+
+**Also fixed:** tools-discovery-nightly timeout — reduced Grok request timeout to 30s, cron timeout to 120s. Had been failing 2 days in a row.

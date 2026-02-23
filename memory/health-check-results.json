@@ -1,19 +1,22 @@
 {
-  "timestamp": "2026-02-06T23:25:03.827584",
+  "timestamp": "2026-02-23T18:30:00.835629",
   "checks": {
     "gmail": {
-      "status": "ok",
-      "message": "Gmail accessible"
+      "status": "error",
+      "message": "[Errno 2] No such file or directory: '/home/clawd/bin/himalaya'"
     },
     "google_calendar": {
       "status": "ok",
       "message": "Calendar API working"
     },
     "whoop": {
-      "status": "ok",
-      "message": "Whoop refreshed"
+      "status": "error",
+      "message": "No tokens file"
     }
   },
-  "all_ok": true,
-  "alerts": []
+  "all_ok": false,
+  "alerts": [
+    "Gmail: [Errno 2] No such file or directory: '/home/clawd/bin/himalaya'",
+    "Whoop: No tokens file"
+  ]
 }

@@ -1,5 +1,5 @@
 {
-  "updated": "2026-02-23T09:16:44.833919",
+  "updated": "2026-02-23T09:47:03.268338",
   "email": {
     "unread": 34,
     "error": null
@@ -20,33 +20,33 @@
         "symbol": "^GSPC",
         "name": "S&P 500",
         "type": "index",
-        "price": 6909.51,
-        "change": 0.69,
-        "prevClose": 6861.89
+        "price": 6893.26,
+        "change": -0.24,
+        "prevClose": 6909.51
       },
       {
         "symbol": "^VIX",
         "name": "VIX",
         "type": "volatility",
-        "price": 20.24,
-        "change": 2023999999900.0,
-        "prevClose": 0.0
+        "price": 19.64,
+        "change": 2.88,
+        "prevClose": 19.09
       },
       {
         "symbol": "^TNX",
         "name": "10Y Treasury",
         "type": "bond",
-        "price": 4.06,
-        "change": -0.61,
+        "price": 4.07,
+        "change": -0.51,
         "prevClose": 4.09
       },
       {
         "symbol": "TSLA",
         "name": "TSLA",
         "type": "stock",
-        "price": 411.82,
-        "change": 0.03,
-        "prevClose": 411.71
+        "price": 403.73,
+        "change": -1.96,
+        "prevClose": 411.82
       }
     ],
     "error": null
@@ -65,84 +65,84 @@
         "symbol": "TSLA",
         "description": "TESLA INC COM",
         "quantity": 5.0,
-        "price": 411.82,
-        "value": 2059.1,
-        "today_gain": 2.5,
-        "today_gain_pct": 0.12,
-        "total_gain": 250.86,
-        "total_gain_pct": 13.87,
-        "pct_of_account": 37.34
+        "price": 403.62,
+        "value": 2018.1,
+        "today_gain": -40.45,
+        "today_gain_pct": -1.96,
+        "total_gain": 209.86,
+        "total_gain_pct": 11.61,
+        "pct_of_account": 36.85
       },
       {
         "symbol": "VOO",
         "description": "VANGUARD INDEX FUNDS S&P 500 E",
         "quantity": 2.748,
-        "price": 634.02,
-        "value": 1742.29,
+        "price": 632.4,
+        "value": 1737.84,
         "today_gain": 7.89,
-        "today_gain_pct": 0.45,
-        "total_gain": 95.88,
-        "total_gain_pct": 5.82,
-        "pct_of_account": 31.6
+        "today_gain_pct": 0.46,
+        "total_gain": 91.43,
+        "total_gain_pct": 5.55,
+        "pct_of_account": 31.73
       },
       {
         "symbol": "UNH",
         "description": "UNITEDHEALTH GROUP INC",
         "quantity": 2.014,
-        "price": 290.0,
-        "value": 584.06,
-        "today_gain": 3.63,
-        "today_gain_pct": 0.62,
-        "total_gain": -72.23,
-        "total_gain_pct": -11.01,
-        "pct_of_account": 10.59
+        "price": 290.43,
+        "value": 584.93,
+        "today_gain": 1.01,
+        "today_gain_pct": 0.17,
+        "total_gain": -71.36,
+        "total_gain_pct": -10.87,
+        "pct_of_account": 10.68
       },
       {
         "symbol": "TRGP",
         "description": "TARGA RESOURCES CORP",
         "quantity": 2.0,
-        "price": 231.35,
-        "value": 462.7,
-        "today_gain": 7.46,
-        "today_gain_pct": 1.64,
-        "total_gain": 100.18,
-        "total_gain_pct": 27.63,
-        "pct_of_account": 8.39
+        "price": 232.35,
+        "value": 464.7,
+        "today_gain": 16.38,
+        "today_gain_pct": 3.65,
+        "total_gain": 102.18,
+        "total_gain_pct": 28.19,
+        "pct_of_account": 8.48
       },
       {
         "symbol": "NVDA",
         "description": "NVIDIA CORPORATION COM",
         "quantity": 2.0,
-        "price": 189.82,
-        "value": 379.64,
-        "today_gain": 3.68,
-        "today_gain_pct": 0.98,
-        "total_gain": 55.51,
-        "total_gain_pct": 17.13,
-        "pct_of_account": 6.89
+        "price": 192.51,
+        "value": 385.02,
+        "today_gain": 9.22,
+        "today_gain_pct": 2.45,
+        "total_gain": 60.89,
+        "total_gain_pct": 18.79,
+        "pct_of_account": 7.03
       },
       {
         "symbol": "PFE",
         "description": "PFIZER INC",
         "quantity": 6.148,
-        "price": 26.65,
-        "value": 163.84,
-        "today_gain": -4.43,
-        "today_gain_pct": -2.63,
-        "total_gain": 11.01,
-        "total_gain_pct": 7.2,
-        "pct_of_account": 2.97
+        "price": 26.79,
+        "value": 164.7,
+        "today_gain": -0.43,
+        "today_gain_pct": -0.26,
+        "total_gain": 11.87,
+        "total_gain_pct": 7.77,
+        "pct_of_account": 3.01
       },
       {
         "symbol": "CCJ",
         "description": "CAMECO CORP COM NPV ISIN #CA13",
         "quantity": 1.002,
-        "price": 121.35,
-        "value": 121.59,
-        "today_gain": 4.86,
-        "today_gain_pct": 4.16,
-        "total_gain": 49.17,
-        "total_gain_pct": 67.9,
+        "price": 120.75,
+        "value": 120.99,
+        "today_gain": 1.72,
+        "today_gain_pct": 1.45,
+        "total_gain": 48.57,
+        "total_gain_pct": 67.07,
         "pct_of_account": 2.21
       },
       {
@@ -158,11 +158,11 @@
         "pct_of_account": 0.01
       }
     ],
-    "total_value": 5513.83,
-    "today_gain": 25.59,
-    "today_gain_pct": 0.46,
-    "total_gain": 490.38,
-    "total_gain_pct": 9.76,
+    "total_value": 5476.89,
+    "today_gain": -4.66,
+    "today_gain_pct": -0.09,
+    "total_gain": 453.44,
+    "total_gain_pct": 9.03,
     "cost_basis": 5022.84,
     "history": [
       5549.28,
@@ -199,34 +199,16 @@
         "projectId": "668b598bef8511130af04740",
         "title": "CRUMP sign up",
         "project": "\ud83d\udcbcWork",
-        "dueDate": "2026-02-18T05:00:00.000+0000",
+        "dueDate": "2026-02-23T05:00:00.000+0000",
         "priority": 0,
         "status": 0
       },
       {
-        "id": "69403cebe982513b82ab8d69",
+        "id": "699c656ede305102e24a19cd",
         "projectId": "668b598bef8511130af04740",
-        "title": "call Jessica",
+        "title": "figure out booklets",
         "project": "\ud83d\udcbcWork",
-        "dueDate": "2026-02-19T05:00:00.000+0000",
-        "priority": 0,
-        "status": 0
-      },
-      {
-        "id": "6970f514dc9bd1033140ad4e",
-        "projectId": "668b598bef8511130af04740",
-        "title": "dm mercedes",
-        "project": "\ud83d\udcbcWork",
-        "dueDate": "2026-02-19T05:00:00.000+0000",
-        "priority": 0,
-        "status": 0
-      },
-      {
-        "id": "697d7639f6cd51053398d00d",
-        "projectId": "668b598bef8511130af04740",
-        "title": "reup PA",
-        "project": "\ud83d\udcbcWork",
-        "dueDate": "2026-02-19T05:00:00.000+0000",
+        "dueDate": "2026-02-23T05:00:00.000+0000",
         "priority": 0,
         "status": 0
       },
@@ -235,16 +217,7 @@
         "projectId": "668b598bef8511130af04740",
         "title": "build mysite",
         "project": "\ud83d\udcbcWork",
-        "dueDate": "2026-02-19T05:00:00.000+0000",
-        "priority": 0,
-        "status": 0
-      },
-      {
-        "id": "6939ce77d5ddd13b82ab8286",
-        "projectId": "668b598bef8511130af04740",
-        "title": "call Edmond early afternoon",
-        "project": "\ud83d\udcbcWork",
-        "dueDate": "2026-02-19T19:00:00.000+0000",
+        "dueDate": "2026-02-24T05:00:00.000+0000",
         "priority": 0,
         "status": 0
       },
@@ -253,7 +226,16 @@
         "projectId": "668b598bef8511130af04740",
         "title": "call Matt Herman",
         "project": "\ud83d\udcbcWork",
-        "dueDate": "2026-02-20T05:00:00.000+0000",
+        "dueDate": "2026-02-24T05:00:00.000+0000",
+        "priority": 0,
+        "status": 0
+      },
+      {
+        "id": "6939ce77d5ddd13b82ab8286",
+        "projectId": "668b598bef8511130af04740",
+        "title": "call Edmond early afternoon",
+        "project": "\ud83d\udcbcWork",
+        "dueDate": "2026-03-02T19:00:00.000+0000",
         "priority": 0,
         "status": 0
       },
@@ -276,7 +258,7 @@
         "status": 0
       }
     ],
-    "total": 11
+    "total": 9
   },
   "packages": {
     "packages": [
@@ -425,6 +407,6 @@
     ],
     "total_cost": 26.5,
     "connected_count": 9,
-    "updated": "2026-02-23T09:16:44.833884"
+    "updated": "2026-02-23T09:47:03.268302"
   }
 }

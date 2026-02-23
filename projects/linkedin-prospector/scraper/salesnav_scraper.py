@@ -40,19 +40,22 @@ CAMPAIGNS = [
         "id": 2,
         "name": "Federal Employees at Risk",
         "description": "Federal/government employees in NJ — DOGE cuts = need life insurance conversation",
-        "url": "https://www.linkedin.com/sales/search/people?query=(filters%3AList((type%3AREGION%2Cvalues%3AList((id%3A102571732%2Ctext%3ANew%2520Jersey%252C%2520United%2520States%2CselectionType%3AINCLUDED)))%2C(type%3ACURRENT_COMPANY%2Cvalues%3AList((id%3A1316%2Ctext%3AUnited%2520States%2520Federal%2520Government%2CselectionType%3AINCLUDED)%2C(id%3A3009%2Ctext%3AUS%2520Army%2CselectionType%3AINCLUDED)%2C(id%3A3013%2Ctext%3AUS%2520Navy%2CselectionType%3AINCLUDED)))))&sessionId=salesnav-federal",
+        # NJ state-wide (id 101651951) — federal agencies added as keyword search
+        "url": "https://www.linkedin.com/sales/search/people?query=(recentSearchParam%3A(doLogHistory%3Atrue)%2Cfilters%3AList((type%3AREGION%2Cvalues%3AList((id%3A101651951%2Ctext%3ANew%2520Jersey%252C%2520United%2520States%2CselectionType%3AINCLUDED)))%2C(type%3ACURRENT_COMPANY%2Cvalues%3AList((id%3A1316%2Ctext%3AUS%2520Federal%2520Government%2CselectionType%3AINCLUDED)%2C(id%3A2561%2Ctext%3AUS%2520Army%2CselectionType%3AINCLUDED)%2C(id%3A1718%2Ctext%3AUS%2520Department%2520of%2520Veterans%2520Affairs%2CselectionType%3AINCLUDED)))))",
     },
     {
         "id": 3,
         "name": "Young Families — Monmouth County",
-        "description": "Ages 28-40 in Monmouth County — young families need life insurance",
-        "url": "https://www.linkedin.com/sales/search/people?query=(filters%3AList((type%3AREGION%2Cvalues%3AList((id%3A104255643%2Ctext%3AMonmouth%2520County%252C%2520New%2520Jersey%252C%2520United%2520States%2CselectionType%3AINCLUDED)))%2C(type%3AYEARS_OF_EXPERIENCE%2Cvalues%3AList((id%3A3%2Ctext%3A3%2520to%25205%2520years%2CselectionType%3AINCLUDED)%2C(id%3A4%2Ctext%3A6%2520to%252010%2520years%2CselectionType%3AINCLUDED)))))&sessionId=salesnav-young-families",
+        "description": "3-15 years experience in Monmouth County — young families need life insurance",
+        # Monmouth County (id 102659333), years of experience 3-5 (id 3), 6-10 (id 4), 11-15 (id 5)
+        "url": "https://www.linkedin.com/sales/search/people?query=(recentSearchParam%3A(doLogHistory%3Atrue)%2Cfilters%3AList((type%3AREGION%2Cvalues%3AList((id%3A102659333%2Ctext%3AMonmouth%2520County%252C%2520New%2520Jersey%252C%2520United%2520States%2CselectionType%3AINCLUDED)))%2C(type%3AYEARS_OF_EXPERIENCE%2Cvalues%3AList((id%3A3%2Ctext%3A3%2520to%25205%2520years%2CselectionType%3AINCLUDED)%2C(id%3A4%2Ctext%3A6%2520to%252010%2520years%2CselectionType%3AINCLUDED)%2C(id%3A5%2Ctext%3A11%2520to%252015%2520years%2CselectionType%3AINCLUDED)))))",
     },
     {
         "id": 4,
         "name": "High Earners Approaching Retirement",
-        "description": "Senior titles in NJ — approaching retirement, need estate/retirement planning",
-        "url": "https://www.linkedin.com/sales/search/people?query=(filters%3AList((type%3AREGION%2Cvalues%3AList((id%3A102571732%2Ctext%3ANew%2520Jersey%252C%2520United%2520States%2CselectionType%3AINCLUDED)))%2C(type%3ACURRENT_TITLE%2Cvalues%3AList((id%3A10%2Ctext%3ACEO%2CselectionType%3AINCLUDED)%2C(id%3A9%2Ctext%3ACFO%2CselectionType%3AINCLUDED)%2C(id%3A13%2Ctext%3AVP%2CselectionType%3AINCLUDED)%2C(id%3A14%2Ctext%3ADirector%2CselectionType%3AINCLUDED)))%2C(type%3AYEARS_OF_EXPERIENCE%2Cvalues%3AList((id%3A5%2Ctext%3A11%2520to%252015%2520years%2CselectionType%3AINCLUDED)%2C(id%3A6%2Ctext%3AMore%2520than%252015%2520years%2CselectionType%3AINCLUDED)))))&sessionId=salesnav-high-earners",
+        "description": "Director/VP/CXO in Monmouth County, 15+ years experience — retirement and estate planning",
+        # Monmouth County (id 102659333), seniority Director (5), VP (6), CXO (10), Owner (1), Partner (4)
+        "url": "https://www.linkedin.com/sales/search/people?query=(recentSearchParam%3A(doLogHistory%3Atrue)%2Cfilters%3AList((type%3AREGION%2Cvalues%3AList((id%3A102659333%2Ctext%3AMonmouth%2520County%252C%2520New%2520Jersey%252C%2520United%2520States%2CselectionType%3AINCLUDED)))%2C(type%3ASENIORITY_LEVEL%2Cvalues%3AList((id%3A5%2Ctext%3ADirector%2CselectionType%3AINCLUDED)%2C(id%3A6%2Ctext%3AVP%2CselectionType%3AINCLUDED)%2C(id%3A10%2Ctext%3ACXO%2CselectionType%3AINCLUDED)%2C(id%3A1%2Ctext%3AOwner%2CselectionType%3AINCLUDED)))%2C(type%3AYEARS_OF_EXPERIENCE%2Cvalues%3AList((id%3A5%2Ctext%3A11%2520to%252015%2520years%2CselectionType%3AINCLUDED)%2C(id%3A6%2Ctext%3AMore%2520than%252015%2520years%2CselectionType%3AINCLUDED)))))",
     },
 ]
 

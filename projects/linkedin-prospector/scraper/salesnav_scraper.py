@@ -34,7 +34,7 @@ CAMPAIGNS = [
         "id": 1,
         "name": "Local Job Changes",
         "description": "People who recently changed jobs in Monmouth County NJ — life transition = insurance review moment",
-        "url": "https://www.linkedin.com/sales/search/people?query=(filters%3AList((type%3AREGION%2Cvalues%3AList((id%3A104255643%2Ctext%3AMonmouth%2520County%252C%2520New%2520Jersey%252C%2520United%2520States%2CselectionType%3AINCLUDED)))%2C(type%3ATITLE_TENURE%2Cvalues%3AList((id%3A1%2Ctext%3ALess%2520than%25201%2520year%2CselectionType%3AINCLUDED)))))&sessionId=salesnav-local-job-changes",
+        "url": "https://www.linkedin.com/sales/search/people?query=(recentSearchParam%3A(doLogHistory%3Atrue)%2Cfilters%3AList((type%3AREGION%2Cvalues%3AList((id%3A102659333%2Ctext%3AMonmouth%2520County%252C%2520New%2520Jersey%252C%2520United%2520States%2CselectionType%3AINCLUDED)))%2C(type%3ARECENTLY_CHANGED_JOBS%2Cvalues%3AList((id%3ARPC%2CselectionType%3AINCLUDED)))))",
     },
     {
         "id": 2,

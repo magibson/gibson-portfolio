@@ -1,4 +1,14 @@
 {
-  "generated_at": "2026-02-07T00:00:25.345280",
-  "alerts": []
+  "generated_at": "2026-02-23T06:00:09.352842",
+  "alerts": [
+    {
+      "company": "Saks Fifth Avenue",
+      "state": "PA",
+      "city": "Wilkes Barre",
+      "affected": 155,
+      "date": "2026-04-11",
+      "type": "Closing",
+      "first_seen": "2026-02-23T06:00:09.352492"
+    }
+  ]
 }

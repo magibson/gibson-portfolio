@@ -981,3 +981,23 @@ Also set up tonight:
 **Files:** `~/clawd/scripts/hair-tracker.py`, data at `~/clawd/data/health/hair-tracker.json`
 
 **Also fixed:** tools-discovery-nightly timeout — reduced Grok request timeout to 30s, cron timeout to 120s. Had been failing 2 days in a row.
+
+---
+## 2026-02-22 — Mac Mini Migration + Propwire Scraper
+
+**Migration (DONE ✅)**
+- ~/clawd cloned from GitHub to Mac mini
+- Python venv + all dependencies installed
+- API keys: xAI, Anthropic, OpenAI, Alpaca, Google OAuth all connected
+- Main dashboard (8080), move-out tracker (8088), LinkedIn prospector (8089) all live
+- LaunchAgents for all services (auto-start, KeepAlive)
+- All hardcoded paths updated (VPS → Mac mini)
+- New Tailscale IP: 100.82.133.57
+- Pushed to GitHub
+
+**Propwire Scraper (IN PROGRESS 🔧)**
+- Login working, session saved at ~/.playwright-profiles/propwire/
+- Playwright + stealth installed
+- Scraper at ~/builds/propwire/propwire_scraper.py
+- Blocker: "What's New" modal blocks filter inputs; need to inspect actual DOM selectors
+- Next: overnight DOM inspection run + fix selectors for county/price/date filters + export

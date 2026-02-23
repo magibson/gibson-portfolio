@@ -49,7 +49,7 @@ def chat(messages, model="grok-3-fast", tools=None, temperature=0.7, timeout=30)
     except Exception as e:
         return {"error": str(e)}
 
-def responses_api(messages, model="grok-4", tools=None, timeout=60):
+def responses_api(messages, model="grok-4", tools=None, timeout=120):
     """Use the responses API for agentic tool calling"""
     headers = {
         "Authorization": f"Bearer {API_KEY}",

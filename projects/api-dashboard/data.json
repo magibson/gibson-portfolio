@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-02-07T00:00:12.848785",
+  "lastUpdated": "2026-02-23T00:05:00.843882",
   "totalCost": 26.5,
   "apis": [
     {
@@ -16,7 +16,7 @@
       "id": "xai",
       "name": "xAI / Grok",
       "purpose": "X (Twitter) search & research",
-      "status": "connected",
+      "status": "error",
       "cost": 4.5,
       "requests": 245,
       "xSearches": 89
@@ -25,7 +25,7 @@
       "id": "whoop",
       "name": "Whoop",
       "purpose": "Fitness & recovery tracking",
-      "status": "connected",
+      "status": "error",
       "cost": 0,
       "requests": 62,
       "lastSync": "2h ago"
@@ -34,7 +34,7 @@
       "id": "withings",
       "name": "Withings",
       "purpose": "Weight & body composition",
-      "status": "connected",
+      "status": "error",
       "cost": 0,
       "requests": 8,
       "lastSync": "4h ago"
@@ -52,7 +52,7 @@
       "id": "ticktick",
       "name": "TickTick",
       "purpose": "Task management",
-      "status": "connected",
+      "status": "error",
       "cost": 0,
       "requests": 31,
       "lastSync": "1h ago"
@@ -87,39 +87,39 @@
   ],
   "dailyUsage": [
     {
-      "day": "Feb 01",
-      "cost": 1.11,
-      "requests": 423
+      "day": "Feb 17",
+      "cost": 0.29,
+      "requests": 341
     },
     {
-      "day": "Feb 02",
-      "cost": 1.86,
-      "requests": 498
+      "day": "Feb 18",
+      "cost": 1.68,
+      "requests": 480
     },
     {
-      "day": "Feb 03",
+      "day": "Feb 19",
+      "cost": 0.37,
+      "requests": 349
+    },
+    {
+      "day": "Feb 20",
       "cost": 0.78,
       "requests": 390
     },
     {
-      "day": "Feb 04",
-      "cost": 1.08,
-      "requests": 420
+      "day": "Feb 21",
+      "cost": 0.54,
+      "requests": 366
     },
     {
-      "day": "Feb 05",
-      "cost": 0.28,
-      "requests": 340
+      "day": "Feb 22",
+      "cost": 0.68,
+      "requests": 380
     },
     {
-      "day": "Feb 06",
-      "cost": 0.01,
-      "requests": 313
-    },
-    {
-      "day": "Feb 07",
-      "cost": 1.01,
-      "requests": 413
+      "day": "Feb 23",
+      "cost": 1.74,
+      "requests": 486
     }
   ]
 }

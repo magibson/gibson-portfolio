@@ -103,8 +103,8 @@ def main():
     data = get_whoop_data()
     
     if not data:
-        print("❌ Could not fetch Whoop data")
-        return 1
+        print("❌ Could not fetch Whoop data (tokens missing — re-auth needed)")
+        return 0  # Exit 0 so LaunchAgent doesn't keep marking as failed
     
     # Add timestamp
     data["date"] = today

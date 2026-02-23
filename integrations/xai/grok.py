@@ -110,6 +110,26 @@ def search_x(query, context=None):
     
     return parse_response(result)
 
+def fetch_x_article(url, question=None):
+    """
+    Fetch and read the full content of an X article or post using Grok's live search.
+    Uses grok-3 which has better web/X browsing capability.
+    """
+    prompt = question or "Read the full content of this article and summarize every tip, lesson, and recommendation in it."
+    
+    messages = [
+        {
+            "role": "user",
+            "content": f"{prompt}\n\nURL: {url}\n\nIMPORTANT: Actually read the article at that URL. Do not hallucinate or guess the content. If you cannot access it, say so explicitly."
+        }
+    ]
+    
+    # Use both x_search and web_search to maximize chances of getting the content
+    tools = [{"type": "x_search"}, {"type": "web_search"}]
+    
+    result = responses_api(messages, model="grok-4", tools=tools, timeout=120)
+    return parse_response(result)
+
 def web_search_grok(query, context=None):
     """
     Web search using Grok's web search tool

@@ -33,8 +33,9 @@ CAMPAIGNS = [
     {
         "id": 1,
         "name": "Local Job Changes",
-        "description": "People who recently changed jobs in Monmouth County NJ — life transition = insurance review moment",
-        "url": "https://www.linkedin.com/sales/search/people?query=(recentSearchParam%3A(doLogHistory%3Atrue)%2Cfilters%3AList((type%3AREGION%2Cvalues%3AList((id%3A102659333%2Ctext%3AMonmouth%2520County%252C%2520New%2520Jersey%252C%2520United%2520States%2CselectionType%3AINCLUDED)))%2C(type%3ARECENTLY_CHANGED_JOBS%2Cvalues%3AList((id%3ARPC%2CselectionType%3AINCLUDED)))))",
+        "description": "People who recently changed jobs in Monmouth/Ocean/Middlesex County NJ",
+        # Monmouth (102659333), Ocean (102529148), Middlesex (103287764)
+        "url": "https://www.linkedin.com/sales/search/people?query=(recentSearchParam%3A(doLogHistory%3Atrue)%2Cfilters%3AList((type%3AREGION%2Cvalues%3AList((id%3A102659333%2Ctext%3AMonmouth%2520County%252C%2520New%2520Jersey%2CselectionType%3AINCLUDED)%2C(id%3A102529148%2Ctext%3AOcean%2520County%252C%2520New%2520Jersey%2CselectionType%3AINCLUDED)%2C(id%3A103287764%2Ctext%3AMiddlesex%2520County%252C%2520New%2520Jersey%2CselectionType%3AINCLUDED)))%2C(type%3ARECENTLY_CHANGED_JOBS%2Cvalues%3AList((id%3ARPC%2CselectionType%3AINCLUDED)))))",
     },
     {
         "id": 2,
@@ -45,17 +46,17 @@ CAMPAIGNS = [
     },
     {
         "id": 3,
-        "name": "Young Families — Monmouth County",
-        "description": "3-15 years experience in Monmouth County — young families need life insurance",
-        # Monmouth County (id 102659333), years of experience 3-5 (id 3), 6-10 (id 4), 11-15 (id 5)
-        "url": "https://www.linkedin.com/sales/search/people?query=(recentSearchParam%3A(doLogHistory%3Atrue)%2Cfilters%3AList((type%3AREGION%2Cvalues%3AList((id%3A102659333%2Ctext%3AMonmouth%2520County%252C%2520New%2520Jersey%252C%2520United%2520States%2CselectionType%3AINCLUDED)))%2C(type%3AYEARS_OF_EXPERIENCE%2Cvalues%3AList((id%3A3%2Ctext%3A3%2520to%25205%2520years%2CselectionType%3AINCLUDED)%2C(id%3A4%2Ctext%3A6%2520to%252010%2520years%2CselectionType%3AINCLUDED)%2C(id%3A5%2Ctext%3A11%2520to%252015%2520years%2CselectionType%3AINCLUDED)))))",
+        "name": "Young Families — NJ Shore Counties",
+        "description": "3-15 years experience in Monmouth/Ocean/Middlesex County — young families need life insurance",
+        # Monmouth (102659333), Ocean (102529148), Middlesex (103287764)
+        "url": "https://www.linkedin.com/sales/search/people?query=(recentSearchParam%3A(doLogHistory%3Atrue)%2Cfilters%3AList((type%3AREGION%2Cvalues%3AList((id%3A102659333%2Ctext%3AMonmouth%2520County%252C%2520New%2520Jersey%2CselectionType%3AINCLUDED)%2C(id%3A102529148%2Ctext%3AOcean%2520County%252C%2520New%2520Jersey%2CselectionType%3AINCLUDED)%2C(id%3A103287764%2Ctext%3AMiddlesex%2520County%252C%2520New%2520Jersey%2CselectionType%3AINCLUDED)))%2C(type%3AYEARS_OF_EXPERIENCE%2Cvalues%3AList((id%3A3%2Ctext%3A3%2520to%25205%2520years%2CselectionType%3AINCLUDED)%2C(id%3A4%2Ctext%3A6%2520to%252010%2520years%2CselectionType%3AINCLUDED)%2C(id%3A5%2Ctext%3A11%2520to%252015%2520years%2CselectionType%3AINCLUDED)))))",
     },
     {
         "id": 4,
-        "name": "High Earners Approaching Retirement",
-        "description": "Director/VP/CXO in Monmouth County, 15+ years experience — retirement and estate planning",
-        # Monmouth County (id 102659333), seniority Director (5), VP (6), CXO (10), Owner (1), Partner (4)
-        "url": "https://www.linkedin.com/sales/search/people?query=(recentSearchParam%3A(doLogHistory%3Atrue)%2Cfilters%3AList((type%3AREGION%2Cvalues%3AList((id%3A102659333%2Ctext%3AMonmouth%2520County%252C%2520New%2520Jersey%252C%2520United%2520States%2CselectionType%3AINCLUDED)))%2C(type%3ASENIORITY_LEVEL%2Cvalues%3AList((id%3A5%2Ctext%3ADirector%2CselectionType%3AINCLUDED)%2C(id%3A6%2Ctext%3AVP%2CselectionType%3AINCLUDED)%2C(id%3A10%2Ctext%3ACXO%2CselectionType%3AINCLUDED)%2C(id%3A1%2Ctext%3AOwner%2CselectionType%3AINCLUDED)))%2C(type%3AYEARS_OF_EXPERIENCE%2Cvalues%3AList((id%3A5%2Ctext%3A11%2520to%252015%2520years%2CselectionType%3AINCLUDED)%2C(id%3A6%2Ctext%3AMore%2520than%252015%2520years%2CselectionType%3AINCLUDED)))))",
+        "name": "High Earners — NJ Shore Counties",
+        "description": "Director/VP/CXO in Monmouth/Ocean/Middlesex County, 15+ years experience",
+        # Monmouth (102659333), Ocean (102529148), Middlesex (103287764)
+        "url": "https://www.linkedin.com/sales/search/people?query=(recentSearchParam%3A(doLogHistory%3Atrue)%2Cfilters%3AList((type%3AREGION%2Cvalues%3AList((id%3A102659333%2Ctext%3AMonmouth%2520County%252C%2520New%2520Jersey%2CselectionType%3AINCLUDED)%2C(id%3A102529148%2Ctext%3AOcean%2520County%252C%2520New%2520Jersey%2CselectionType%3AINCLUDED)%2C(id%3A103287764%2Ctext%3AMiddlesex%2520County%252C%2520New%2520Jersey%2CselectionType%3AINCLUDED)))%2C(type%3ASENIORITY_LEVEL%2Cvalues%3AList((id%3A5%2Ctext%3ADirector%2CselectionType%3AINCLUDED)%2C(id%3A6%2Ctext%3AVP%2CselectionType%3AINCLUDED)%2C(id%3A10%2Ctext%3ACXO%2CselectionType%3AINCLUDED)%2C(id%3A1%2Ctext%3AOwner%2CselectionType%3AINCLUDED)))%2C(type%3AYEARS_OF_EXPERIENCE%2Cvalues%3AList((id%3A5%2Ctext%3A11%2520to%252015%2520years%2CselectionType%3AINCLUDED)%2C(id%3A6%2Ctext%3AMore%2520than%252015%2520years%2CselectionType%3AINCLUDED)))))",
     },
 ]
 
@@ -152,8 +153,10 @@ def write_leads_direct(leads: list, campaign_id: int, search_name: str) -> int:
 SCRAPE_JS = """
 () => {
     const leads = [];
-    const CARD_SELECTORS = 'li.artdeco-list__item, [data-view-name="search-results-lead-card"], ol.artdeco-list li, .search-results__result-list li, [class*="search-results"] li[class*="artdeco"]';
-    const cards = document.querySelectorAll(CARD_SELECTORS);
+    // Use the first ol (main results list) children — most reliable
+    const firstOl = document.querySelector('ol.artdeco-list, ol[class*="search-results"], ol');
+    const CARD_SELECTORS = 'li.artdeco-list__item';
+    const cards = firstOl ? firstOl.querySelectorAll(':scope > li') : document.querySelectorAll(CARD_SELECTORS);
 
     function getText(el, sel) {
         if (!el) return '';
@@ -295,9 +298,14 @@ async def scrape_campaign(page, campaign: dict, max_pages: int, existing_urls: s
         all_leads.extend(new_leads)
         log(f"  {len(new_leads)} new leads this page ({len(all_leads)} total so far)")
 
-        # Check if there's a next page
-        if len(leads) < RESULTS_PER_PAGE:
-            log(f"  Only {len(leads)} results (< {RESULTS_PER_PAGE}) — last page reached")
+        # Check if there's a next page — use card count, not extracted leads count
+        # (some cards may have no name but still count as a page slot)
+        raw_card_count = await page.evaluate("""() => {
+            const ol = document.querySelector('ol.artdeco-list, ol[class*="search-results"], ol');
+            return ol ? ol.querySelectorAll(':scope > li').length : 0;
+        }""")
+        if raw_card_count < RESULTS_PER_PAGE:
+            log(f"  Only {raw_card_count} cards on page (< {RESULTS_PER_PAGE}) — last page reached")
             break
 
         # Navigate to next page

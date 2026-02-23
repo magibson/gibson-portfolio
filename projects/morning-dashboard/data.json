@@ -1,7 +1,7 @@
 {
-  "updated": "2026-02-23T15:21:53.814146",
+  "updated": "2026-02-23T15:47:08.710063",
   "email": {
-    "unread": 1,
+    "unread": 0,
     "error": null
   },
   "calendar": {
@@ -20,15 +20,15 @@
         "symbol": "^GSPC",
         "name": "S&P 500",
         "type": "index",
-        "price": 6824.78,
-        "change": -1.23,
+        "price": 6830.12,
+        "change": -1.15,
         "prevClose": 6909.51
       },
       {
         "symbol": "^VIX",
         "name": "VIX",
         "type": "volatility",
-        "price": 21.53,
+        "price": 21.32,
         "change": 0,
         "prevClose": 0.0
       },
@@ -44,8 +44,8 @@
         "symbol": "TSLA",
         "name": "TSLA",
         "type": "stock",
-        "price": 394.85,
-        "change": -4.12,
+        "price": 396.01,
+        "change": -3.84,
         "prevClose": 411.82
       }
     ],
@@ -65,61 +65,61 @@
         "symbol": "TSLA",
         "description": "TESLA INC COM",
         "quantity": 5.0,
-        "price": 394.87,
-        "value": 1974.35,
-        "today_gain": -84.2,
-        "today_gain_pct": -4.09,
-        "total_gain": 166.11,
-        "total_gain_pct": 9.19,
-        "pct_of_account": 36.58
+        "price": 396.05,
+        "value": 1980.25,
+        "today_gain": -78.3,
+        "today_gain_pct": -3.8,
+        "total_gain": 172.01,
+        "total_gain_pct": 9.51,
+        "pct_of_account": 36.65
       },
       {
         "symbol": "VOO",
         "description": "VANGUARD INDEX FUNDS S&P 500 E",
         "quantity": 2.748,
-        "price": 626.23,
-        "value": 1720.88,
-        "today_gain": -9.07,
-        "today_gain_pct": -0.52,
-        "total_gain": 74.47,
-        "total_gain_pct": 4.52,
-        "pct_of_account": 31.88
+        "price": 626.69,
+        "value": 1722.14,
+        "today_gain": -7.8,
+        "today_gain_pct": -0.45,
+        "total_gain": 75.73,
+        "total_gain_pct": 4.6,
+        "pct_of_account": 31.87
       },
       {
         "symbol": "UNH",
         "description": "UNITEDHEALTH GROUP INC",
         "quantity": 2.014,
-        "price": 283.58,
-        "value": 571.13,
-        "today_gain": -12.79,
-        "today_gain_pct": -2.19,
-        "total_gain": -85.16,
-        "total_gain_pct": -12.98,
-        "pct_of_account": 10.58
+        "price": 282.7,
+        "value": 569.36,
+        "today_gain": -14.56,
+        "today_gain_pct": -2.49,
+        "total_gain": -86.93,
+        "total_gain_pct": -13.25,
+        "pct_of_account": 10.54
       },
       {
         "symbol": "TRGP",
         "description": "TARGA RESOURCES CORP",
         "quantity": 2.0,
-        "price": 232.44,
-        "value": 464.88,
-        "today_gain": 16.56,
-        "today_gain_pct": 3.7,
-        "total_gain": 102.36,
-        "total_gain_pct": 28.24,
-        "pct_of_account": 8.61
+        "price": 232.07,
+        "value": 464.14,
+        "today_gain": 15.82,
+        "today_gain_pct": 3.53,
+        "total_gain": 101.62,
+        "total_gain_pct": 28.03,
+        "pct_of_account": 8.59
       },
       {
         "symbol": "NVDA",
         "description": "NVIDIA CORPORATION COM",
         "quantity": 2.0,
-        "price": 190.53,
-        "value": 381.06,
-        "today_gain": 5.26,
-        "today_gain_pct": 1.4,
-        "total_gain": 56.93,
-        "total_gain_pct": 17.56,
-        "pct_of_account": 7.06
+        "price": 190.9,
+        "value": 381.8,
+        "today_gain": 6.0,
+        "today_gain_pct": 1.6,
+        "total_gain": 57.67,
+        "total_gain_pct": 17.79,
+        "pct_of_account": 7.07
       },
       {
         "symbol": "PFE",
@@ -128,7 +128,7 @@
         "price": 27.05,
         "value": 166.3,
         "today_gain": 1.17,
-        "today_gain_pct": 0.71,
+        "today_gain_pct": 0.73,
         "total_gain": 13.47,
         "total_gain_pct": 8.81,
         "pct_of_account": 3.08
@@ -137,13 +137,13 @@
         "symbol": "CCJ",
         "description": "CAMECO CORP COM NPV ISIN #CA13",
         "quantity": 1.002,
-        "price": 118.1,
-        "value": 118.34,
-        "today_gain": -0.93,
-        "today_gain_pct": -0.78,
-        "total_gain": 45.92,
-        "total_gain_pct": 63.41,
-        "pct_of_account": 2.19
+        "price": 118.77,
+        "value": 119.01,
+        "today_gain": -0.26,
+        "today_gain_pct": -0.22,
+        "total_gain": 46.59,
+        "total_gain_pct": 64.33,
+        "pct_of_account": 2.2
       },
       {
         "symbol": "CASH",
@@ -158,11 +158,11 @@
         "pct_of_account": 0.01
       }
     ],
-    "total_value": 5397.55,
-    "today_gain": -84.0,
-    "today_gain_pct": -1.56,
-    "total_gain": 374.1,
-    "total_gain_pct": 7.45,
+    "total_value": 5403.61,
+    "today_gain": -77.93,
+    "today_gain_pct": -1.44,
+    "total_gain": 380.16,
+    "total_gain_pct": 7.57,
     "cost_basis": 5022.84,
     "history": [
       5549.28,
@@ -198,15 +198,6 @@
         "id": "698fb1c1b3af5105f0c1aa7e",
         "projectId": "668b598bef8511130af04740",
         "title": "CRUMP sign up",
-        "project": "\ud83d\udcbcWork",
-        "dueDate": "2026-02-23T05:00:00.000+0000",
-        "priority": 0,
-        "status": 0
-      },
-      {
-        "id": "699c656ede305102e24a19cd",
-        "projectId": "668b598bef8511130af04740",
-        "title": "figure out booklets",
         "project": "\ud83d\udcbcWork",
         "dueDate": "2026-02-23T05:00:00.000+0000",
         "priority": 0,
@@ -258,7 +249,7 @@
         "status": 0
       }
     ],
-    "total": 9
+    "total": 8
   },
   "packages": {
     "packages": [
@@ -407,6 +398,6 @@
     ],
     "total_cost": 26.5,
     "connected_count": 9,
-    "updated": "2026-02-23T15:21:53.814109"
+    "updated": "2026-02-23T15:47:08.710026"
   }
 }

@@ -442,6 +442,57 @@ async def run(headless=False, test_only=False):
                                     await snap(page, "data_select_dialog")
 
                                 # Step 2: "What Data Would You Like to Download?" dialog
+                                # Select extra data category checkboxes before downloading:
+                                # We want: Last Sale, Mortgage/Loan, Equity
+                                await delay(1.5, 2.5)
+                                await snap(page, "data_categories")
+
+                                # Find all checkboxes in the dialog and check which are unchecked
+                                # Categories are labeled — we want any containing these keywords
+                                WANTED_CATEGORIES = ["sale", "mortgage", "loan", "equity", "transfer"]
+                                checked_cats = await page.evaluate("""(wanted) => {
+                                    const results = [];
+                                    // Look in any dialog/modal that's open
+                                    const containers = [
+                                        document.querySelector('[role="dialog"]'),
+                                        document.querySelector('[class*="modal"]'),
+                                        document.querySelector('[class*="download"]'),
+                                        document.body
+                                    ].filter(Boolean);
+
+                                    for (const container of containers) {
+                                        const labels = container.querySelectorAll('label');
+                                        for (const label of labels) {
+                                            const text = label.innerText?.toLowerCase() || '';
+                                            const isWanted = wanted.some(w => text.includes(w));
+                                            if (!isWanted) continue;
+
+                                            // Find checkbox associated with this label
+                                            let cb = label.querySelector('input[type="checkbox"]');
+                                            if (!cb && label.htmlFor) {
+                                                cb = document.getElementById(label.htmlFor);
+                                            }
+                                            if (!cb) {
+                                                // Try sibling
+                                                cb = label.previousElementSibling;
+                                                if (!cb || cb.type !== 'checkbox') cb = label.nextElementSibling;
+                                            }
+
+                                            if (cb && cb.type === 'checkbox' && !cb.checked) {
+                                                cb.click();
+                                                results.push(label.innerText.trim().slice(0, 50));
+                                            } else if (cb && cb.checked) {
+                                                results.push('(already checked) ' + label.innerText.trim().slice(0, 50));
+                                            }
+                                        }
+                                        if (results.length > 0) break;
+                                    }
+                                    return results;
+                                }""", WANTED_CATEGORIES)
+                                log(f"Data categories selected: {checked_cats}")
+                                await delay(1, 1.5)
+                                await snap(page, "categories_selected")
+
                                 # Click "Download N Properties" button
                                 # Find the "Download N Properties" button via JS (most reliable)
                                 dl_btn_text = await page.evaluate("""() => {
@@ -601,19 +652,35 @@ async def run(headless=False, test_only=False):
         else:
             log("⚠️ No price/value column found — skipping price filter")
 
-        # ── Dedup against existing leads ──────────────────────────────
+        # ── Dedup against all previously sent leads ───────────────────
+        # Persistent seen-leads file: one address per line
+        SEEN_FILE = LEADS_DIR / "seen_leads.txt"
         existing = set()
-        for f in LEADS_DIR.glob("propwire_leads_*.csv"):
-            try:
-                with open(f) as fh:
-                    for row in csv.DictReader(fh):
-                        addr = row.get("address", row.get("Address", "")).strip().lower()
-                        if addr:
-                            existing.add(addr)
-            except:
-                pass
 
-        addr_key = next((k for k in fields if "address" in k.lower()), None)
+        # Load persistent seen list
+        if SEEN_FILE.exists():
+            with open(SEEN_FILE) as fh:
+                for line in fh:
+                    existing.add(line.strip().lower())
+            log(f"Loaded {len(existing)} previously seen leads from seen_leads.txt")
+
+        # Also scan all historical CSVs (propwire_leads, dial_ready, monmouth_*)
+        for pattern in ["propwire_leads_*.csv", "dial_ready_*.csv", "monmouth_*.csv"]:
+            for f in LEADS_DIR.glob(pattern):
+                try:
+                    with open(f) as fh:
+                        for row in csv.DictReader(fh):
+                            addr = (row.get("Address") or row.get("address") or
+                                    row.get("Property Address") or "").strip().lower()
+                            if addr:
+                                existing.add(addr)
+                except:
+                    pass
+        log(f"Total seen leads (persistent + CSV history): {len(existing)}")
+
+        addr_key = next((k for k in fields if k.lower() == "address"), None)
+        if not addr_key:
+            addr_key = next((k for k in fields if "address" in k.lower()), None)
         before_dedup = len(rows)
         new_rows = [r for r in rows if not addr_key or r.get(addr_key, "").strip().lower() not in existing]
         log(f"Dedup: {before_dedup} → {len(new_rows)} new leads ({before_dedup - len(new_rows)} skipped)")
@@ -624,6 +691,15 @@ async def run(headless=False, test_only=False):
             w.writeheader()
             w.writerows(new_rows)
         log(f"✅ {len(new_rows)} leads saved → {final}")
+
+        # Append new lead addresses to persistent seen-leads file
+        if addr_key and new_rows:
+            with open(SEEN_FILE, "a") as fh:
+                for r in new_rows:
+                    addr = r.get(addr_key, "").strip().lower()
+                    if addr:
+                        fh.write(addr + "\n")
+            log(f"📝 {len(new_rows)} addresses appended to seen_leads.txt")
     else:
         log("❌ No leads saved — export failed")
 

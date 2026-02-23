@@ -308,69 +308,17 @@ async def run(headless=False, test_only=False):
         await delay(4, 6)
         await snap(page, "location_set")
 
-        # ── Price filter ─────────────────────────────────────────────────
-        # Filter buttons are div.custom-input elements, NOT <button> tags
-        log("Setting price filter: $700k+")
-        try:
-            price_div = page.locator("div.custom-input:has-text('Price')").first
-            await price_div.wait_for(state="visible", timeout=12000)
-            await price_div.click()
-            await delay(1.5, 2)
-            await snap(page, "price_open")
+        # ── Price filter — SKIPPED, filter locally after download ────────
+        # Propwire's React price input is unreliable via automation.
+        # Export all Monmouth County leads and filter by Est. Value >= $700k in post-processing.
+        log("Price filter: skipping (will filter locally post-download)")
 
-            # The price panel has input[name='start'] (min) and input[name='end'] (max)
-            min_input = page.locator("input[name='start']").first
-            if await min_input.count() > 0:
-                await min_input.triple_click()
-                await min_input.type("700000", delay=50)
-                await delay(0.5, 1)
-                log("Min price set: $700,000")
+        # ── Date filter — SKIPPED, filter locally after download ─────────
+        # Will filter by sale date post-download in Python.
+        log("Date filter: skipping (will filter locally post-download)")
 
-            # Apply: look for any apply/done button inside the open panel
-            apply_btn = page.locator("button:has-text('Apply'), button:has-text('Done'), button:has-text('Search')").first
-            if await apply_btn.count() > 0 and await apply_btn.is_visible():
-                await apply_btn.click()
-            else:
-                await price_div.click()  # toggle closed
-            await delay(1.5, 2.5)
-            await snap(page, "price_set")
-            log("✅ Price filter applied")
-        except Exception as e:
-            log(f"⚠️ Price filter: {e}")
-
-        # ── Date filter via More ─────────────────────────────────────────
-        log("Setting date filter: last 12 months")
-        try:
-            more_div = page.locator("div.custom-input:has-text('More')").first
-            await more_div.wait_for(state="visible", timeout=8000)
-            await more_div.click()
-            await delay(1.5, 2.5)
-            await snap(page, "more_open")
-
-            from_d = (datetime.now() - timedelta(days=365)).strftime("%m/%d/%Y")
-            to_d   = datetime.now().strftime("%m/%d/%Y")
-
-            date_inputs = page.locator("input[placeholder*='MM/DD/YYYY' i], input[placeholder*='Start date' i], input[placeholder*='From' i]")
-            cnt = await date_inputs.count()
-            if cnt >= 2:
-                await date_inputs.nth(0).fill(from_d)
-                await delay(0.3, 0.6)
-                await date_inputs.nth(1).fill(to_d)
-                log(f"Date range: {from_d} → {to_d}")
-            elif cnt == 1:
-                await date_inputs.nth(0).fill(from_d)
-                log(f"Single date input: {from_d}")
-
-            apply_btn = page.locator("button:has-text('Apply'), button:has-text('Search'), button:has-text('Done')").first
-            if await apply_btn.count() > 0 and await apply_btn.is_visible():
-                await apply_btn.click()
-            else:
-                await page.keyboard.press("Escape")
-            await delay(3, 5)
-            await snap(page, "date_set")
-            log("✅ Date filter applied")
-        except Exception as e:
-            log(f"⚠️ Date filter: {e}")
+        if False:  # date filter disabled — filtering locally post-download
+            pass
 
         # ── Wait for results ──────────────────────────────────────────────
         await delay(3, 5)
@@ -387,41 +335,241 @@ async def run(headless=False, test_only=False):
             pass
 
         # ── Select all & Export ───────────────────────────────────────────
-        # Select all records
+        # Ensure no modal/drawer is open before interacting with results
+        await delay(2, 3)
+
+        # Select-all: use Playwright dispatchEvent to trigger React's onChange
+        # The checkbox at top ~210px (results header) is the select-all
         try:
-            select_all = page.locator("input[type='checkbox']").first
-            if await select_all.count() > 0 and await select_all.is_visible():
-                await select_all.click()
-                await delay(1, 2)
-                log("Select-all clicked")
+            # Use Playwright locator with force=True to bypass span interception
+            # Filter to viewport-visible checkboxes only (not the off-screen ones)
+            all_cbs = page.locator("input[type='checkbox']")
+            cnt = await all_cbs.count()
+            select_all_cb = None
+            for i in range(min(cnt, 5)):  # check first 5 only
+                cb = all_cbs.nth(i)
+                try:
+                    box = await cb.bounding_box()
+                    if box and box["y"] > 150 and box["y"] < 270:
+                        select_all_cb = cb
+                        log(f"Select-all checkbox found at y={box['y']:.0f} (index {i})")
+                        break
+                except:
+                    pass
+
+            if select_all_cb:
+                # Use dispatchEvent to trigger React's synthetic events
+                await select_all_cb.dispatch_event("click")
+                await delay(2, 3)
                 await snap(page, "selected")
+                log("Select-all dispatched")
+            else:
+                log("⚠️ Could not locate select-all checkbox by position")
         except Exception as e:
             log(f"⚠️ Select-all: {e}")
 
-        # Export
-        raw_file = None
-        for sel in [
-            "button:has-text('Export')",
-            "button:has-text('Download')",
-            "a:has-text('Export')",
-            "[aria-label*='export' i]",
-            "button:has-text('CSV')",
-        ]:
+        # Check how many items are in cart
+        cart_count = await page.evaluate("""() => {
+            // The cart button is btn--selected with a number
+            const btns = Array.from(document.querySelectorAll("button.btn--selected, button[class*='btn--selected']"));
+            for (const btn of btns) {
+                const t = btn.innerText?.trim();
+                if (t && /^\\d+$/.test(t)) return parseInt(t);
+            }
+            return 0;
+        }""")
+        log(f"Cart count after select-all: {cart_count}")
+
+        if cart_count == 0:
+            log("⚠️ Cart still 0 after select-all — trying again with direct checkbox click")
+            # Try Playwright force-click with no checks
             try:
-                el = page.locator(sel).first
-                if await el.count() > 0 and await el.is_visible():
-                    log(f"Export button found: {sel}")
-                    async with page.expect_download(timeout=60000) as dl_info:
-                        await el.click()
-                        await delay(1, 2)
-                    dl  = await dl_info.value
-                    dst = LEADS_DIR / f"propwire_raw_{datetime.now().strftime('%Y-%m-%d')}.csv"
-                    await dl.save_as(str(dst))
-                    log(f"✅ Downloaded: {dst}")
-                    raw_file = dst
-                    break
+                cb = page.locator("input[type='checkbox']").nth(1)
+                await cb.click(force=True)
+                await delay(2, 3)
+                cart_count = await page.evaluate("""() => {
+                    const btns = Array.from(document.querySelectorAll("button.btn--selected, button[class*='btn--selected']"));
+                    for (const btn of btns) {
+                        const t = btn.innerText?.trim();
+                        if (t && /^\\d+$/.test(t)) return parseInt(t);
+                    }
+                    return 0;
+                }""")
+                log(f"Cart after retry: {cart_count}")
             except Exception as e:
-                log(f"Export ({sel}): {e}")
+                log(f"⚠️ Select-all retry: {e}")
+            await snap(page, "cart_retry")
+        
+        # Click the cart button to open export options
+        raw_file = None
+        try:
+            cart_btn = page.locator("button.btn--selected").first
+            if await cart_btn.count() > 0:
+                log("Clicking cart/export button...")
+                await cart_btn.click()
+                await delay(2, 3)
+                await snap(page, "cart_open")
+                
+                # Look for export/download option in the popup
+                # Click "Download" button to open the dropdown
+                dl_btn = page.locator("button:has-text('Download')").first
+                if await dl_btn.count() > 0:
+                    log("Opening Download dropdown...")
+                    await dl_btn.dispatch_event("click")
+                    await delay(1.5, 2)
+                    await snap(page, "download_dropdown")
+
+                    # Click "Download Only" from dropdown
+                    for opt_sel in [
+                        "text='Download Only'",
+                        "li:has-text('Download Only')",
+                        "[role='menuitem']:has-text('Download Only')",
+                    ]:
+                        try:
+                            opt = page.locator(opt_sel).first
+                            if await opt.count() > 0:
+                                log(f"Clicking 'Download Only' via {opt_sel}")
+                                await opt.click(force=True)
+                                await delay(1.5, 2.5)
+                                await snap(page, "confirm_dialog")
+
+                                # Step 1: "Are you sure?" confirmation dialog
+                                confirm = page.locator("button:has-text('Yes, Download Only'), button:has-text('Yes, download only')").first
+                                if await confirm.count() > 0:
+                                    log("Clicking: Yes, Download Only")
+                                    await confirm.click(force=True)
+                                    await delay(1.5, 2.5)
+                                    await snap(page, "data_select_dialog")
+
+                                # Step 2: "What Data Would You Like to Download?" dialog
+                                # Click "Download N Properties" button
+                                # Find the "Download N Properties" button via JS (most reliable)
+                                dl_btn_text = await page.evaluate("""() => {
+                                    const btns = Array.from(document.querySelectorAll('button'));
+                                    for (const b of btns) {
+                                        const t = b.innerText?.trim();
+                                        if (t && t.startsWith('Download') && /\\d/.test(t)) return t;
+                                    }
+                                    return null;
+                                }""")
+                                log(f"Download button text: {dl_btn_text}")
+                                dl_props_btn = page.locator(f"button:has-text('{dl_btn_text}')").first if dl_btn_text else None
+                                if not dl_props_btn or await dl_props_btn.count() == 0:
+                                    dl_props_btn = page.locator("button:has-text('Download 100'), button:has-text('Download Properties'), button:has-text('Download All')").first
+                                
+                                if await dl_props_btn.count() > 0:
+                                    log("Clicking: Download N Properties")
+                                    await dl_props_btn.click(force=True)
+                                    await delay(3, 5)
+                                    await snap(page, "download_triggered")
+
+                                    # The download is async — generated under "My Activity"
+                                    # Dismiss the confirmation modal and go to My Activity
+                                    dismiss = page.locator("button:has-text('Dismiss'), button:has-text('Go To My Activity')").first
+                                    if await dismiss.count() > 0:
+                                        # Navigate to My Activity
+                                        go_btn = page.locator("button:has-text('Go To My Activity'), a:has-text('My Activity')").first
+                                        if await go_btn.count() > 0:
+                                            await go_btn.click(force=True)
+                                        else:
+                                            await dismiss.click(force=True)
+                                            await page.goto(f"{BASE}/activity", wait_until="domcontentloaded", timeout=30000)
+
+                                    await delay(5, 8)
+                                    await snap(page, "my_activity")
+                                    log("Navigated to My Activity")
+
+                                    # Wait for download link to appear (poll up to 3 min)
+                                    download_url = None
+                                    for attempt in range(18):  # 18 x 10s = 3 min
+                                        dl_link = await page.evaluate("""() => {
+                                            // Look for CSV download links or download buttons in activity list
+                                            const links = Array.from(document.querySelectorAll('a[href*=".csv"], a[href*="download"], a[download]'));
+                                            if (links.length > 0) return links[0].href;
+                                            // Also check buttons that trigger downloads
+                                            const btns = Array.from(document.querySelectorAll('button'));
+                                            for (const b of btns) {
+                                                const t = b.innerText?.trim().toLowerCase();
+                                                if (t.includes('download') && t.includes('csv')) return 'btn:' + t;
+                                            }
+                                            return null;
+                                        }""")
+                                        if dl_link:
+                                            log(f"Download link found: {dl_link}")
+                                            download_url = dl_link
+                                            break
+                                        log(f"Waiting for download to generate... ({attempt+1}/18)")
+                                        await delay(9, 11)
+                                        await page.reload(wait_until="domcontentloaded")
+                                        await delay(2, 3)
+
+                                    if download_url and not download_url.startswith("btn:"):
+                                        log(f"Downloading from: {download_url}")
+                                        try:
+                                            async with page.expect_download(timeout=60000) as dl_info:
+                                                try:
+                                                    await page.goto(download_url, wait_until="commit")
+                                                except Exception:
+                                                    pass  # "Download is starting" is expected
+                                            dl  = await dl_info.value
+                                            dst = LEADS_DIR / f"propwire_raw_{datetime.now().strftime('%Y-%m-%d')}.csv"
+                                            await dl.save_as(str(dst))
+                                            log(f"✅ Downloaded: {dst}")
+                                            raw_file = dst
+                                        except Exception as e:
+                                            log(f"⚠️ Download via goto: {e}")
+                                            # Fallback: click the link directly on the activity page
+                                            try:
+                                                dl_link_el = page.locator(f"a[href='{download_url}'], a[href*='download']").first
+                                                if await dl_link_el.count() > 0:
+                                                    async with page.expect_download(timeout=60000) as dl_info:
+                                                        await dl_link_el.click()
+                                                    dl  = await dl_info.value
+                                                    dst = LEADS_DIR / f"propwire_raw_{datetime.now().strftime('%Y-%m-%d')}.csv"
+                                                    await dl.save_as(str(dst))
+                                                    log(f"✅ Downloaded via link click: {dst}")
+                                                    raw_file = dst
+                                            except Exception as e2:
+                                                log(f"⚠️ Download fallback: {e2}")
+                                    elif download_url and download_url.startswith("btn:"):
+                                        # There's a button — click it
+                                        dl_btn2 = page.locator("button:has-text('Download CSV'), button:has-text('Download')").first
+                                        if await dl_btn2.count() > 0:
+                                            async with page.expect_download(timeout=60000) as dl_info:
+                                                await dl_btn2.click(force=True)
+                                            dl  = await dl_info.value
+                                            dst = LEADS_DIR / f"propwire_raw_{datetime.now().strftime('%Y-%m-%d')}.csv"
+                                            await dl.save_as(str(dst))
+                                            log(f"✅ Downloaded via button: {dst}")
+                                            raw_file = dst
+                                    else:
+                                        log("⚠️ Download link never appeared in My Activity")
+                                        await snap(page, "activity_timeout")
+                                else:
+                                    log("⚠️ Could not find final Download button")
+                                    await snap(page, "missing_dl_btn")
+                                break
+                        except Exception as e:
+                            log(f"  Download Only ({opt_sel}): {e}")
+                
+                if not raw_file:
+                    await snap(page, "export_options")
+                    # Try direct download link
+                    dl_link = await page.evaluate("""() => {
+                        const links = Array.from(document.querySelectorAll('a[href*="export"], a[href*="download"], a[href*="csv"]'));
+                        return links[0]?.href || null;
+                    }""")
+                    if dl_link:
+                        log(f"Direct export link: {dl_link}")
+                        async with page.expect_download(timeout=60000) as dl_info:
+                            await page.goto(dl_link)
+                        dl  = await dl_info.value
+                        dst = LEADS_DIR / f"propwire_raw_{datetime.now().strftime('%Y-%m-%d')}.csv"
+                        await dl.save_as(str(dst))
+                        log(f"✅ Downloaded via link: {dst}")
+                        raw_file = dst
+        except Exception as e:
+            log(f"⚠️ Cart/export: {e}")
 
         if not raw_file:
             log("❌ Export failed — check screenshots")
@@ -430,7 +578,30 @@ async def run(headless=False, test_only=False):
         await ctx.close()
 
     if raw_file:
-        # Dedup against existing leads
+        with open(raw_file) as fh:
+            reader = csv.DictReader(fh)
+            rows   = list(reader)
+            fields = reader.fieldnames or []
+
+        log(f"Raw download: {len(rows)} total rows")
+        log(f"Columns: {fields[:10]}")
+
+        # ── Local price filter: Est. Value >= $700k ───────────────────
+        MIN_VALUE = 700_000
+        price_key = next((k for k in fields if "value" in k.lower() or "price" in k.lower()), None)
+        if price_key:
+            def parse_price(v):
+                try:
+                    return float(str(v).replace("$","").replace(",","").strip())
+                except:
+                    return 0
+            before = len(rows)
+            rows = [r for r in rows if parse_price(r.get(price_key, "0")) >= MIN_VALUE]
+            log(f"Price filter (>= $700k via '{price_key}'): {before} → {len(rows)} rows")
+        else:
+            log("⚠️ No price/value column found — skipping price filter")
+
+        # ── Dedup against existing leads ──────────────────────────────
         existing = set()
         for f in LEADS_DIR.glob("propwire_leads_*.csv"):
             try:
@@ -442,21 +613,17 @@ async def run(headless=False, test_only=False):
             except:
                 pass
 
-        with open(raw_file) as fh:
-            reader = csv.DictReader(fh)
-            rows   = list(reader)
-            fields = reader.fieldnames or []
-
         addr_key = next((k for k in fields if "address" in k.lower()), None)
+        before_dedup = len(rows)
         new_rows = [r for r in rows if not addr_key or r.get(addr_key, "").strip().lower() not in existing]
+        log(f"Dedup: {before_dedup} → {len(new_rows)} new leads ({before_dedup - len(new_rows)} skipped)")
 
         final = LEADS_DIR / f"propwire_leads_{datetime.now().strftime('%Y-%m-%d')}.csv"
         with open(final, "w", newline="") as fh:
             w = csv.DictWriter(fh, fieldnames=fields)
             w.writeheader()
             w.writerows(new_rows)
-        log(f"✅ {len(new_rows)} new leads saved → {final}")
-        log(f"   ({len(rows) - len(new_rows)} dupes skipped)")
+        log(f"✅ {len(new_rows)} leads saved → {final}")
     else:
         log("❌ No leads saved — export failed")
 

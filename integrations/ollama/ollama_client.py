@@ -14,8 +14,8 @@ import json
 from pathlib import Path
 
 OLLAMA_BASE  = "http://localhost:11434"
-DEFAULT_MODEL = "jarvis-local"
-FAST_MODEL    = "llama3.2:3b"
+DEFAULT_MODEL = "jarvis-local"   # qwen2.5:7b base — upgraded Feb 22 2026
+FAST_MODEL    = "qwen2.5:7b"    # 5-10x better than llama3.2:3b, same zero cost
 
 def is_running() -> bool:
     try:

@@ -5,7 +5,7 @@
       "description": "JARVIS-style personal dashboard with weather, calendar, tasks, portfolio, packages",
       "location": "/home/clawd/clawd/projects/morning-dashboard",
       "status": "active",
-      "notes": "Accessible via Tailscale at http://100.83.250.65:8080",
+      "notes": "Accessible via Tailscale at http://100.82.133.57:8080",
       "created": "2026-01-28T00:00:00",
       "last_updated": "2026-01-29T02:55:00"
     },

@@ -14,7 +14,7 @@ from pathlib import Path
 # Add parent dir to path for whoop-v2 module
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-MEMORY_DIR = Path("/home/clawd/clawd/memory")
+MEMORY_DIR = Path("/Users/jarvis/clawd/memory")
 HEALTH_LOG = MEMORY_DIR / "health-log.json"
 
 def get_whoop_data():
@@ -22,7 +22,7 @@ def get_whoop_data():
     try:
         # Import from whoop-v2.py which handles token refresh
         from importlib.util import spec_from_file_location, module_from_spec
-        spec = spec_from_file_location("whoop_v2", "/home/clawd/clawd/whoop-v2.py")
+        spec = spec_from_file_location("whoop_v2", "/Users/jarvis/clawd/whoop-v2.py")
         whoop = module_from_spec(spec)
         spec.loader.exec_module(whoop)
         

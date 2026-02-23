@@ -17,7 +17,7 @@ from urllib.parse import urlparse
 from datetime import datetime
 
 # ===== CONFIGURATION =====
-HOST = "100.83.250.65"  # Tailscale IP only
+HOST = "100.82.133.57"  # Tailscale IP only
 PORT = 8765
 AUTH_TOKEN = "1fa124bc0a493b0db3dda04174bf83f9a5d3621fc51a03b916bf5784dc2f82bf"
 

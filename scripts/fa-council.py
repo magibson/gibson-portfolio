@@ -116,7 +116,7 @@ def send_telegram(text: str, chat_id: str = TELEGRAM_CHAT_ID) -> bool:
 
     if not token:
         # Try ~/.env or .env file
-        for env_file in [os.path.expanduser("~/.env"), "/home/clawd/.env", "/home/clawd/clawd/.env"]:
+        for env_file in [os.path.expanduser("~/.env"), "/home/clawd/.env", "/Users/jarvis/clawd/.env"]:
             if os.path.exists(env_file):
                 with open(env_file) as f:
                     for line in f:

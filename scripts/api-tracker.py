@@ -15,21 +15,21 @@ APIS = {
     "whoop": {
         "name": "Whoop",
         "purpose": "Fitness/recovery data",
-        "token_file": "/home/clawd/clawd/.whoop_tokens.json",
+        "token_file": "/Users/jarvis/clawd/.whoop_tokens.json",
         "cost": "Free (with subscription)",
         "docs": "https://developer.whoop.com"
     },
     "withings": {
         "name": "Withings",
         "purpose": "Weight/body composition",
-        "token_file": "/home/clawd/clawd/.withings_tokens.json",
+        "token_file": "/Users/jarvis/clawd/.withings_tokens.json",
         "cost": "Free",
         "docs": "https://developer.withings.com"
     },
     "xai": {
         "name": "xAI/Grok",
         "purpose": "X (Twitter) search, AI queries",
-        "env_file": "/home/clawd/clawd/integrations/xai/.env",
+        "env_file": "/Users/jarvis/clawd/integrations/xai/.env",
         "cost": "~$0.20-0.50/1M tokens + $5/1k X searches",
         "docs": "https://docs.x.ai"
     },
@@ -43,14 +43,14 @@ APIS = {
     "gmail": {
         "name": "Gmail",
         "purpose": "Email monitoring/alerts",
-        "token_file": "/home/clawd/clawd/.gmail_tokens.json",
+        "token_file": "/Users/jarvis/clawd/.gmail_tokens.json",
         "cost": "Free",
         "docs": "https://developers.google.com/gmail/api"
     },
     "ticktick": {
         "name": "TickTick",
         "purpose": "Task management",
-        "env_file": "/home/clawd/clawd/integrations/.personal-config.json",
+        "env_file": "/Users/jarvis/clawd/integrations/.personal-config.json",
         "cost": "Free",
         "docs": "https://developer.ticktick.com"
     },

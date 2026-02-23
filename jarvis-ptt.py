@@ -23,7 +23,7 @@ import threading
 import queue
 
 # ===== CONFIGURATION =====
-VPS_URL = "http://100.83.250.65:8765"  # Tailscale IP
+VPS_URL = "http://100.82.133.57:8765"  # Tailscale IP
 
 # Whisper - use "tiny" or "base" for speed
 WHISPER_MODEL = "tiny.en"  # Fastest English-only model

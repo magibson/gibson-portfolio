@@ -16,7 +16,7 @@ try:
 except ImportError:
     HAS_REQUESTS = False
 
-RESULTS_FILE = Path("/home/clawd/clawd/memory/health-check-results.json")
+RESULTS_FILE = Path("/Users/jarvis/clawd/memory/health-check-results.json")
 
 def check_gmail():
     """Check if Gmail/himalaya is working"""
@@ -35,8 +35,8 @@ def check_gmail():
 
 def check_google_calendar():
     """Check if Google Calendar tokens are valid"""
-    tokens_file = Path("/home/clawd/clawd/google-tokens.json")
-    creds_file = Path("/home/clawd/clawd/google-credentials.json")
+    tokens_file = Path("/Users/jarvis/clawd/google-tokens.json")
+    creds_file = Path("/Users/jarvis/clawd/google-credentials.json")
     
     if not tokens_file.exists():
         return {"status": "error", "message": "No tokens file"}
@@ -82,7 +82,7 @@ def check_google_calendar():
 
 def check_whoop():
     """Check if Whoop tokens are valid (using v2 API)"""
-    tokens_file = Path("/home/clawd/clawd/.whoop_tokens.json")
+    tokens_file = Path("/Users/jarvis/clawd/.whoop_tokens.json")
     
     if not tokens_file.exists():
         return {"status": "error", "message": "No tokens file"}

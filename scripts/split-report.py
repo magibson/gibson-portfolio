@@ -4,8 +4,8 @@
 import re
 import os
 
-INPUT_FILE = "/home/clawd/clawd/carter-gibson-job-search-strategy.md"
-OUTPUT_DIR = "/home/clawd/clawd/carter-report-pdfs"
+INPUT_FILE = "/Users/jarvis/clawd/carter-gibson-job-search-strategy.md"
+OUTPUT_DIR = "/Users/jarvis/clawd/carter-report-pdfs"
 
 # Define sections to extract
 SECTIONS = [

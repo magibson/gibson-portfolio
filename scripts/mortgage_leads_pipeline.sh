@@ -7,7 +7,7 @@ set -e
 
 # Config
 TRACERFY_API_KEY="${TRACERFY_API_KEY:-}"
-OUTPUT_DIR="/home/clawd/clawd/leads"
+OUTPUT_DIR="/Users/jarvis/clawd/leads"
 DATE=$(date +%Y-%m-%d)
 OUTPUT_FILE="${OUTPUT_DIR}/monmouth_leads_${DATE}.csv"
 
@@ -18,7 +18,7 @@ echo "[$(date)] Starting mortgage leads pipeline..."
 
 # Step 1: Get property data from Propwire (or use cached nj.com data for now)
 # Note: Propwire requires manual export or scraper - using nj.com scraped data as backup
-PROPERTY_DATA="/home/clawd/clawd/monmouth_mortgage_leads_jan2026.csv"
+PROPERTY_DATA="/Users/jarvis/clawd/monmouth_mortgage_leads_jan2026.csv"
 
 if [ ! -f "$PROPERTY_DATA" ]; then
     echo "ERROR: No property data found at $PROPERTY_DATA"

@@ -18,7 +18,7 @@ import threading
 from urllib.parse import urlparse, parse_qs
 
 # Configuration
-HOST = "100.83.250.65"  # Tailscale IP
+HOST = "100.82.133.57"  # Tailscale IP
 PORT = 8765
 QUEUE_FILE = "/tmp/jarvis_queue.txt"
 RESPONSE_TIMEOUT = 60  # seconds

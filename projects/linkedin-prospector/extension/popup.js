@@ -7,7 +7,7 @@ const STORAGE_KEY = 'jarvisScrapeState';
 let collectedLeads = [];
 let campaigns = [];
 let selectedCampaign = null;
-let settings = { apiUrl: 'http://100.83.250.65:8089', maxPages: 0, searchName: '' };
+let settings = { apiUrl: 'http://100.82.133.57:8089', maxPages: 0, searchName: '' };
 
 // Load saved settings
 chrome.storage.local.get(['jarvisSettings', 'jarvisSelectedCampaignId'], (result) => {

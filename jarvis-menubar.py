@@ -22,7 +22,7 @@ import threading
 import json
 
 # ===== CONFIGURATION =====
-VPS_URL = "http://100.83.250.65:8765"
+VPS_URL = "http://100.82.133.57:8765"
 LOCAL_TTS_URL = "http://localhost:5001"
 AUTH_TOKEN = "1fa124bc0a493b0db3dda04174bf83f9a5d3621fc51a03b916bf5784dc2f82bf"
 

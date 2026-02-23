@@ -13,7 +13,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse
 
 # Configuration
-HOST = "100.83.250.65"
+HOST = "100.82.133.57"
 PORT = 8765
 
 # Load Telegram config

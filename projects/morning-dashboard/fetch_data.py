@@ -16,8 +16,8 @@ import requests
 # Paths
 SCRIPT_DIR = Path(__file__).parent
 DATA_FILE = SCRIPT_DIR / "data.json"
-CREDENTIALS_FILE = Path("/home/clawd/clawd/google-credentials.json")
-TOKENS_FILE = Path("/home/clawd/clawd/google-tokens.json")
+CREDENTIALS_FILE = Path("/Users/jarvis/clawd/google-credentials.json")
+TOKENS_FILE = Path("/Users/jarvis/clawd/google-tokens.json")
 
 def load_credentials():
     """Load Google OAuth credentials"""
@@ -484,7 +484,7 @@ def load_api_status():
             "id": "xai",
             "name": "Grok",
             "purpose": "X search & research",
-            "status": "connected" if Path("/home/clawd/clawd/integrations/xai/.env").exists() else "error",
+            "status": "connected" if Path("/Users/jarvis/clawd/integrations/xai/.env").exists() else "error",
             "cost": 4.50,
             "requests": 245
         },
@@ -492,7 +492,7 @@ def load_api_status():
             "id": "whoop",
             "name": "Whoop",
             "purpose": "Fitness tracking",
-            "status": "connected" if Path("/home/clawd/clawd/.whoop_tokens.json").exists() else "error",
+            "status": "connected" if Path("/Users/jarvis/clawd/.whoop_tokens.json").exists() else "error",
             "cost": 0,
             "requests": 62
         },
@@ -500,7 +500,7 @@ def load_api_status():
             "id": "withings",
             "name": "Withings",
             "purpose": "Body composition",
-            "status": "connected" if Path("/home/clawd/clawd/.withings_tokens.json").exists() else "error",
+            "status": "connected" if Path("/Users/jarvis/clawd/.withings_tokens.json").exists() else "error",
             "cost": 0,
             "requests": 8
         },
@@ -516,7 +516,7 @@ def load_api_status():
             "id": "ticktick",
             "name": "TickTick",
             "purpose": "Task management",
-            "status": "connected" if Path("/home/clawd/clawd/integrations/.personal-config.json").exists() else "error",
+            "status": "connected" if Path("/Users/jarvis/clawd/integrations/.personal-config.json").exists() else "error",
             "cost": 0,
             "requests": 31
         },

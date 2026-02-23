@@ -1,11 +1,17 @@
 {
-  "updated": "2026-02-07T03:55:05.302690",
+  "updated": "2026-02-22T20:42:26.599767",
   "email": {
-    "unread": 1,
+    "unread": 18,
     "error": null
   },
   "calendar": {
-    "events": [],
+    "events": [
+      {
+        "time": "All day",
+        "title": "Sydney's Birthday",
+        "color": "cyan"
+      }
+    ],
     "error": null
   },
   "markets": {
@@ -14,33 +20,33 @@
         "symbol": "^GSPC",
         "name": "S&P 500",
         "type": "index",
-        "price": 6932.3,
-        "change": 1.97,
-        "prevClose": 6798.4
+        "price": 6909.51,
+        "change": 0.69,
+        "prevClose": 6861.89
       },
       {
         "symbol": "^VIX",
         "name": "VIX",
         "type": "volatility",
-        "price": 17.76,
-        "change": -18.42,
-        "prevClose": 21.77
+        "price": 19.09,
+        "change": -5.64,
+        "prevClose": 20.23
       },
       {
         "symbol": "^TNX",
         "name": "10Y Treasury",
         "type": "bond",
-        "price": 4.21,
-        "change": -0.1,
-        "prevClose": 4.21
+        "price": 4.09,
+        "change": 0.27,
+        "prevClose": 4.08
       },
       {
         "symbol": "TSLA",
         "name": "TSLA",
         "type": "stock",
-        "price": 411.11,
-        "change": 3.5,
-        "prevClose": 397.21
+        "price": 411.82,
+        "change": 0.03,
+        "prevClose": 411.71
       }
     ],
     "error": null
@@ -59,85 +65,85 @@
         "symbol": "TSLA",
         "description": "TESLA INC COM",
         "quantity": 5.0,
-        "price": 411.11,
-        "value": 2055.55,
-        "today_gain": 25.5,
-        "today_gain_pct": 1.26,
-        "total_gain": 247.31,
-        "total_gain_pct": 13.68,
-        "pct_of_account": 37.83
+        "price": 411.82,
+        "value": 2059.1,
+        "today_gain": 2.5,
+        "today_gain_pct": 0.12,
+        "total_gain": 250.86,
+        "total_gain_pct": 13.87,
+        "pct_of_account": 37.34
       },
       {
         "symbol": "VOO",
         "description": "VANGUARD INDEX FUNDS S&P 500 E",
         "quantity": 2.748,
-        "price": 635.24,
-        "value": 1745.64,
-        "today_gain": 11.9,
-        "today_gain_pct": 0.69,
-        "total_gain": 99.23,
-        "total_gain_pct": 6.03,
-        "pct_of_account": 32.13
+        "price": 634.02,
+        "value": 1742.29,
+        "today_gain": 7.89,
+        "today_gain_pct": 0.45,
+        "total_gain": 95.88,
+        "total_gain_pct": 5.82,
+        "pct_of_account": 31.6
       },
       {
         "symbol": "UNH",
         "description": "UNITEDHEALTH GROUP INC",
         "quantity": 2.014,
-        "price": 276.65,
-        "value": 557.17,
-        "today_gain": 1.47,
-        "today_gain_pct": 0.26,
-        "total_gain": -99.12,
-        "total_gain_pct": -15.1,
-        "pct_of_account": 10.25
+        "price": 290.0,
+        "value": 584.06,
+        "today_gain": 3.63,
+        "today_gain_pct": 0.62,
+        "total_gain": -72.23,
+        "total_gain_pct": -11.01,
+        "pct_of_account": 10.59
       },
       {
         "symbol": "TRGP",
         "description": "TARGA RESOURCES CORP",
         "quantity": 2.0,
-        "price": 211.44,
-        "value": 422.88,
-        "today_gain": 14.0,
-        "today_gain_pct": 3.42,
-        "total_gain": 60.36,
-        "total_gain_pct": 16.65,
-        "pct_of_account": 7.78
+        "price": 231.35,
+        "value": 462.7,
+        "today_gain": 7.46,
+        "today_gain_pct": 1.64,
+        "total_gain": 100.18,
+        "total_gain_pct": 27.63,
+        "pct_of_account": 8.39
       },
       {
         "symbol": "NVDA",
         "description": "NVIDIA CORPORATION COM",
         "quantity": 2.0,
-        "price": 185.41,
-        "value": 370.82,
-        "today_gain": 22.44,
-        "today_gain_pct": 6.44,
-        "total_gain": 46.69,
-        "total_gain_pct": 14.4,
-        "pct_of_account": 6.82
+        "price": 189.82,
+        "value": 379.64,
+        "today_gain": 3.68,
+        "today_gain_pct": 0.98,
+        "total_gain": 55.51,
+        "total_gain_pct": 17.13,
+        "pct_of_account": 6.89
       },
       {
         "symbol": "PFE",
         "description": "PFIZER INC",
         "quantity": 6.148,
-        "price": 27.22,
-        "value": 167.35,
-        "today_gain": 2.71,
-        "today_gain_pct": 1.64,
-        "total_gain": 14.52,
-        "total_gain_pct": 9.5,
-        "pct_of_account": 3.08
+        "price": 26.65,
+        "value": 163.84,
+        "today_gain": -4.43,
+        "today_gain_pct": -2.63,
+        "total_gain": 11.01,
+        "total_gain_pct": 7.2,
+        "pct_of_account": 2.97
       },
       {
         "symbol": "CCJ",
         "description": "CAMECO CORP COM NPV ISIN #CA13",
         "quantity": 1.002,
-        "price": 113.63,
-        "value": 113.86,
-        "today_gain": -1.19,
-        "today_gain_pct": -1.04,
-        "total_gain": 41.44,
-        "total_gain_pct": 57.22,
-        "pct_of_account": 2.1
+        "price": 121.35,
+        "value": 121.59,
+        "today_gain": 4.86,
+        "today_gain_pct": 4.16,
+        "total_gain": 49.17,
+        "total_gain_pct": 67.9,
+        "pct_of_account": 2.21
       },
       {
         "symbol": "CASH",
@@ -152,11 +158,11 @@
         "pct_of_account": 0.01
       }
     ],
-    "total_value": 5433.88,
-    "today_gain": 76.83,
-    "today_gain_pct": 1.41,
-    "total_gain": 410.43,
-    "total_gain_pct": 8.17,
+    "total_value": 5513.83,
+    "today_gain": 25.59,
+    "today_gain_pct": 0.46,
+    "total_gain": 490.38,
+    "total_gain_pct": 9.76,
     "cost_basis": 5022.84,
     "history": [
       5549.28,
@@ -171,20 +177,38 @@
   "ticktick": {
     "tasks": [
       {
-        "id": "69403cebe982513b82ab8d69",
-        "projectId": "668b598bef8511130af04740",
-        "title": "call Jessica",
-        "project": "\ud83d\udcbcWork",
-        "dueDate": "2026-02-02T05:00:00.000+0000",
+        "id": "6976f20190d451ad07ef377e",
+        "projectId": "6848f275f9b5511f0414ebae",
+        "title": "Figure out security system",
+        "project": "Life",
+        "dueDate": "2026-02-11T05:00:00.000+0000",
         "priority": 0,
         "status": 0
       },
       {
-        "id": "6970ea42dc9691033140acf7",
+        "id": "698c9e7fc3611102eb1a8e5a",
+        "projectId": "6848f275f9b5511f0414ebae",
+        "title": "go over subscriptions",
+        "project": "Life",
+        "dueDate": "2026-02-14T05:00:00.000+0000",
+        "priority": 0,
+        "status": 0
+      },
+      {
+        "id": "698fb1c1b3af5105f0c1aa7e",
         "projectId": "668b598bef8511130af04740",
-        "title": "get on track for learnings",
+        "title": "CRUMP sign up",
         "project": "\ud83d\udcbcWork",
-        "dueDate": "2026-02-02T05:00:00.000+0000",
+        "dueDate": "2026-02-18T05:00:00.000+0000",
+        "priority": 0,
+        "status": 0
+      },
+      {
+        "id": "69403cebe982513b82ab8d69",
+        "projectId": "668b598bef8511130af04740",
+        "title": "call Jessica",
+        "project": "\ud83d\udcbcWork",
+        "dueDate": "2026-02-19T05:00:00.000+0000",
         "priority": 0,
         "status": 0
       },
@@ -193,7 +217,7 @@
         "projectId": "668b598bef8511130af04740",
         "title": "dm mercedes",
         "project": "\ud83d\udcbcWork",
-        "dueDate": "2026-02-02T05:00:00.000+0000",
+        "dueDate": "2026-02-19T05:00:00.000+0000",
         "priority": 0,
         "status": 0
       },
@@ -202,7 +226,16 @@
         "projectId": "668b598bef8511130af04740",
         "title": "reup PA",
         "project": "\ud83d\udcbcWork",
-        "dueDate": "2026-02-02T05:00:00.000+0000",
+        "dueDate": "2026-02-19T05:00:00.000+0000",
+        "priority": 0,
+        "status": 0
+      },
+      {
+        "id": "6989ee5cb0591102f04d677c",
+        "projectId": "668b598bef8511130af04740",
+        "title": "build mysite",
+        "project": "\ud83d\udcbcWork",
+        "dueDate": "2026-02-19T05:00:00.000+0000",
         "priority": 0,
         "status": 0
       },
@@ -211,39 +244,39 @@
         "projectId": "668b598bef8511130af04740",
         "title": "call Edmond early afternoon",
         "project": "\ud83d\udcbcWork",
-        "dueDate": "2026-02-02T19:00:00.000+0000",
+        "dueDate": "2026-02-19T19:00:00.000+0000",
         "priority": 0,
         "status": 0
       },
       {
-        "id": "6976f20190d451ad07ef377e",
-        "projectId": "6848f275f9b5511f0414ebae",
-        "title": "Figure out security system",
-        "project": "Life",
-        "dueDate": "2026-02-03T05:00:00.000+0000",
-        "priority": 0,
-        "status": 0
-      },
-      {
-        "id": "6983bd9d56321102f04d5d57",
+        "id": "6997745412ab9102e24a115b",
         "projectId": "668b598bef8511130af04740",
-        "title": "send letters",
+        "title": "call Matt Herman",
         "project": "\ud83d\udcbcWork",
-        "dueDate": "2026-02-05T05:00:00.000+0000",
+        "dueDate": "2026-02-20T05:00:00.000+0000",
         "priority": 0,
         "status": 0
       },
       {
-        "id": "6986a3c89f8d9102f04d6303",
+        "id": "699775cc12995102e24a11d5",
         "projectId": "668b598bef8511130af04740",
-        "title": "check hearsay",
+        "title": "call gilbert",
         "project": "\ud83d\udcbcWork",
-        "dueDate": "2026-02-09T05:00:00.000+0000",
+        "dueDate": null,
+        "priority": 0,
+        "status": 0
+      },
+      {
+        "id": "699775d212961102e24a122e",
+        "projectId": "668b598bef8511130af04740",
+        "title": "call nick orphans",
+        "project": "\ud83d\udcbcWork",
+        "dueDate": null,
         "priority": 0,
         "status": 0
       }
     ],
-    "total": 8
+    "total": 11
   },
   "packages": {
     "packages": [
@@ -313,7 +346,7 @@
         "id": "xai",
         "name": "Grok",
         "purpose": "X search & research",
-        "status": "connected",
+        "status": "error",
         "cost": 4.5,
         "requests": 245
       },
@@ -321,7 +354,7 @@
         "id": "whoop",
         "name": "Whoop",
         "purpose": "Fitness tracking",
-        "status": "connected",
+        "status": "error",
         "cost": 0,
         "requests": 62
       },
@@ -329,7 +362,7 @@
         "id": "withings",
         "name": "Withings",
         "purpose": "Body composition",
-        "status": "connected",
+        "status": "error",
         "cost": 0,
         "requests": 8
       },
@@ -391,7 +424,7 @@
       }
     ],
     "total_cost": 26.5,
-    "connected_count": 11,
-    "updated": "2026-02-07T03:55:05.302635"
+    "connected_count": 8,
+    "updated": "2026-02-22T20:42:26.599734"
   }
 }

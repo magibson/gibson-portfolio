@@ -8,7 +8,7 @@ import sys
 import requests
 from datetime import datetime
 
-TOKEN_FILE = "/home/clawd/clawd/.whoop_tokens.json"
+TOKEN_FILE = "/Users/jarvis/clawd/.whoop_tokens.json"
 CLIENT_ID = "3108dd26-076e-495d-be16-540aad459356"
 CLIENT_SECRET = "8b227cf6705ece46d4f33851390645435c761266a81c46e930c7d9b46c083387"
 BASE_URL = "https://api.prod.whoop.com/developer/v2"

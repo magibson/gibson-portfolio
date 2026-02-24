@@ -1,5 +1,5 @@
 {
-  "updated": "2026-02-24T08:10:55.666762",
+  "updated": "2026-02-24T08:41:14.896430",
   "email": {
     "unread": 3,
     "error": null
@@ -22,17 +22,17 @@
         "symbol": "^VIX",
         "name": "VIX",
         "type": "volatility",
-        "price": 21.38,
-        "change": 1.76,
+        "price": 21.26,
+        "change": 1.19,
         "prevClose": 21.01
       },
       {
         "symbol": "^TNX",
         "name": "10Y Treasury",
         "type": "bond",
-        "price": 4.03,
-        "change": -1.4,
-        "prevClose": 4.09
+        "price": 4.04,
+        "change": 0.27,
+        "prevClose": 4.03
       },
       {
         "symbol": "TSLA",
@@ -392,6 +392,6 @@
     ],
     "total_cost": 26.5,
     "connected_count": 9,
-    "updated": "2026-02-24T08:10:55.666719"
+    "updated": "2026-02-24T08:41:14.896392"
   }
 }

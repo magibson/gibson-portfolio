@@ -14,8 +14,15 @@ import json
 from pathlib import Path
 
 OLLAMA_BASE  = "http://localhost:11434"
-DEFAULT_MODEL = "jarvis-local"   # qwen2.5:7b base — upgraded Feb 22 2026
-FAST_MODEL    = "qwen2.5:7b"    # 5-10x better than llama3.2:3b, same zero cost
+# Model routing — use the right tool for each job:
+# qwen2.5:7b     — best local model, use for: lead scoring, email drafts, summarization, research
+# jarvis-local   — qwen2.5:7b + Matt context, use for: personalized tasks, daily logs
+# llama3.2:3b    — fastest, use for: simple classification, bulk processing
+# nomic-embed    — embeddings only (for future second brain / RAG)
+
+DEFAULT_MODEL = "qwen2.5:7b"     # Best quality for most local tasks
+FAST_MODEL    = "llama3.2:3b"    # Speed over quality — bulk/simple tasks
+EMBED_MODEL   = "nomic-embed-text"  # Embeddings for RAG/second brain
 
 def is_running() -> bool:
     try:

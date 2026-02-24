@@ -1,17 +1,11 @@
 {
-  "updated": "2026-02-23T23:35:52.570807",
+  "updated": "2026-02-24T00:06:10.424779",
   "email": {
     "unread": 1,
     "error": null
   },
   "calendar": {
-    "events": [
-      {
-        "time": "All day",
-        "title": "Sydney's Birthday",
-        "color": "cyan"
-      }
-    ],
+    "events": [],
     "error": null
   },
   "markets": {
@@ -398,6 +392,6 @@
     ],
     "total_cost": 26.5,
     "connected_count": 9,
-    "updated": "2026-02-23T23:35:52.570770"
+    "updated": "2026-02-24T00:06:10.424745"
   }
 }

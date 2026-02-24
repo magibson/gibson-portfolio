@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-02-23T18:30:00.835629",
+  "timestamp": "2026-02-24T18:04:05.954782",
   "checks": {
     "gmail": {
       "status": "error",
@@ -10,13 +10,12 @@
       "message": "Calendar API working"
     },
     "whoop": {
-      "status": "error",
-      "message": "No tokens file"
+      "status": "ok",
+      "message": "Whoop refreshed"
     }
   },
   "all_ok": false,
   "alerts": [
-    "Gmail: [Errno 2] No such file or directory: '/home/clawd/bin/himalaya'",
-    "Whoop: No tokens file"
+    "Gmail: [Errno 2] No such file or directory: '/home/clawd/bin/himalaya'"
   ]
 }

@@ -3465,7 +3465,7 @@
       "type": "Closing",
       "source": "https://www.pa.gov/agencies/dli/programs-services/workforce-development-home/warn-requirements/warn-notices.html",
       "first_seen": "2026-02-23T06:00:09.352492",
-      "is_new": true
+      "is_new": false
     },
     {
       "id": "481a8365a6cf",
@@ -3478,7 +3478,7 @@
       "type": "Closing",
       "source": "https://www.pa.gov/agencies/dli/programs-services/workforce-development-home/warn-requirements/warn-notices.html",
       "first_seen": "2026-02-23T06:00:09.352492",
-      "is_new": true
+      "is_new": false
     },
     {
       "id": "acb374260bc9",
@@ -3491,7 +3491,7 @@
       "type": "Closing",
       "source": "https://www.pa.gov/agencies/dli/programs-services/workforce-development-home/warn-requirements/warn-notices.html",
       "first_seen": "2026-02-23T06:00:09.352492",
-      "is_new": true
+      "is_new": false
     },
     {
       "id": "a1472c72679c",
@@ -3504,10 +3504,10 @@
       "type": "Layoff",
       "source": "https://www.pa.gov/agencies/dli/programs-services/workforce-development-home/warn-requirements/warn-notices.html",
       "first_seen": "2026-02-23T06:00:09.352492",
-      "is_new": true
+      "is_new": false
     }
   ],
-  "last_updated": "2026-02-23T11:00:03.611438",
+  "last_updated": "2026-02-24T11:00:04.985137",
   "metadata": {
     "nj_count": 1,
     "pa_count": 269,

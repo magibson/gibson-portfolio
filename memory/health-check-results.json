@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-02-24T18:04:05.954782",
+  "timestamp": "2026-02-24T18:34:04.986344",
   "checks": {
     "gmail": {
       "status": "error",
@@ -11,7 +11,7 @@
     },
     "whoop": {
       "status": "ok",
-      "message": "Whoop refreshed"
+      "message": "Whoop working (Recovery: 84.0%)"
     }
   },
   "all_ok": false,

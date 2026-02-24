@@ -92,6 +92,7 @@ def responses_api(messages, model="grok-4", tools=None, timeout=120):
 def search_x(query, context=None):
     """
     Search X (Twitter) using Grok's native X Search tool
+    NOTE: Server-side tools require grok-4 family models.
     """
     messages = []
     
@@ -103,10 +104,10 @@ def search_x(query, context=None):
         "content": f"Search X for: {query}\n\nProvide a summary of what you find, including relevant posts, users, and trends."
     })
     
-    # Enable X Search tool
+    # Enable X Search tool — requires grok-4
     tools = [{"type": "x_search"}]
     
-    result = responses_api(messages, tools=tools)
+    result = responses_api(messages, model="grok-4", tools=tools)
     
     return parse_response(result)
 
@@ -133,6 +134,7 @@ def fetch_x_article(url, question=None):
 def web_search_grok(query, context=None):
     """
     Web search using Grok's web search tool
+    NOTE: Server-side tools require grok-4 family models.
     """
     messages = []
     
@@ -146,7 +148,7 @@ def web_search_grok(query, context=None):
     
     tools = [{"type": "web_search"}]
     
-    result = responses_api(messages, tools=tools)
+    result = responses_api(messages, model="grok-4", tools=tools)
     
     return parse_response(result)
 

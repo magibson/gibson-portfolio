@@ -1,7 +1,7 @@
 {
-  "updated": "2026-02-25T08:12:01.738863",
+  "updated": "2026-02-25T08:42:26.458510",
   "email": {
-    "unread": 17,
+    "unread": 18,
     "error": null
   },
   "calendar": {
@@ -22,16 +22,16 @@
         "symbol": "^VIX",
         "name": "VIX",
         "type": "volatility",
-        "price": 19.04,
-        "change": -2.61,
+        "price": 19.01,
+        "change": -2.76,
         "prevClose": 19.55
       },
       {
         "symbol": "^TNX",
         "name": "10Y Treasury",
         "type": "bond",
-        "price": 4.03,
-        "change": 0.1,
+        "price": 4.06,
+        "change": 0.57,
         "prevClose": 4.03
       },
       {
@@ -374,6 +374,6 @@
     ],
     "total_cost": 26.5,
     "connected_count": 10,
-    "updated": "2026-02-25T08:12:01.738830"
+    "updated": "2026-02-25T08:42:26.458471"
   }
 }

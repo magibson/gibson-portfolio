@@ -41,3 +41,9 @@ Video game. Matt has it bookmarked in his browser.
 Tags: gaming
 
 ---
+
+## Feb 25, 2026
+
+**Movie — Project Hail Mary**
+Andy Weir adaptation starring Ryan Gosling. Releases March 20, 2026. Filmed for IMAX — 3/4 of film in expanded aspect ratio. Matt wants to see in IMAX near Monmouth County NJ. Closest options: AMC Freehold 14, AMC Newport Centre Jersey City, or AMC Lincoln Square NYC for best screen.
+Tags: movies, personal, IMAX

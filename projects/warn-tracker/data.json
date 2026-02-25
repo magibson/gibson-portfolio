@@ -3505,13 +3505,39 @@
       "source": "https://www.pa.gov/agencies/dli/programs-services/workforce-development-home/warn-requirements/warn-notices.html",
       "first_seen": "2026-02-23T06:00:09.352492",
       "is_new": false
+    },
+    {
+      "id": "662178c3a309",
+      "company": "Bradford Regional Medical Center",
+      "state": "PA",
+      "city": "Bradford",
+      "county": "",
+      "affected": 238,
+      "date": "2026-05-02",
+      "type": "Closing",
+      "source": "https://www.pa.gov/agencies/dli/programs-services/workforce-development-home/warn-requirements/warn-notices.html",
+      "first_seen": "2026-02-25T11:00:03.517321",
+      "is_new": true
+    },
+    {
+      "id": "98081ea740d4",
+      "company": "Post Consumer Brands, LLC",
+      "state": "PA",
+      "city": "Bloomsburg",
+      "county": "",
+      "affected": 11,
+      "date": "2026-05-01",
+      "type": "Layoff",
+      "source": "https://www.pa.gov/agencies/dli/programs-services/workforce-development-home/warn-requirements/warn-notices.html",
+      "first_seen": "2026-02-25T11:00:03.517321",
+      "is_new": true
     }
   ],
-  "last_updated": "2026-02-24T11:00:04.985137",
+  "last_updated": "2026-02-25T11:00:03.520864",
   "metadata": {
     "nj_count": 1,
-    "pa_count": 269,
-    "total_affected": 38682,
-    "new_count": 0
+    "pa_count": 271,
+    "total_affected": 38931,
+    "new_count": 2
   }
 }

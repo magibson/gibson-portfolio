@@ -47,3 +47,9 @@ Tags: gaming
 **Movie — Project Hail Mary**
 Andy Weir adaptation starring Ryan Gosling. Releases March 20, 2026. Filmed for IMAX — 3/4 of film in expanded aspect ratio. Matt wants to see in IMAX near Monmouth County NJ. Closest options: AMC Freehold 14, AMC Newport Centre Jersey City, or AMC Lincoln Square NYC for best screen.
 Tags: movies, personal, IMAX
+
+**Lead Import Template**
+NYL CRM import template saved at ~/clawd/reference/lead-import-template.xlsx
+Columns: First Name, Middle Name, Last Name, Source, Sub-Source, Target Segment, Home Phone, Mobile Phone, Work Phone, Personal Email, Work Email, Other Email, Date Of Birth, Gender, Street, City, State, Postal Code
+Source picklist: Canvassing, CI, Digital, Field Event, Initial Market, Networking, Personal Introduction, Personal Observation, Seminars, Worksite
+Tags: work, leads, CRM, NYL

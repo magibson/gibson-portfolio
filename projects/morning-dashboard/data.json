@@ -1,7 +1,7 @@
 {
-  "updated": "2026-02-24T18:53:20.699514",
+  "updated": "2026-02-24T19:28:46.223767",
   "email": {
-    "unread": 8,
+    "unread": 10,
     "error": null
   },
   "calendar": {
@@ -374,6 +374,6 @@
     ],
     "total_cost": 26.5,
     "connected_count": 10,
-    "updated": "2026-02-24T18:53:20.699477"
+    "updated": "2026-02-24T19:28:46.223728"
   }
 }

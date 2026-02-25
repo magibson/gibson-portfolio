@@ -4,6 +4,99 @@
 
 ---
 
+## 2026-02-24 — Local AI Second Brain (RAG + ChromaDB) ✅
+
+**Scripts:**
+- `~/clawd/scripts/second-brain-index.py` — Indexer (embed all memory/reference/lead files)
+- `~/clawd/scripts/second-brain.py` — Query interface (natural language search)
+
+**Stack:**
+- ChromaDB 1.5.1 (persistent vector DB at `~/clawd/data/second-brain-db`)
+- Ollama `nomic-embed-text` model for embeddings (localhost:11434)
+- Python 3.11 venv at `~/clawd/second-brain-env` (3.14 incompatible with ChromaDB)
+
+**What's indexed (436 chunks across 45 files):**
+- `memory/*.md` — all daily session logs
+- `MEMORY.md` + `NIGHTLY-BUILDS.md`
+- `reference/*.md` — research, playbooks, project ideas
+- `leads/*.csv` — mortgage lead files (structured summaries, first 50 rows each)
+
+**Features:**
+- Smart chunking: 800-char chunks with 150-char overlap
+- SHA256 hash caching — only re-indexes changed files
+- `--force` flag to re-index everything
+- `--file` flag to index a single file
+- `--type` filter (markdown vs csv_summary)
+- `--json` output for LLM pipelines
+- `--context-only` for clean RAG pipe-in
+- `--stats` to see DB contents
+- Scores results by cosine similarity (1 - distance)
+
+**Cron:**
+- LaunchAgent: `com.jarvis.second-brain-reindex` fires daily at 2:00 AM
+- Plist: `~/clawd/launchagents/com.jarvis.second-brain-reindex.plist`
+- Log: `/tmp/second-brain-reindex.log`
+
+**Sample queries tested:**
+- "What are my top mortgage leads?" → surfaced Feb 24 leads + tracker notes ✓
+- "What do I know about Carter Gibson?" → surfaced reference files ✓
+- "What projects did I build for Jarvis AI voice?" → surfaced NIGHTLY-BUILDS entries ✓
+
+**Usage:**
+```bash
+# Query
+~/clawd/second-brain-env/bin/python3 ~/clawd/scripts/second-brain.py "your question"
+
+# Re-index
+~/clawd/second-brain-env/bin/python3 ~/clawd/scripts/second-brain-index.py
+
+# Stats
+~/clawd/second-brain-env/bin/python3 ~/clawd/scripts/second-brain.py --stats
+```
+
+---
+
+## 2026-02-24 — Prospect Intelligence Dossier ✅
+
+**Script:** `~/clawd/scripts/prospect-dossier.py`
+**Output dir:** `~/clawd/leads/dossiers/`
+
+**What it does:**
+- Takes a lead's name + address (or LinkedIn URL) and builds a 1-page research brief
+- Sections: Contact Info, LinkedIn/Career Profile, Property & Financial Snapshot, Recent Life Events, Social Media Presence, 3 Conversation Starters tailored for a financial advisor cold call
+- Pulls data via Gemini (LinkedIn/career/property/life events research) and Grok (X/social search)
+- Hooked into existing lead pipeline — accepts `--csv` flag with any `priority_dial` or `dial_ready` CSV, auto-maps columns
+- Output saved as Markdown to `~/clawd/leads/dossiers/<Name>_dossier_YYYYMMDD.md`
+
+**Usage:**
+```bash
+# Single lead (name + address)
+python3 ~/clawd/scripts/prospect-dossier.py --name "John Smith" --address "123 Main St, Manalapan, NJ"
+
+# From LinkedIn URL
+python3 ~/clawd/scripts/prospect-dossier.py --name "John Smith" --linkedin "https://linkedin.com/in/johnsmith"
+
+# From priority_dial CSV (row 1 = top lead)
+python3 ~/clawd/scripts/prospect-dossier.py --csv ~/clawd/leads/priority_dial_2026-02-24.csv --row 1
+
+# Batch: top 5 leads
+python3 ~/clawd/scripts/prospect-dossier.py --csv ~/clawd/leads/priority_dial_2026-02-24.csv --all --limit 5
+```
+
+**Test run:** Built dossier for Caitlyn Haberle (2 Wendi Way, Manalapan, NJ) from `priority_dial_2026-02-24.csv`
+- Found: Financial Advisor at Equitable Advisors, Monmouth U grad, Series 7/66
+- Property: est. $650-750K home, household income est. $150-200K+
+- Facebook profile found (private), no X presence
+- 3 tailored conversation starters generated ✅
+- Full dossier: `~/clawd/leads/dossiers/Caitlyn_Haberle_dossier_20260224.md`
+
+**Architecture:**
+- Research modules: `research_linkedin()`, `research_property()`, `research_life_events()`, `research_social_presence()`, `generate_conversation_starters()`
+- CSV parser handles both `priority_dial` and `dial_ready` formats
+- Graceful fallback on API errors — never crashes mid-run
+
+---
+
 ## 2026-02-21 — Kalshi Weather Paper Trading Eval Dashboard 🌦️
 
 **Location:** `~/clawd/projects/kalshi-weather-eval/app.py` | **Port:** 8104 | **Service:** `jarvis-kalshi-eval.service`
@@ -1001,12 +1094,3 @@ Also set up tonight:
 - Scraper at ~/builds/propwire/propwire_scraper.py
 - Blocker: "What's New" modal blocks filter inputs; need to inspect actual DOM selectors
 - Next: overnight DOM inspection run + fix selectors for county/price/date filters + export
-
----
-## QUEUED BUILDS
-
-### Tonight (Feb 25) — Prospect Intelligence Dossier
-Build a script that takes a lead (name + address or LinkedIn URL) and generates a 1-page research brief: LinkedIn profile, employer, estimated income, recent life events (job change, new home), social media presence, conversation starters for a financial advisor cold call. Hook it into the Propwire/LinkedIn lead pipeline so Matt can request a dossier before dialing. Deliver via Telegram.
-
-### Tomorrow Night (Feb 26) — Local AI Second Brain
-Set up a RAG pipeline using Ollama (nomic-embed-text already running on port 11434). Index: all memory/*.md files, MEMORY.md, lead CSVs, NIGHTLY-BUILDS.md, project notes in ~/clawd/reference/. Build a query tool so I can search the vector DB before answering questions. Goal: stop burning context window on memory, never forget anything Matt has told me.

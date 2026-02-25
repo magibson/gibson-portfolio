@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.jarvis.second-brain-api</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/jarvis/clawd/second-brain-env/bin/python3</string>
+        <string>/Users/jarvis/clawd/scripts/second-brain-api.py</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/jarvis/clawd/scripts</string>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/jarvis/clawd/logs/second-brain-api.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/jarvis/clawd/logs/second-brain-api.error.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/Users/jarvis/clawd/second-brain-env/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <key>HOME</key>
+        <string>/Users/jarvis</string>
+    </dict>
+
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+</dict>
+</plist>

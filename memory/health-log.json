@@ -157,21 +157,21 @@
     },
     {
       "recovery": {
-        "score": 94.0,
-        "hrv": 53.842346,
+        "score": 97.0,
+        "hrv": 54.274612,
         "resting_hr": 63.0,
         "spo2": 95.96875
       },
       "sleep": {
-        "performance": 82.0,
-        "efficiency": 96.89158,
-        "hours": 6.5,
-        "rem_mins": 99,
-        "deep_mins": 79
+        "performance": 84.0,
+        "efficiency": 88.2917,
+        "hours": 8.4,
+        "rem_mins": 122,
+        "deep_mins": 88
       },
       "date": "2026-02-25",
-      "logged_at": "2026-02-25T08:30:04.399414"
+      "logged_at": "2026-02-25T10:02:22.699248"
     }
   ],
-  "last_updated": "2026-02-25T08:30:04.401299"
+  "last_updated": "2026-02-25T10:02:22.699936"
 }

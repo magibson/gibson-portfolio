@@ -78,13 +78,30 @@ async def snap(page, name: str):
     except:
         pass
 
+def clean_url(url: str) -> str:
+    """Strip tracking params from LinkedIn URLs for stable dedup."""
+    if not url:
+        return url
+    # Remove _ntb and other tracking params, keep base URL
+    try:
+        from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
+        p = urlparse(url)
+        params = parse_qs(p.query)
+        # Remove known tracking params
+        for key in ['_ntb', 'trk', 'trkInfo']:
+            params.pop(key, None)
+        clean_query = urlencode({k: v[0] for k, v in params.items()})
+        return urlunparse((p.scheme, p.netloc, p.path, p.params, clean_query, ''))
+    except:
+        return url
+
 def get_existing_urls() -> set:
     """Get all LinkedIn URLs already in DB to avoid duplicates."""
     try:
         db = sqlite3.connect(str(DB_PATH))
         rows = db.execute("SELECT linkedin_url FROM leads WHERE linkedin_url IS NOT NULL AND linkedin_url != ''").fetchall()
         db.close()
-        return {r[0] for r in rows}
+        return {clean_url(r[0]) for r in rows}
     except Exception as e:
         log(f"⚠️ Could not load existing URLs: {e}")
         return set()
@@ -102,7 +119,7 @@ def post_leads_to_api(leads: list, campaign_id: int, search_name: str) -> int:
         r = requests.post(f"{API_BASE}/api/leads", json=payload, timeout=30)
         if r.ok:
             data = r.json()
-            saved = data.get("saved", 0)
+            saved = data.get("new", data.get("saved", 0))
             log(f"✅ API: {saved} new leads saved for campaign {campaign_id}")
             return saved
         else:
@@ -284,7 +301,7 @@ async def scrape_campaign(page, campaign: dict, max_pages: int, existing_urls: s
         log(f"Page {page_num}: extracted {len(leads)} leads")
 
         # Dedup against existing DB entries
-        new_leads = [l for l in leads if l.get("linkedin_url") not in existing_urls]
+        new_leads = [l for l in leads if clean_url(l.get("linkedin_url","")) not in existing_urls]
         dupes = len(leads) - len(new_leads)
         if dupes > 0:
             log(f"  Skipped {dupes} already-seen leads")
@@ -293,7 +310,7 @@ async def scrape_campaign(page, campaign: dict, max_pages: int, existing_urls: s
         for l in new_leads:
             l["search_name"] = name
             l["campaign_id"] = cid
-            existing_urls.add(l.get("linkedin_url",""))
+            existing_urls.add(clean_url(l.get("linkedin_url","")))
 
         all_leads.extend(new_leads)
         log(f"  {len(new_leads)} new leads this page ({len(all_leads)} total so far)")

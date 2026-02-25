@@ -411,7 +411,19 @@ def receive_leads():
     dupe_count = 0
 
     for lead in leads:
-        url = lead.get('linkedin_url', '').strip()
+        raw_url = lead.get('linkedin_url', '').strip()
+        if not raw_url:
+            continue
+        # Strip tracking params for stable dedup
+        try:
+            from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
+            p = urlparse(raw_url)
+            params = parse_qs(p.query)
+            for key in ['_ntb', 'trk', 'trkInfo']:
+                params.pop(key, None)
+            url = urlunparse((p.scheme, p.netloc, p.path, p.params, urlencode({k: v[0] for k, v in params.items()}), ''))
+        except:
+            url = raw_url
         if not url:
             continue
         try:

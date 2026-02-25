@@ -1001,3 +1001,12 @@ Also set up tonight:
 - Scraper at ~/builds/propwire/propwire_scraper.py
 - Blocker: "What's New" modal blocks filter inputs; need to inspect actual DOM selectors
 - Next: overnight DOM inspection run + fix selectors for county/price/date filters + export
+
+---
+## QUEUED BUILDS
+
+### Tonight (Feb 25) — Prospect Intelligence Dossier
+Build a script that takes a lead (name + address or LinkedIn URL) and generates a 1-page research brief: LinkedIn profile, employer, estimated income, recent life events (job change, new home), social media presence, conversation starters for a financial advisor cold call. Hook it into the Propwire/LinkedIn lead pipeline so Matt can request a dossier before dialing. Deliver via Telegram.
+
+### Tomorrow Night (Feb 26) — Local AI Second Brain
+Set up a RAG pipeline using Ollama (nomic-embed-text already running on port 11434). Index: all memory/*.md files, MEMORY.md, lead CSVs, NIGHTLY-BUILDS.md, project notes in ~/clawd/reference/. Build a query tool so I can search the vector DB before answering questions. Goal: stop burning context window on memory, never forget anything Matt has told me.

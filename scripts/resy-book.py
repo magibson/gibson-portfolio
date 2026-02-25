@@ -1,19 +1,24 @@
 #!/usr/bin/env python3
 """
-resy-book.py — Book a restaurant on Resy using a saved browser session.
+resy-book.py — Book, list, cancel, and modify Resy reservations.
 
 Usage:
-    python3 resy-book.py --restaurant "Via45" --date "2026-03-07" --time "19:00" --party 2
-    python3 resy-book.py --restaurant "Via45" --date "Saturday" --time "7pm" --party 2 --location "Monmouth County NJ"
+    # List upcoming reservations
+    python3 resy-book.py --list
 
-Arguments:
-    --restaurant  Restaurant name (required)
-    --date        Date: YYYY-MM-DD, "Saturday", "March 7", etc.
-    --time        Time: "19:00", "7pm", "7:30 PM"
-    --party       Party size (default: 2)
-    --location    Location/area (default: Monmouth County NJ)
-    --dry-run     Find slot but don't confirm booking
-    --headless    Run browser headless (default: visible)
+    # Cancel a reservation
+    python3 resy-book.py --cancel 843499889
+
+    # Modify a reservation
+    python3 resy-book.py --modify 843499889 --date "March 10" --time "7:30pm" --party 2
+
+    # Book a new reservation
+    python3 resy-book.py --restaurant "Via45" --date "Saturday" --time "7pm" --party 2
+
+Authentication:
+    Uses the persistent Chromium profile at ~/.playwright-profiles/resy/
+    Tokens are extracted automatically at runtime — no manual re-login needed.
+    If login required: python3 save-sessions.py resy
 """
 
 import argparse
@@ -21,38 +26,145 @@ import sys
 import re
 import time
 import json
+import http.client
+import urllib.parse
 from pathlib import Path
 from datetime import datetime, timedelta
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
 
 PROFILE_DIR = Path.home() / ".playwright-profiles" / "resy"
-STATE_FILE = PROFILE_DIR / "state.json"
 DEFAULT_LOCATION = "Monmouth County, NJ"
 RESY_BASE = "https://resy.com"
+API_BASE = "api.resy.com"
 
+
+# ─── Auth / Session ────────────────────────────────────────────────────────────
+
+def get_resy_auth() -> dict:
+    """
+    Extract fresh auth headers from the Resy persistent browser profile.
+    Navigates to resy.com, intercepts the x-resy-auth-token header.
+    Returns a dict of headers ready for API calls.
+    """
+    captured = {}
+    with sync_playwright() as p:
+        ctx = p.chromium.launch_persistent_context(
+            str(PROFILE_DIR),
+            headless=True,
+            args=["--no-sandbox", "--disable-blink-features=AutomationControlled"],
+            user_agent=(
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/131.0.0.0 Safari/537.36"
+            ),
+        )
+        page = ctx.new_page()
+
+        def handle_request(req):
+            h = req.headers
+            if "api.resy.com" in req.url and "x-resy-auth-token" in h:
+                captured.update(dict(h))
+
+        page.on("request", handle_request)
+        try:
+            page.goto(RESY_BASE, wait_until="domcontentloaded", timeout=15000)
+            time.sleep(3)
+        except Exception:
+            pass
+        ctx.close()
+
+    if not captured:
+        print("❌ Could not extract Resy auth token.")
+        print("   Make sure you're logged in: python3 save-sessions.py resy")
+        sys.exit(1)
+
+    return {
+        "Authorization": captured.get("authorization", ""),
+        "x-resy-auth-token": captured.get("x-resy-auth-token", ""),
+        "x-resy-universal-auth": captured.get("x-resy-universal-auth", ""),
+        "Origin": "https://resy.com",
+        "Referer": "https://resy.com/",
+        "User-Agent": (
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+        ),
+        "Accept": "application/json, text/plain, */*",
+        "x-origin": "https://resy.com",
+    }
+
+
+def resy_get(path: str, params: dict = None, headers: dict = None) -> dict:
+    """GET request to Resy API."""
+    url = path
+    if params:
+        url += "?" + urllib.parse.urlencode(params)
+    conn = http.client.HTTPSConnection(API_BASE)
+    conn.request("GET", url, headers=headers)
+    resp = conn.getresponse()
+    body = resp.read()
+    if resp.status != 200:
+        raise RuntimeError(f"API error {resp.status}: {body[:200].decode()}")
+    return json.loads(body)
+
+
+def resy_delete(path: str, form_data: dict, headers: dict) -> dict:
+    """DELETE request to Resy API with form-encoded body."""
+    h = dict(headers)
+    h["Content-Type"] = "application/x-www-form-urlencoded"
+    body = urllib.parse.urlencode(form_data).encode()
+    conn = http.client.HTTPSConnection(API_BASE)
+    conn.request("DELETE", path, body=body, headers=h)
+    resp = conn.getresponse()
+    body = resp.read()
+    if resp.status not in (200, 201, 204):
+        raise RuntimeError(f"API error {resp.status}: {body[:200].decode()}")
+    try:
+        return json.loads(body) if body else {}
+    except Exception:
+        return {}
+
+
+def resy_post(path: str, form_data: dict = None, json_data: dict = None, headers: dict = None) -> dict:
+    """POST request to Resy API."""
+    h = dict(headers)
+    if json_data:
+        h["Content-Type"] = "application/json"
+        body = json.dumps(json_data).encode()
+    else:
+        h["Content-Type"] = "application/x-www-form-urlencoded"
+        body = urllib.parse.urlencode(form_data or {}).encode()
+    conn = http.client.HTTPSConnection(API_BASE)
+    conn.request("POST", path, body=body, headers=h)
+    resp = conn.getresponse()
+    body = resp.read()
+    if resp.status not in (200, 201, 204):
+        raise RuntimeError(f"API error {resp.status}: {body[:300].decode()}")
+    try:
+        return json.loads(body) if body else {}
+    except Exception:
+        return {}
+
+
+# ─── Date/Time Parsing ─────────────────────────────────────────────────────────
 
 def parse_date(date_str: str) -> str:
     """Normalize date to YYYY-MM-DD."""
     date_str = date_str.strip()
     today = datetime.now()
 
-    # Already in YYYY-MM-DD
     if re.match(r"^\d{4}-\d{2}-\d{2}$", date_str):
         return date_str
 
-    # Day of week: "Saturday", "this Saturday", "next Friday"
-    days = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]
-    lower = date_str.lower().replace("this ","").replace("next ","")
+    days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+    lower = date_str.lower().replace("this ", "").replace("next ", "")
     if lower in days:
         target_dow = days.index(lower)
         current_dow = today.weekday()
         diff = (target_dow - current_dow) % 7
         if diff == 0:
-            diff = 7  # next occurrence
-        target = today + timedelta(days=diff)
-        return target.strftime("%Y-%m-%d")
+            diff = 7
+        return (today + timedelta(days=diff)).strftime("%Y-%m-%d")
 
-    # "March 7", "Mar 7", "March 7 2026"
     for fmt in ["%B %d %Y", "%b %d %Y", "%B %d", "%b %d"]:
         try:
             dt = datetime.strptime(date_str, fmt)
@@ -64,7 +176,6 @@ def parse_date(date_str: str) -> str:
         except ValueError:
             continue
 
-    # "03/07", "3/7/2026"
     for fmt in ["%m/%d/%Y", "%m/%d"]:
         try:
             dt = datetime.strptime(date_str, fmt)
@@ -74,18 +185,15 @@ def parse_date(date_str: str) -> str:
         except ValueError:
             continue
 
-    raise ValueError(f"Cannot parse date: {date_str}")
+    raise ValueError(f"Cannot parse date: {date_str!r}")
 
 
 def parse_time(time_str: str) -> str:
     """Normalize time to HH:MM (24h)."""
     time_str = time_str.strip().upper()
-    # Already 24h
     if re.match(r"^\d{1,2}:\d{2}$", time_str):
         h, m = time_str.split(":")
         return f"{int(h):02d}:{m}"
-
-    # "7pm", "7:30pm", "7:30 PM"
     m = re.match(r"^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$", time_str)
     if m:
         h = int(m.group(1))
@@ -96,29 +204,306 @@ def parse_time(time_str: str) -> str:
         if meridiem == "AM" and h == 12:
             h = 0
         return f"{h:02d}:{mins}"
+    raise ValueError(f"Cannot parse time: {time_str!r}")
 
-    raise ValueError(f"Cannot parse time: {time_str}")
+
+# ─── --list ────────────────────────────────────────────────────────────────────
+
+def cmd_list(args):
+    """Show upcoming Resy reservations."""
+    print("🔄 Fetching Resy auth token...")
+    headers = get_resy_auth()
+
+    print("📋 Fetching upcoming reservations...")
+    data = resy_get("/3/user/reservations", {"limit": 20, "offset": 0}, headers=headers)
+
+    reservations = data.get("reservations", [])
+    venues = data.get("venues", {})
+
+    if not reservations:
+        print("\n✅ No upcoming Resy reservations.")
+        return []
+
+    results = []
+    print(f"\n{'─'*55}")
+    print(f"  RESY RESERVATIONS ({len(reservations)} upcoming)")
+    print(f"{'─'*55}")
+
+    for r in reservations:
+        rid = r.get("reservation_id")
+        day = r.get("day", "")
+        time_slot = r.get("time_slot", "")[:5]  # HH:MM
+        venue_id = str(r.get("venue", {}).get("id", ""))
+        venue_info = venues.get(venue_id, {})
+        venue_name = venue_info.get("name", "Unknown Venue")
+        seats = r.get("num_seats", 0)
+        cancel_ok = r.get("cancellation", {}).get("allowed", False)
+        change_ok = r.get("change", {}).get("allowed", False)
+
+        # Format date nicely
+        try:
+            dt = datetime.strptime(day, "%Y-%m-%d")
+            day_display = dt.strftime("%a, %b %d %Y")
+        except Exception:
+            day_display = day
+
+        # Format time
+        try:
+            t = datetime.strptime(time_slot, "%H:%M")
+            time_display = t.strftime("%-I:%M %p")
+        except Exception:
+            time_display = time_slot
+
+        modifiers = []
+        if not cancel_ok:
+            modifiers.append("no-cancel")
+        if not change_ok:
+            modifiers.append("no-modify")
+
+        print(f"\n  [{rid}] {venue_name}")
+        print(f"       {day_display} at {time_display} · Party of {seats}")
+        if modifiers:
+            print(f"       ⚠️  {', '.join(modifiers)}")
+
+        results.append({
+            "id": str(rid),
+            "service": "resy",
+            "venue": venue_name,
+            "date": day,
+            "time": time_slot,
+            "party": seats,
+            "can_cancel": cancel_ok,
+            "can_modify": change_ok,
+            "resy_token": r.get("resy_token", ""),
+        })
+
+    print(f"\n{'─'*55}")
+    return results
 
 
-def check_session_valid() -> bool:
-    """Check if saved session file exists and has cookies."""
-    if not STATE_FILE.exists():
-        print(f"❌ No saved session found at {STATE_FILE}")
-        print(f"   Run: python3 save-sessions.py resy")
-        return False
-    with open(STATE_FILE) as f:
-        state = json.load(f)
-    cookies = state.get("cookies", [])
-    resy_cookies = [c for c in cookies if "resy.com" in c.get("domain", "")]
-    if not resy_cookies:
-        print(f"⚠️  No Resy cookies in session. Re-run save-sessions.py resy")
-        return False
-    print(f"✅ Session loaded: {len(resy_cookies)} Resy cookies")
-    return True
+# ─── --cancel ──────────────────────────────────────────────────────────────────
 
+def cmd_cancel(reservation_id: str):
+    """Cancel a Resy reservation by ID."""
+    print(f"🔄 Fetching Resy auth token...")
+    headers = get_resy_auth()
+
+    # Get reservations to find the resy_token for this ID
+    print(f"🔍 Looking up reservation {reservation_id}...")
+    data = resy_get("/3/user/reservations", {"limit": 20, "offset": 0}, headers=headers)
+    reservations = data.get("reservations", [])
+    venues = data.get("venues", {})
+
+    target = None
+    for r in reservations:
+        if str(r.get("reservation_id")) == str(reservation_id):
+            target = r
+            break
+
+    if not target:
+        print(f"❌ Reservation {reservation_id} not found in your upcoming reservations.")
+        print("   Run --list to see your current reservations.")
+        sys.exit(1)
+
+    venue_id = str(target.get("venue", {}).get("id", ""))
+    venue_name = venues.get(venue_id, {}).get("name", "Unknown")
+    day = target.get("day", "")
+    time_slot = target.get("time_slot", "")[:5]
+    cancel_ok = target.get("cancellation", {}).get("allowed", False)
+    resy_token = target.get("resy_token", "")
+
+    if not cancel_ok:
+        print(f"❌ Reservation {reservation_id} cannot be cancelled.")
+        print(f"   Venue: {venue_name} | {day} @ {time_slot}")
+        sys.exit(1)
+
+    print(f"\n⚠️  CANCEL RESERVATION")
+    print(f"   Venue: {venue_name}")
+    print(f"   Date:  {day} at {time_slot}")
+    print(f"   ID:    {reservation_id}")
+    print()
+    confirm = input("   Type 'yes' to confirm cancellation: ").strip().lower()
+    if confirm != "yes":
+        print("   Cancelled — no changes made.")
+        sys.exit(0)
+
+    print(f"\n🗑️  Cancelling reservation {reservation_id}...")
+    try:
+        result = resy_delete(
+            "/3/user/reservations",
+            {"resy_token": resy_token},
+            headers=headers,
+        )
+        print(f"✅ Reservation cancelled successfully!")
+        print(f"   {venue_name} | {day} @ {time_slot}")
+    except RuntimeError as e:
+        print(f"❌ Cancellation failed: {e}")
+        sys.exit(1)
+
+
+# ─── --modify ──────────────────────────────────────────────────────────────────
+
+def cmd_modify(reservation_id: str, new_date: str, new_time: str, new_party: int):
+    """
+    Modify a Resy reservation.
+    Resy's modify flow: find a new slot at the same venue, then use the change API.
+    """
+    print(f"🔄 Fetching Resy auth token...")
+    headers = get_resy_auth()
+
+    # Look up the reservation
+    print(f"🔍 Looking up reservation {reservation_id}...")
+    data = resy_get("/3/user/reservations", {"limit": 20, "offset": 0}, headers=headers)
+    reservations = data.get("reservations", [])
+    venues = data.get("venues", {})
+
+    target = None
+    for r in reservations:
+        if str(r.get("reservation_id")) == str(reservation_id):
+            target = r
+            break
+
+    if not target:
+        print(f"❌ Reservation {reservation_id} not found.")
+        sys.exit(1)
+
+    venue_id = str(target.get("venue", {}).get("id", ""))
+    venue_name = venues.get(venue_id, {}).get("name", "Unknown")
+    service_type_id = target.get("service_type_id", 2)
+    change_ok = target.get("change", {}).get("allowed", False)
+
+    if not change_ok:
+        print(f"❌ Reservation {reservation_id} cannot be modified.")
+        print(f"   Venue: {venue_name}")
+        sys.exit(1)
+
+    date_norm = parse_date(new_date) if new_date else target.get("day", "")
+    time_norm = parse_time(new_time) if new_time else target.get("time_slot", "19:00")[:5]
+    party = new_party or target.get("num_seats", 2)
+
+    print(f"\n📅 Modifying reservation {reservation_id}:")
+    print(f"   Venue:     {venue_name}")
+    print(f"   New date:  {date_norm}")
+    print(f"   New time:  {time_norm}")
+    print(f"   New party: {party}")
+
+    # Step 1: Search for available slots at same venue
+    print(f"\n🔍 Searching for available slots...")
+    try:
+        venue_data = resy_get(
+            "/4/find",
+            {
+                "lat": 0,
+                "long": 0,
+                "day": date_norm,
+                "party_size": party,
+                "venue_id": venue_id,
+            },
+            headers=headers,
+        )
+        # Try alternative endpoint
+    except Exception:
+        pass
+
+    # Use venue details endpoint
+    try:
+        venue_details = resy_get(
+            "/3/venue",
+            {
+                "url_slug": venues.get(venue_id, {}).get("url_slug", ""),
+                "location": "new-york-ny",
+                "day": date_norm,
+                "party_size": party,
+            },
+            headers=headers,
+        )
+        slots = venue_details.get("slots", [])
+    except Exception as e:
+        print(f"   Could not fetch slots: {e}")
+        slots = []
+
+    if not slots:
+        # Fall back to the Resy web UI for modification
+        print(f"\n⚠️  Could not find available slots via API.")
+        print(f"   Please modify via the Resy app or website:")
+        print(f"   https://resy.com/profile/reservations")
+        sys.exit(1)
+
+    # Find closest slot to requested time
+    target_minutes = int(time_norm.split(":")[0]) * 60 + int(time_norm.split(":")[1])
+    best_slot = None
+    best_diff = float("inf")
+
+    for slot in slots:
+        config = slot.get("config", {})
+        slot_id = config.get("id")
+        slot_token = slot.get("token", "")
+        slot_time = config.get("time_slot", "")
+        if not slot_time:
+            continue
+
+        try:
+            h, m = slot_time[:5].split(":")
+            slot_minutes = int(h) * 60 + int(m)
+            diff = abs(slot_minutes - target_minutes)
+            if diff < best_diff:
+                best_diff = diff
+                best_slot = slot
+                best_slot_time = slot_time
+        except Exception:
+            continue
+
+    if not best_slot:
+        print(f"❌ No available slots found for {date_norm}")
+        sys.exit(1)
+
+    slot_token = best_slot.get("token", "")
+    print(f"   Found slot: {best_slot_time}")
+
+    # Step 2: Get a new resy_token for the new slot
+    try:
+        book_data = resy_post(
+            "/3/details",
+            form_data={
+                "config_id": best_slot.get("config", {}).get("id", ""),
+                "day": date_norm,
+                "party_size": party,
+            },
+            headers=headers,
+        )
+        new_book_token = book_data.get("book_token", {}).get("value", "")
+    except Exception as e:
+        print(f"❌ Could not get booking token: {e}")
+        sys.exit(1)
+
+    # Step 3: Use the change/rebook endpoint
+    try:
+        result = resy_post(
+            "/3/user/reservations",
+            form_data={
+                "book_token": new_book_token,
+                "source_id": "resy.com-venue-details",
+            },
+            headers=headers,
+        )
+
+        # Cancel the old reservation
+        old_token = target.get("resy_token", "")
+        resy_delete("/3/user/reservations", {"resy_token": old_token}, headers=headers)
+
+        print(f"\n✅ Reservation modified!")
+        print(f"   {venue_name} | {date_norm} at {best_slot_time} | Party of {party}")
+    except Exception as e:
+        print(f"❌ Modification failed: {e}")
+        print(f"   Try modifying directly: https://resy.com/profile/reservations")
+        sys.exit(1)
+
+
+# ─── --restaurant (book new) ───────────────────────────────────────────────────
 
 def book_resy(restaurant: str, date: str, time_str: str, party: int,
               location: str, dry_run: bool, headless: bool):
+    """Book a new Resy reservation via the web UI."""
 
     date_norm = parse_date(date)
     time_norm = parse_time(time_str)
@@ -131,141 +516,94 @@ def book_resy(restaurant: str, date: str, time_str: str, party: int,
     print(f"   Location   : {location}")
     print(f"   Dry run    : {dry_run}")
 
-    if not check_session_valid():
-        sys.exit(1)
-
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=headless, slow_mo=200)
-        context = browser.new_context(
-            storage_state=str(STATE_FILE),
-            viewport={"width": 1280, "height": 900},
+        ctx = p.chromium.launch_persistent_context(
+            str(PROFILE_DIR),
+            headless=headless,
+            args=["--no-sandbox", "--disable-blink-features=AutomationControlled"],
+            slow_mo=200,
             user_agent=(
                 "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
                 "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/120.0.0.0 Safari/537.36"
+                "Chrome/131.0.0.0 Safari/537.36"
             ),
         )
-        page = context.new_page()
+        page = ctx.new_page()
 
-        # Navigate to Resy and verify login
-        print("\n🔐 Verifying login...")
+        print("\n🔐 Navigating to Resy...")
         page.goto(RESY_BASE, wait_until="domcontentloaded", timeout=30000)
         time.sleep(2)
 
-        # Check for sign-in indicators
-        page_content = page.content().lower()
-        if "sign in" in page_content and "log out" not in page_content and "account" not in page_content:
-            print("❌ Not logged in to Resy. Run: python3 save-sessions.py resy")
-            browser.close()
+        content = page.content().lower()
+        if "sign in" in content and "log out" not in content and "account" not in content:
+            print("❌ Not logged in. Run: python3 save-sessions.py resy")
+            ctx.close()
             sys.exit(1)
+
         print("✅ Logged in to Resy")
 
-        # Search for the restaurant
-        print(f"\n🔍 Searching for '{restaurant}' on Resy...")
-
-        # Build search URL
+        # Search
+        print(f"\n🔍 Searching for '{restaurant}'...")
         search_url = (
             f"{RESY_BASE}/search?"
-            f"query={restaurant.replace(' ', '+')}"
-            f"&location={location.replace(' ', '+').replace(',', '%2C')}"
+            f"query={urllib.parse.quote(restaurant)}"
+            f"&location={urllib.parse.quote(location)}"
             f"&day={date_norm}&party_size={party}"
         )
         page.goto(search_url, wait_until="domcontentloaded", timeout=30000)
         time.sleep(3)
 
-        # Try to find restaurant in results
-        print("   Scanning search results...")
+        results = page.query_selector_all(
+            "[data-test-id='search-result'], .VenueCard, [class*='VenueCard'], [class*='venue-result']"
+        )
+        print(f"   Found {len(results)} result(s)")
 
-        # Look for restaurant name in results
-        restaurant_link = None
-        try:
-            # Resy search results
-            results = page.query_selector_all('[data-test-id="search-result"], .VenueCard, .venue-card, [class*="VenueCard"], [class*="venue-result"]')
-            print(f"   Found {len(results)} result(s)")
+        restaurant_el = None
+        for result in results:
+            if restaurant.lower() in result.inner_text().lower():
+                restaurant_el = result
+                print("   ✅ Found matching restaurant")
+                break
 
-            for result in results:
-                text = result.inner_text().lower()
-                if restaurant.lower() in text:
-                    restaurant_link = result
-                    print(f"   ✅ Found matching restaurant")
-                    break
-        except Exception as e:
-            print(f"   ⚠️  Selector search failed: {e}")
+        if not restaurant_el and results:
+            restaurant_el = results[0]
 
-        # If no exact match, try clicking the first result
-        if not restaurant_link:
-            print(f"   Trying first available result...")
-            try:
-                first = page.query_selector('[data-test-id="search-result"]:first-child, .VenueCard:first-child')
-                if first:
-                    restaurant_link = first
-            except Exception:
-                pass
-
-        if not restaurant_link:
-            # Try direct venue search
-            print(f"   Attempting direct venue page navigation...")
-            # Resy uses slug-based URLs
+        if not restaurant_el:
             slug = restaurant.lower().replace(" ", "-").replace("'", "")
             venue_url = f"{RESY_BASE}/cities/nj/{slug}"
             page.goto(venue_url, wait_until="domcontentloaded", timeout=30000)
             time.sleep(2)
             if "404" in page.title() or "not found" in page.content().lower():
                 print(f"❌ Restaurant '{restaurant}' not found on Resy")
-                browser.close()
+                ctx.close()
                 sys.exit(1)
         else:
-            restaurant_link.click()
+            restaurant_el.click()
             time.sleep(2)
 
-        # Now on the venue page — find available time slots
         print(f"\n🕐 Looking for available slots around {time_norm}...")
-
-        # Resy uses a reservation widget
-        # Set date and party size if needed
-        try:
-            # Look for date picker
-            date_input = page.query_selector('[data-test-id="resy-date-picker"], input[type="date"], [aria-label*="date"]')
-            if date_input:
-                date_input.fill(date_norm)
-                time.sleep(1)
-
-            # Party size
-            party_select = page.query_selector('[data-test-id="party-size-select"], select[name*="party"], [aria-label*="party"]')
-            if party_select:
-                party_select.select_option(str(party))
-                time.sleep(1)
-        except Exception as e:
-            print(f"   Note: Could not set filters: {e}")
-
         time.sleep(2)
 
-        # Find time slots
         slots = page.query_selector_all(
-            '[data-test-id="reservation-button"], '
-            '.ReservationButton, '
-            '[class*="ReservationButton"], '
-            '[class*="reservation-slot"], '
-            'button[data-time], '
-            '[data-cy="time-slot"]'
+            "[data-test-id='reservation-button'], "
+            ".ReservationButton, [class*='ReservationButton'], "
+            "button[data-time], [data-cy='time-slot']"
         )
-
         print(f"   Found {len(slots)} time slot(s)")
 
         if not slots:
-            print(f"❌ No available time slots found for {date_norm}")
-            browser.close()
+            print(f"❌ No available time slots for {date_norm}")
+            ctx.close()
             sys.exit(1)
 
-        # Find closest slot to requested time
-        target_minutes = int(time_norm.split(":")[0]) * 60 + int(time_norm.split(":")[1])
+        target_min = int(time_norm.split(":")[0]) * 60 + int(time_norm.split(":")[1])
         best_slot = None
         best_diff = float("inf")
+        best_text = ""
 
         for slot in slots:
-            slot_text = slot.inner_text().strip()
-            # Parse time from slot text (e.g., "7:00 PM", "7:30 PM")
-            m = re.search(r"(\d{1,2}):?(\d{2})?\s*(AM|PM)?", slot_text, re.IGNORECASE)
+            text = slot.inner_text().strip()
+            m = re.search(r"(\d{1,2}):?(\d{2})?\s*(AM|PM)?", text, re.IGNORECASE)
             if m:
                 h = int(m.group(1))
                 mins = int(m.group(2) or 0)
@@ -274,75 +612,71 @@ def book_resy(restaurant: str, date: str, time_str: str, party: int,
                     h += 12
                 elif meridiem == "AM" and h == 12:
                     h = 0
-                slot_minutes = h * 60 + mins
-                diff = abs(slot_minutes - target_minutes)
+                diff = abs(h * 60 + mins - target_min)
                 if diff < best_diff:
                     best_diff = diff
                     best_slot = slot
-                    best_slot_text = slot_text
+                    best_text = text
 
         if not best_slot:
             best_slot = slots[0]
-            best_slot_text = slots[0].inner_text().strip()
+            best_text = slots[0].inner_text().strip()
 
-        print(f"   Selected slot: {best_slot_text}")
+        print(f"   Selected: {best_text}")
 
         if dry_run:
-            print(f"\n✅ DRY RUN — Would book: {best_slot_text} at {restaurant}")
-            print(f"   (No booking made — remove --dry-run to confirm)")
-            browser.close()
+            print(f"\n✅ DRY RUN — Would book: {best_text} at {restaurant}")
+            ctx.close()
             return
 
-        # Click the time slot
-        print(f"\n📅 Booking slot: {best_slot_text}...")
+        print(f"\n📅 Booking: {best_text}...")
         best_slot.click()
         time.sleep(2)
 
-        # Look for confirmation/booking modal
         try:
-            # Resy confirmation flow
             confirm_btn = page.wait_for_selector(
-                '[data-test-id="confirm-button"], '
-                'button:has-text("Reserve"), '
-                'button:has-text("Book"), '
-                'button:has-text("Confirm")',
-                timeout=10000
+                "[data-test-id='confirm-button'], button:has-text('Reserve'), "
+                "button:has-text('Book'), button:has-text('Confirm')",
+                timeout=10000,
             )
-            print(f"   Found confirmation button, proceeding...")
+            confirm_btn.click()
+            time.sleep(3)
 
-            if dry_run:
-                print(f"✅ DRY RUN complete — slot found and ready to confirm")
+            success = page.query_selector(
+                "[data-test-id='confirmation'], [class*='confirmation'], "
+                "h1:has-text('confirmed'), h2:has-text('See you')"
+            )
+            if success:
+                print(f"\n🎉 BOOKING CONFIRMED!")
+                print(f"   {restaurant} | {date_norm} at {best_text} | Party of {party}")
             else:
-                confirm_btn.click()
-                time.sleep(3)
-
-                # Check for success
-                success = page.query_selector(
-                    '[data-test-id="confirmation"], '
-                    '[class*="confirmation"], '
-                    'h1:has-text("confirmed"), '
-                    'h2:has-text("See you")'
-                )
-                if success:
-                    print(f"\n🎉 BOOKING CONFIRMED!")
-                    print(f"   {restaurant} | {date_norm} at {best_slot_text} | Party of {party}")
-                else:
-                    print(f"\n⚠️  Booking submitted — please verify in your Resy app/email")
+                print(f"\n⚠️  Booking submitted — verify in your Resy app/email")
 
         except PlaywrightTimeout:
             print(f"⚠️  Confirmation dialog not found. Check browser window.")
-            input("Press ENTER when done reviewing...")
+            if not headless:
+                input("Press ENTER when done reviewing...")
 
-        browser.close()
+        ctx.close()
 
+
+# ─── CLI ───────────────────────────────────────────────────────────────────────
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Book a restaurant on Resy",
+        description="Resy — book, list, cancel, and modify restaurant reservations",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=__doc__
+        epilog=__doc__,
     )
-    parser.add_argument("--restaurant", "-r", required=True, help="Restaurant name")
+
+    # Modes
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--list", action="store_true", help="List upcoming reservations")
+    mode.add_argument("--cancel", metavar="ID", help="Cancel reservation by ID")
+    mode.add_argument("--modify", metavar="ID", help="Modify reservation by ID")
+    mode.add_argument("--restaurant", "-r", metavar="NAME", help="Book a new reservation")
+
+    # Book new
     parser.add_argument("--date", "-d", default="today", help="Date (YYYY-MM-DD, Saturday, March 7)")
     parser.add_argument("--time", "-t", default="19:00", help="Time (7pm, 19:00, 7:30 PM)")
     parser.add_argument("--party", "-p", type=int, default=2, help="Party size")
@@ -350,17 +684,43 @@ def main():
     parser.add_argument("--dry-run", action="store_true", help="Find slot but don't confirm")
     parser.add_argument("--headless", action="store_true", help="Run browser headless")
 
+    # JSON output (for book.py --list aggregation)
+    parser.add_argument("--json", action="store_true", help="Output JSON (for scripting)")
+
     args = parser.parse_args()
 
-    book_resy(
-        restaurant=args.restaurant,
-        date=args.date,
-        time_str=args.time,
-        party=args.party,
-        location=args.location,
-        dry_run=args.dry_run,
-        headless=args.headless,
-    )
+    if args.list:
+        results = cmd_list(args)
+        if args.json:
+            print(json.dumps(results))
+        return
+
+    if args.cancel:
+        cmd_cancel(args.cancel)
+        return
+
+    if args.modify:
+        cmd_modify(
+            reservation_id=args.modify,
+            new_date=args.date if args.date != "today" else None,
+            new_time=args.time if args.time != "19:00" else None,
+            new_party=args.party if args.party != 2 else None,
+        )
+        return
+
+    if args.restaurant:
+        book_resy(
+            restaurant=args.restaurant,
+            date=args.date,
+            time_str=args.time,
+            party=args.party,
+            location=args.location,
+            dry_run=args.dry_run,
+            headless=args.headless,
+        )
+        return
+
+    parser.print_help()
 
 
 if __name__ == "__main__":

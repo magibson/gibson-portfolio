@@ -95,7 +95,11 @@ def get_safari_cookies_for_domain(domain: str) -> list[dict]:
 
 
 def save_session_manual(service_key: str, playwright):
-    """Open a visible browser for manual login/verification."""
+    """
+    Open a visible persistent browser for manual login.
+    Uses launch_persistent_context for better session persistence —
+    Chrome profile stores encrypted cookies and session data.
+    """
     cfg = PROFILES[service_key]
     profile_dir = cfg["profile_dir"]
     profile_dir.mkdir(parents=True, exist_ok=True)
@@ -106,21 +110,25 @@ def save_session_manual(service_key: str, playwright):
     print(f"  Profile: {profile_dir}")
     print(f"{'='*60}")
 
-    browser = playwright.chromium.launch(headless=False, slow_mo=300)
+    # Determine launch args per service
+    extra_args = ["--no-sandbox", "--disable-blink-features=AutomationControlled"]
+    if service_key == "opentable":
+        extra_args.append("--disable-http2")
 
-    # If we have existing state, pre-load it
-    context_opts = {
-        "viewport": {"width": 1280, "height": 900},
-        "user_agent": (
+    # Use persistent context — stores full Chrome profile
+    # This is better than regular context for session persistence
+    context = playwright.chromium.launch_persistent_context(
+        str(profile_dir),
+        headless=False,
+        slow_mo=300,
+        args=extra_args,
+        user_agent=(
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
             "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/120.0.0.0 Safari/537.36"
+            "Chrome/131.0.0.0 Safari/537.36"
         ),
-    }
-    if state_path.exists():
-        context_opts["storage_state"] = str(state_path)
-
-    context = browser.new_context(**context_opts)
+        viewport={"width": 1280, "height": 900},
+    )
     page = context.new_page()
 
     print(f"  Opening {cfg['url']} ...")
@@ -128,31 +136,35 @@ def save_session_manual(service_key: str, playwright):
     time.sleep(3)
 
     # Auto-detect login
-    content = page.content()
-    logged_in = cfg["login_check"](content)
+    page_content = page.content()
+    logged_in = cfg["login_check"](page_content)
 
     if logged_in:
-        print(f"  ✅ Login detected automatically!")
+        print(f"  ✅ Already logged in to {cfg['name']}!")
     else:
-        print(f"\n  ⚠️  Not logged in (or could not detect). Browser is open.")
+        print(f"\n  ⚠️  Not logged in. Browser is open.")
         print(f"  Please log in at: {cfg['url']}")
         print(f"  Then press ENTER here to save your session.")
         input("\n  > Press ENTER after logging in: ")
 
-    # Save state
+    # Save state.json snapshot (as fallback)
     context.storage_state(path=str(state_path))
 
     with open(state_path) as f:
         state = json.load(f)
     n = len(state.get("cookies", []))
     print(f"  ✅ Session saved: {n} cookies → {state_path}")
+    print(f"  ✅ Persistent profile stored at: {profile_dir}")
 
-    browser.close()
+    context.close()
     return state_path
 
 
 def save_session_auto(service_key: str, playwright):
-    """Try importing Safari cookies, then verify in browser."""
+    """
+    Try importing Safari cookies if available, then verify login via persistent context.
+    Falls back to manual login if not logged in.
+    """
     cfg = PROFILES[service_key]
     profile_dir = cfg["profile_dir"]
     profile_dir.mkdir(parents=True, exist_ok=True)
@@ -162,37 +174,36 @@ def save_session_auto(service_key: str, playwright):
     print(f"  AUTO SESSION CAPTURE: {cfg['name']}")
     print(f"{'='*60}")
 
-    # Try to import Safari cookies
-    safari_cookies = []
-    for domain in cfg["domains"]:
-        safari_cookies.extend(get_safari_cookies_for_domain(domain))
+    # Try to import Safari cookies into state.json first (if not already set up)
+    if not state_path.exists():
+        safari_cookies = []
+        for domain in cfg["domains"]:
+            safari_cookies.extend(get_safari_cookies_for_domain(domain))
 
-    # Build initial state
-    initial_state = {"cookies": safari_cookies, "origins": []}
+        if safari_cookies:
+            print(f"  Pre-loading {len(safari_cookies)} Safari cookies...")
+            initial_state = {"cookies": safari_cookies, "origins": []}
+            with open(state_path, "w") as f:
+                json.dump(initial_state, f)
 
-    # Write temp state if we have cookies
-    temp_state = None
-    if safari_cookies:
-        import tempfile, os
-        fd, temp_state = tempfile.mkstemp(suffix=".json")
-        with os.fdopen(fd, "w") as f:
-            json.dump(initial_state, f)
-        print(f"  Pre-loading {len(safari_cookies)} Safari cookies...")
+    # Determine launch args per service
+    extra_args = ["--no-sandbox", "--disable-blink-features=AutomationControlled"]
+    if service_key == "opentable":
+        extra_args.append("--disable-http2")
 
-    # Launch browser with pre-loaded cookies
-    browser = playwright.chromium.launch(headless=False, slow_mo=200)
-    context_opts = {
-        "viewport": {"width": 1280, "height": 900},
-        "user_agent": (
+    # Use persistent context for better session persistence
+    context = playwright.chromium.launch_persistent_context(
+        str(profile_dir),
+        headless=False,
+        slow_mo=200,
+        args=extra_args,
+        user_agent=(
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
             "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/120.0.0.0 Safari/537.36"
+            "Chrome/131.0.0.0 Safari/537.36"
         ),
-    }
-    if temp_state:
-        context_opts["storage_state"] = temp_state
-
-    context = browser.new_context(**context_opts)
+        viewport={"width": 1280, "height": 900},
+    )
     page = context.new_page()
 
     print(f"  Navigating to {cfg['url']} ...")
@@ -200,46 +211,81 @@ def save_session_auto(service_key: str, playwright):
     time.sleep(3)
 
     # Check login status
-    content = page.content()
-    logged_in = cfg["login_check"](content)
+    page_content = page.content()
+    logged_in = cfg["login_check"](page_content)
 
     if logged_in:
         print(f"  ✅ Logged in to {cfg['name']}!")
-        context.storage_state(path=str(state_path))
-        with open(state_path) as f:
-            state = json.load(f)
-        n = len(state.get("cookies", []))
-        print(f"  ✅ Session saved: {n} cookies → {state_path}")
     else:
         print(f"\n  ⚠️  Not logged in. Browser is open at {cfg['url']}")
         print(f"  Please log in, then press ENTER.")
         input("\n  > Press ENTER after logging in: ")
-        context.storage_state(path=str(state_path))
-        with open(state_path) as f:
-            state = json.load(f)
-        n = len(state.get("cookies", []))
-        print(f"  ✅ Session saved: {n} cookies → {state_path}")
 
-    browser.close()
-    if temp_state:
-        Path(temp_state).unlink(missing_ok=True)
+    # Save state.json snapshot
+    context.storage_state(path=str(state_path))
+    with open(state_path) as f:
+        state = json.load(f)
+    n = len(state.get("cookies", []))
+    print(f"  ✅ Session saved: {n} cookies → {state_path}")
+    print(f"  ✅ Persistent profile stored at: {profile_dir}")
 
+    context.close()
     return state_path
 
 
 def check_sessions():
     """Print status of all saved sessions."""
+    import time
+    from datetime import datetime
+
     print("\n🔍 Session Status:\n")
+    now = time.time()
+
     for key, cfg in PROFILES.items():
         state_path = cfg["profile_dir"] / "state.json"
-        if not state_path.exists():
+        profile_dir = cfg["profile_dir"]
+
+        profile_exists = profile_dir.exists() and (profile_dir / "Default").exists()
+        state_exists = state_path.exists()
+
+        if not state_exists and not profile_exists:
             print(f"  ❌ {cfg['name']:15s} — no session saved")
+            print(f"     Run: python3 save-sessions.py {key}")
             continue
-        with open(state_path) as f:
-            state = json.load(f)
-        cookies = state.get("cookies", [])
-        domain_cookies = [c for c in cookies if any(d in c.get("domain","") for d in cfg["domains"])]
-        print(f"  {'✅' if domain_cookies else '⚠️ '} {cfg['name']:15s} — {len(domain_cookies)} domain cookies ({len(cookies)} total)")
+
+        if state_exists:
+            with open(state_path) as f:
+                state = json.load(f)
+            cookies = state.get("cookies", [])
+            domain_cookies = [c for c in cookies if any(d in c.get("domain","") for d in cfg["domains"])]
+
+            # Check for expired session cookies
+            expired = [c for c in domain_cookies
+                       if c.get("expires", -1) > 0 and c.get("expires") < now]
+            valid = [c for c in domain_cookies
+                     if c.get("expires", -1) < 0 or c.get("expires", 0) >= now]
+
+            if not domain_cookies:
+                status = "⚠️ "
+                detail = "no domain cookies"
+            elif len(expired) > len(valid):
+                status = "⚠️ "
+                detail = f"mostly expired ({len(expired)}/{len(domain_cookies)} expired)"
+            else:
+                status = "✅"
+                detail = f"{len(valid)} valid cookies"
+
+            print(f"  {status} {cfg['name']:15s} — {detail}")
+            if profile_exists:
+                print(f"     Profile: {profile_dir}")
+            print(f"     State:   {state_path}")
+        else:
+            print(f"  ⚠️  {cfg['name']:15s} — profile exists but no state.json")
+            print(f"     Run: python3 save-sessions.py {key}")
+
+    print()
+    print("  To refresh sessions: python3 save-sessions.py opentable amc")
+    print("  Resy: sessions are auto-refreshed at runtime (no manual action needed)")
     print()
 
 

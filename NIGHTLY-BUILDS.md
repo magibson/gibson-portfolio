@@ -1094,3 +1094,74 @@ Also set up tonight:
 - Scraper at ~/builds/propwire/propwire_scraper.py
 - Blocker: "What's New" modal blocks filter inputs; need to inspect actual DOM selectors
 - Next: overnight DOM inspection run + fix selectors for county/price/date filters + export
+
+---
+## 2026-02-25 — Reservation Viewing / Modify / Cancel System
+
+**Status: Resy ✅ | OpenTable ⚠️ (needs re-login) | AMC ⚠️ (needs re-login)**
+
+### What Was Built
+
+**resy-book.py** — Full --list/--cancel/--modify support via Resy API
+- `--list` → shows upcoming reservations with cancel/modify eligibility
+- `--cancel ID` → cancels by reservation_id (with confirmation prompt)
+- `--modify ID --date X --time X --party N` → modify or shows fallback URL
+- Auth: extracts x-resy-auth-token from persistent Chromium profile at runtime
+- Always fresh — no expired sessions, no manual re-login needed for Resy
+
+**opentable-book.py** — GraphQL-based --list/--cancel/--modify
+- Uses OpenTable's /dapi/fe/gql GraphQL API with CSRF tokens
+- Session via persistent profile (~/.playwright-profiles/opentable/)
+- headless=False required — Akamai bot detection blocks headless completely
+- Auto-login when OPENTABLE_EMAIL + OPENTABLE_PASSWORD are in ~/clawd/.env
+
+**amc-book.py** — Browser-automation --list/--cancel/--modify (+ ticket buying)
+- AMC has no public API; everything via Playwright automation
+- headless=False required — Cloudflare protection
+- Auto-login when AMC_EMAIL + AMC_PASSWORD are in ~/clawd/.env
+- /account/order-history is the working orders URL (not /account/orders)
+- modify unsupported (cancel + rebook)
+
+**book.py** — Unified front-end
+- `python3 book.py --list` — shows all services
+- `python3 book.py --list --service resy` — filter to one service
+- `python3 book.py --cancel resy:843499889` — cancel with service prefix
+- `python3 book.py --modify opentable:12345 --date "March 15" --time "7:30pm"`
+
+**save-sessions.py** — Updated to use launch_persistent_context()
+- Persistent Chrome profiles now used for all services (better session persistence)
+- save_session_manual and save_session_auto both updated
+
+### Confirmed Working
+- `python3 resy-book.py --list` → shows 2 upcoming reservations (Madison Modern Social, Beacon 70) ✅
+- `python3 book.py --cancel resy:843499889` → confirms + cancels with 'yes' ✅
+- `python3 book.py --cancel 843499889` → shows "include service prefix" error ✅
+- `python3 resy-book.py --modify 830774281` → shows "cannot be modified" error ✅
+- `python3 resy-book.py --modify 999999` → shows "not found" error ✅
+- `python3 opentable-book.py --list` → shows "not logged in" with instructions ✅
+- `python3 amc-book.py --list` → shows "not logged in" with instructions ✅
+
+### Key Technical Findings
+1. **Resy auth:** x-resy-auth-token is not stored in state.json cookies — it's generated server-side
+   and only appears in XHR request headers. Extract by intercepting API.resy.com requests.
+   
+2. **OpenTable:** headless=True causes complete hang (Akamai TLS fingerprinting).
+   Non-headless works. Uses GraphQL at /dapi/fe/gql with x-csrf-token header.
+   
+3. **AMC:** Session cookie 'session' is a server-side opaque session (base64 JSON with session ID).
+   Expires server-side independently of cookie expiry. Cloudflare blocks headless.
+   Sign In is a modal on main page (no standalone /account/signin URL).
+
+### Next Steps to Activate OT/AMC
+Add to ~/clawd/.env:
+  OPENTABLE_PASSWORD=<password>
+  AMC_PASSWORD=<password>
+Then re-login: python3 save-sessions.py opentable amc
+
+### Files Modified
+- ~/clawd/scripts/resy-book.py — rewrote with --list/--cancel/--modify
+- ~/clawd/scripts/opentable-book.py — rewrote with --list/--cancel/--modify
+- ~/clawd/scripts/amc-book.py — rewrote with --list/--cancel/--modify
+- ~/clawd/scripts/book.py — rewrote unified interface
+- ~/clawd/scripts/save-sessions.py — updated to use persistent context
+- ~/clawd/.env — added OPENTABLE_EMAIL, AMC_EMAIL placeholder entries

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.jarvis.lead-pipeline</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/jarvis/clawd/.venv/bin/python3</string>
+        <string>/Users/jarvis/clawd/scripts/lead-pipeline-dashboard.py</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/jarvis/clawd</string>
+
+    <key>StandardOutPath</key>
+    <string>/Users/jarvis/clawd/logs/lead-pipeline.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/jarvis/clawd/logs/lead-pipeline.log</string>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+        <key>HOME</key>
+        <string>/Users/jarvis</string>
+    </dict>
+</dict>
+</plist>

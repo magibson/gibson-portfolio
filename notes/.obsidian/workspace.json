@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Photography/Gear.md",
+                "file": "Work/Jarvis Help.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Gear"
+              "title": "Jarvis Help"
             }
           }
         ],
@@ -109,7 +109,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Photography/Gear.md",
+                "file": "Work/Jarvis Help.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -119,7 +119,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for Gear"
+              "title": "Backlinks for Jarvis Help"
             }
           },
           {
@@ -128,12 +128,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Photography/Gear.md",
+                "file": "Work/Jarvis Help.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from Gear"
+              "title": "Outgoing links from Jarvis Help"
             }
           },
           {
@@ -171,13 +171,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Photography/Gear.md",
+                "file": "Work/Jarvis Help.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of Gear"
+              "title": "Outline of Jarvis Help"
             }
           }
         ]
@@ -200,8 +200,9 @@
   },
   "active": "41d6aa767b752d42",
   "lastOpenFiles": [
-    "Journal/Today.md",
     "Photography/Gear.md",
+    "Work/Jarvis Help.md",
+    "Journal/Today.md",
     "Projects/Trip Planner.md",
     "Welcome.md",
     "Untitled.md",

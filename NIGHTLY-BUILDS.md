@@ -1165,3 +1165,43 @@ Then re-login: python3 save-sessions.py opentable amc
 - ~/clawd/scripts/book.py — rewrote unified interface
 - ~/clawd/scripts/save-sessions.py — updated to use persistent context
 - ~/clawd/.env — added OPENTABLE_EMAIL, AMC_EMAIL placeholder entries
+
+---
+
+## Lead Pipeline Dashboard — 2026-02-26
+
+**Build:** Lead Pipeline Dashboard for Matt Gibson (NYL)
+**URL:** http://100.82.133.57:8094
+**Script:** ~/clawd/scripts/lead-pipeline-dashboard.py
+**LaunchAgent:** ~/clawd/launchagents/com.jarvis.lead-pipeline.plist
+
+### What Was Built
+Full-stack Flask web app — unified lead pipeline dashboard for New York Life prospecting.
+
+**Features Delivered:**
+1. **Lead Aggregation** — SQLite DB at ~/clawd/leads/pipeline.db
+   - Propwire (propwire_leads, tracerfy enrichment, priority_dial)
+   - LinkedIn Sales Navigator (prospector.db — all 4 campaigns)
+   - Monmouth Annuity Owners (monmouth_ready_to_dial)
+   - File upload for RetirementProspects CSVs
+   - Dedup by source key — safe to re-run
+
+2. **Individual Prospect View** — full contact info, source/sub-source badges,
+   call script tailored to sub-source, dossier button, call outcome logging
+
+3. **NYL CRM Export** — exact column template (First Name, Last Name, Source,
+   Sub-Source, Target Segment, Mobile Phone, etc.) with date/source/sub filtering
+
+4. **Call Scripts** — 6 sub-source-specific scripts embedded in every lead view
+   (Annuity Owner, Annuity Prospect, IRA/401k Rollover, Retiree,
+    LinkedIn-JobChange, LinkedIn-FederalEmployee)
+
+5. **Dashboard Home** — stats by source/sub-source, call outcomes, recent leads,
+   recent activity feed
+
+**Lead Counts at Launch:**
+- Total: 584 (some overlap between propwire sources)
+- LinkedIn: 215 (JobChange: 132, Retiree: 56, FederalEmployee: 27)
+- Propwire: 369 (Annuity Owner: 184, Propwire: 185)
+
+**Tech Stack:** Flask + SQLite, dark theme HTML/CSS, port 8094, auto-starts via LaunchAgent

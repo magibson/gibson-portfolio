@@ -1,3 +1,5 @@
 - planned a date
+	- need to reschedule 
+		- maybe that sunday?
 - need to book more meetings
 - built more things with jarvis

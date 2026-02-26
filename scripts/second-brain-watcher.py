@@ -33,8 +33,46 @@ class ChangeHandler(FileSystemEventHandler):
         # Only watch markdown and text files
         if not str(event.src_path).endswith(('.md', '.txt', '.csv')):
             return
+        # Ignore the trigger file itself to avoid loops
+        if '.proactive-review-trigger' in str(event.src_path):
+            return
         last_event_time = time.time()
 
+
+def get_changed_notes(since: float) -> list:
+    """Return list of note files modified since given timestamp."""
+    changed = []
+    notes_dir = CLAWD_DIR / "notes"
+    for f in notes_dir.rglob("*.md"):
+        if f.stat().st_mtime > since and ".trash" not in str(f):
+            changed.append(f)
+    return changed
+
+def proactive_review(changed_files: list):
+    """Send changed note contents to OpenClaw for proactive review."""
+    if not changed_files:
+        return
+    notes_content = ""
+    for f in changed_files:
+        try:
+            content = f.read_text().strip()
+            if content:
+                notes_content += f"\n\n## {f.name}\n{content}"
+        except:
+            pass
+    if not notes_content:
+        return
+
+    # Write a trigger file that OpenClaw's heartbeat will pick up
+    trigger_path = CLAWD_DIR / "notes" / ".proactive-review-trigger.md"
+    trigger_path.write_text(
+        f"PROACTIVE_REVIEW_TRIGGER\n"
+        f"Changed notes:\n{notes_content}\n\n"
+        f"Read these notes and think: what can I do to help? What is Matt missing? "
+        f"What action items should I take or flag? Act on anything I can do automatically. "
+        f"For things that need Matt's input, send a brief Telegram message."
+    )
+    print(f"[watcher] Proactive review triggered for: {[f.name for f in changed_files]}", flush=True)
 
 def reindex_loop():
     global last_event_time
@@ -43,6 +81,7 @@ def reindex_loop():
         now = time.time()
         if last_event_time > last_indexed and (now - last_event_time) >= DEBOUNCE:
             print(f"[watcher] Change detected — re-indexing...", flush=True)
+            changed = get_changed_notes(last_indexed if last_indexed > 0 else (now - 60))
             try:
                 result = subprocess.run(
                     [str(PYTHON), str(INDEXER)],
@@ -54,6 +93,9 @@ def reindex_loop():
                     print(f"[watcher] Re-index error: {result.stderr[:200]}", flush=True)
             except Exception as e:
                 print(f"[watcher] Error: {e}", flush=True)
+            # Trigger proactive review
+            if changed:
+                proactive_review(changed)
             last_indexed = now
         time.sleep(1)
 

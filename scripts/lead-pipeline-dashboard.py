@@ -1075,7 +1075,7 @@ def generate_dossier(lead_id):
         return jsonify({"error": "Dossier script not found at " + DOSSIER_SCRIPT}), 404
     name = lead["full_name"] or ""
     try:
-        address_parts = [lead["street"] or "", lead["city"] or "", lead["state"] or "NJ", lead["postal_code"] or ""]
+        address_parts = [lead["street"] or "", lead["city"] or "", lead["state"] or "NJ", (lead["zip"] if "zip" in lead.keys() else lead.get("postal_code", "")) or ""]
         address = ", ".join(p for p in address_parts if p)
         result = subprocess.run(
             [VENV_PYTHON, DOSSIER_SCRIPT, "--name", name, "--address", address],

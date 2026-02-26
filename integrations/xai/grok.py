@@ -49,7 +49,7 @@ def chat(messages, model="grok-3-fast", tools=None, temperature=0.7, timeout=30)
     except Exception as e:
         return {"error": str(e)}
 
-def responses_api(messages, model="grok-4", tools=None, timeout=120):
+def responses_api(messages, model="grok-4", tools=None, timeout=240):
     """Use the responses API for agentic tool calling"""
     headers = {
         "Authorization": f"Bearer {API_KEY}",
@@ -128,7 +128,7 @@ def fetch_x_article(url, question=None):
     # Use both x_search and web_search to maximize chances of getting the content
     tools = [{"type": "x_search"}, {"type": "web_search"}]
     
-    result = responses_api(messages, model="grok-4", tools=tools, timeout=120)
+    result = responses_api(messages, model="grok-4", tools=tools, timeout=240)
     return parse_response(result)
 
 def web_search_grok(query, context=None):

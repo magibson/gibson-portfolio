@@ -1,7 +1,7 @@
 {
-  "updated": "2026-02-26T16:27:55.828077",
+  "updated": "2026-02-26T16:58:15.207162",
   "email": {
-    "unread": 19,
+    "unread": 20,
     "error": null
   },
   "calendar": {
@@ -22,8 +22,8 @@
         "symbol": "^VIX",
         "name": "VIX",
         "type": "volatility",
-        "price": 18.64,
-        "change": 3.96,
+        "price": 18.63,
+        "change": 3.9,
         "prevClose": 17.93
       },
       {
@@ -71,12 +71,12 @@
         "symbol": "VOO",
         "description": "VANGUARD INDEX FUNDS S&P 500 E",
         "quantity": 2.748,
-        "price": 634.01,
-        "value": 1742.26,
-        "today_gain": 4.95,
+        "price": 633.95,
+        "value": 1742.09,
+        "today_gain": 4.78,
         "today_gain_pct": 0.28,
-        "total_gain": 95.85,
-        "total_gain_pct": 5.82,
+        "total_gain": 95.68,
+        "total_gain_pct": 5.81,
         "pct_of_account": 31.79
       },
       {
@@ -152,11 +152,11 @@
         "pct_of_account": 0.01
       }
     ],
-    "total_value": 5480.35,
-    "today_gain": 6.47,
-    "today_gain_pct": 0.12,
-    "total_gain": 456.9,
-    "total_gain_pct": 9.1,
+    "total_value": 5480.18,
+    "today_gain": 6.3,
+    "today_gain_pct": 0.11,
+    "total_gain": 456.73,
+    "total_gain_pct": 9.09,
     "cost_basis": 5022.84,
     "history": [
       5549.28,
@@ -374,6 +374,6 @@
     ],
     "total_cost": 26.5,
     "connected_count": 10,
-    "updated": "2026-02-26T16:27:55.828042"
+    "updated": "2026-02-26T16:58:15.207126"
   }
 }

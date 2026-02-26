@@ -35,6 +35,8 @@ GLOB_PATTERNS = [
     "NIGHTLY-BUILDS.md",
     "reference/*.md",
     "leads/*.csv",
+    "notes/**/*.md",
+    "notes/*.md",
 ]
 
 # Chunk settings

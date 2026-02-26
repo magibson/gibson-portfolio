@@ -1,0 +1,3 @@
+- planned a date
+- need to book more meetings
+- built more things with jarvis

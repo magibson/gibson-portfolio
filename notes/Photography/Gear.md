@@ -1,0 +1,4 @@
+- Fuju x100 xi
+- Insta360 go ultra
+- 360 camera
+	- drone?

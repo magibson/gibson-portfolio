@@ -1,0 +1,12 @@
+- flights
+	- planner
+	- booker
+- Lodging
+	- planner
+	- booker
+- Activities
+	- planner
+	- booker
+- transportation
+	- planner
+	- booker

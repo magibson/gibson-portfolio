@@ -1,5 +1,5 @@
 {
-  "updated": "2026-02-26T14:51:58.293112",
+  "updated": "2026-02-26T15:22:17.066356",
   "email": {
     "unread": 16,
     "error": null
@@ -14,32 +14,32 @@
         "symbol": "^GSPC",
         "name": "S&P 500",
         "type": "index",
-        "price": 6910.58,
-        "change": -0.51,
+        "price": 6904.85,
+        "change": -0.59,
         "prevClose": 6946.13
       },
       {
         "symbol": "^VIX",
         "name": "VIX",
         "type": "volatility",
-        "price": 18.73,
-        "change": 4.46,
+        "price": 18.54,
+        "change": 3.4,
         "prevClose": 17.93
       },
       {
         "symbol": "^TNX",
         "name": "10Y Treasury",
         "type": "bond",
-        "price": 4.03,
-        "change": -0.57,
+        "price": 4.02,
+        "change": -0.77,
         "prevClose": 4.05
       },
       {
         "symbol": "TSLA",
         "name": "TSLA",
         "type": "stock",
-        "price": 408.41,
-        "change": -2.14,
+        "price": 407.63,
+        "change": -2.32,
         "prevClose": 417.33
       }
     ],
@@ -59,85 +59,85 @@
         "symbol": "TSLA",
         "description": "TESLA INC COM",
         "quantity": 5.0,
-        "price": 408.4,
-        "value": 2042.0,
-        "today_gain": -4.9,
-        "today_gain_pct": -0.24,
-        "total_gain": 233.76,
-        "total_gain_pct": 12.93,
-        "pct_of_account": 37.24
+        "price": 407.64,
+        "value": 2038.2,
+        "today_gain": -8.7,
+        "today_gain_pct": -0.43,
+        "total_gain": 229.96,
+        "total_gain_pct": 12.72,
+        "pct_of_account": 37.21
       },
       {
         "symbol": "VOO",
         "description": "VANGUARD INDEX FUNDS S&P 500 E",
         "quantity": 2.748,
-        "price": 634.09,
-        "value": 1742.48,
-        "today_gain": 5.17,
-        "today_gain_pct": 0.3,
-        "total_gain": 96.07,
-        "total_gain_pct": 5.84,
-        "pct_of_account": 31.78
+        "price": 633.65,
+        "value": 1741.27,
+        "today_gain": 3.96,
+        "today_gain_pct": 0.23,
+        "total_gain": 94.86,
+        "total_gain_pct": 5.76,
+        "pct_of_account": 31.79
       },
       {
         "symbol": "UNH",
         "description": "UNITEDHEALTH GROUP INC",
         "quantity": 2.014,
-        "price": 287.89,
-        "value": 579.81,
-        "today_gain": 28.08,
-        "today_gain_pct": 5.09,
-        "total_gain": -76.48,
-        "total_gain_pct": -11.65,
+        "price": 287.45,
+        "value": 578.92,
+        "today_gain": 27.19,
+        "today_gain_pct": 4.93,
+        "total_gain": -77.37,
+        "total_gain_pct": -11.79,
         "pct_of_account": 10.57
       },
       {
         "symbol": "TRGP",
         "description": "TARGA RESOURCES CORP",
         "quantity": 2.0,
-        "price": 231.38,
-        "value": 462.76,
-        "today_gain": -0.68,
-        "today_gain_pct": -0.15,
-        "total_gain": 100.24,
-        "total_gain_pct": 27.65,
-        "pct_of_account": 8.44
+        "price": 231.56,
+        "value": 463.12,
+        "today_gain": -0.32,
+        "today_gain_pct": -0.07,
+        "total_gain": 100.6,
+        "total_gain_pct": 27.75,
+        "pct_of_account": 8.46
       },
       {
         "symbol": "NVDA",
         "description": "NVIDIA CORPORATION COM",
         "quantity": 2.0,
-        "price": 185.38,
-        "value": 370.76,
-        "today_gain": -14.94,
-        "today_gain_pct": -3.87,
-        "total_gain": 46.63,
-        "total_gain_pct": 14.39,
-        "pct_of_account": 6.76
+        "price": 184.85,
+        "value": 369.7,
+        "today_gain": -16.0,
+        "today_gain_pct": -4.15,
+        "total_gain": 45.57,
+        "total_gain_pct": 14.06,
+        "pct_of_account": 6.75
       },
       {
         "symbol": "PFE",
         "description": "PFIZER INC",
         "quantity": 6.148,
-        "price": 27.16,
-        "value": 166.98,
-        "today_gain": 0.12,
-        "today_gain_pct": 0.06,
-        "total_gain": 14.15,
-        "total_gain_pct": 9.26,
+        "price": 27.17,
+        "value": 167.04,
+        "today_gain": 0.18,
+        "today_gain_pct": 0.11,
+        "total_gain": 14.21,
+        "total_gain_pct": 9.3,
         "pct_of_account": 3.05
       },
       {
         "symbol": "CCJ",
         "description": "CAMECO CORP COM NPV ISIN #CA13",
         "quantity": 1.002,
-        "price": 117.59,
-        "value": 117.83,
-        "today_gain": -3.5,
-        "today_gain_pct": -2.88,
-        "total_gain": 45.41,
-        "total_gain_pct": 62.7,
-        "pct_of_account": 2.15
+        "price": 118.06,
+        "value": 118.3,
+        "today_gain": -3.03,
+        "today_gain_pct": -2.49,
+        "total_gain": 45.88,
+        "total_gain_pct": 63.35,
+        "pct_of_account": 2.16
       },
       {
         "symbol": "CASH",
@@ -152,11 +152,11 @@
         "pct_of_account": 0.01
       }
     ],
-    "total_value": 5483.23,
-    "today_gain": 9.35,
-    "today_gain_pct": 0.17,
-    "total_gain": 459.78,
-    "total_gain_pct": 9.15,
+    "total_value": 5477.16,
+    "today_gain": 3.28,
+    "today_gain_pct": 0.06,
+    "total_gain": 453.71,
+    "total_gain_pct": 9.03,
     "cost_basis": 5022.84,
     "history": [
       5549.28,
@@ -374,6 +374,6 @@
     ],
     "total_cost": 26.5,
     "connected_count": 10,
-    "updated": "2026-02-26T14:51:58.293075"
+    "updated": "2026-02-26T15:22:17.066315"
   }
 }

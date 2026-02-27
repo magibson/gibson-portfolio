@@ -1,5 +1,5 @@
 {
-  "updated": "2026-02-27T04:07:53.586145",
+  "updated": "2026-02-27T04:43:13.195842",
   "email": {
     "unread": 3,
     "error": null
@@ -28,8 +28,8 @@
         "symbol": "^VIX",
         "name": "VIX",
         "type": "volatility",
-        "price": 19.13,
-        "change": 2.68,
+        "price": 19.0,
+        "change": 1.99,
         "prevClose": 18.63
       },
       {
@@ -380,6 +380,6 @@
     ],
     "total_cost": 26.5,
     "connected_count": 10,
-    "updated": "2026-02-27T04:07:53.586110"
+    "updated": "2026-02-27T04:43:13.195806"
   }
 }

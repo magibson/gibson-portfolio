@@ -1,11 +1,17 @@
 {
-  "updated": "2026-02-26T23:32:07.636691",
+  "updated": "2026-02-27T00:07:29.162847",
   "email": {
     "unread": 1,
     "error": null
   },
   "calendar": {
-    "events": [],
+    "events": [
+      {
+        "time": "All day",
+        "title": "UMD",
+        "color": "cyan"
+      }
+    ],
     "error": null
   },
   "markets": {
@@ -374,6 +380,6 @@
     ],
     "total_cost": 26.5,
     "connected_count": 10,
-    "updated": "2026-02-26T23:32:07.636652"
+    "updated": "2026-02-27T00:07:29.162819"
   }
 }

@@ -3517,7 +3517,7 @@
       "type": "Closing",
       "source": "https://www.pa.gov/agencies/dli/programs-services/workforce-development-home/warn-requirements/warn-notices.html",
       "first_seen": "2026-02-25T11:00:03.517321",
-      "is_new": true
+      "is_new": false
     },
     {
       "id": "98081ea740d4",
@@ -3530,14 +3530,14 @@
       "type": "Layoff",
       "source": "https://www.pa.gov/agencies/dli/programs-services/workforce-development-home/warn-requirements/warn-notices.html",
       "first_seen": "2026-02-25T11:00:03.517321",
-      "is_new": true
+      "is_new": false
     }
   ],
-  "last_updated": "2026-02-25T11:00:03.520864",
+  "last_updated": "2026-02-27T11:00:03.695002",
   "metadata": {
     "nj_count": 1,
     "pa_count": 271,
     "total_affected": 38931,
-    "new_count": 2
+    "new_count": 0
   }
 }

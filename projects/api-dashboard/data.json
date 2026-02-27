@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-02-26T00:05:00.584140",
+  "lastUpdated": "2026-02-27T12:05:00.120865",
   "totalCost": 26.5,
   "apis": [
     {
@@ -87,39 +87,39 @@
   ],
   "dailyUsage": [
     {
-      "day": "Feb 20",
-      "cost": 0.04,
-      "requests": 316
-    },
-    {
       "day": "Feb 21",
-      "cost": 0.97,
-      "requests": 409
+      "cost": 0.81,
+      "requests": 393
     },
     {
       "day": "Feb 22",
-      "cost": 1.11,
-      "requests": 423
+      "cost": 0.98,
+      "requests": 410
     },
     {
       "day": "Feb 23",
-      "cost": 1.33,
-      "requests": 445
+      "cost": 0.11,
+      "requests": 323
     },
     {
       "day": "Feb 24",
-      "cost": 1.6,
-      "requests": 472
+      "cost": 0.93,
+      "requests": 405
     },
     {
       "day": "Feb 25",
-      "cost": 0.21,
-      "requests": 333
+      "cost": 0.67,
+      "requests": 379
     },
     {
       "day": "Feb 26",
-      "cost": 1.3,
-      "requests": 442
+      "cost": 1.47,
+      "requests": 459
+    },
+    {
+      "day": "Feb 27",
+      "cost": 1.49,
+      "requests": 461
     }
   ]
 }

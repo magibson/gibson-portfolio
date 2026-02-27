@@ -49,3 +49,33 @@ LinkedIn = optional enrichment only, not core dependency
 
 ## Target
 50 users @ $149/month = $7,500 MRR
+
+---
+
+# Self-Improvement Scout Finds — Feb 27, 2026
+
+## 1. AI Website Lead Capture Widget — onleads.chat (Easy, ~$0 to test)
+**What it is:** AI chat widget that engages website visitors, qualifies leads, and books appointments automatically. 14-day free trial.
+**Why it helps Matt:** If Matt ever builds a financial advisor landing page, this converts cold traffic into booked appointments with zero manual effort. Shown 16.7% visitor-to-lead rate and 34.6% lead-to-booking rate in live tests. CRM sync (HubSpot) included.
+**Next step:** Worth testing once a landing page exists. Free trial, 5-min setup.
+
+## 2. obra/superpowers — Agentic Skills Framework (Easy, free, open source)
+**What it is:** GitHub-trending (~64k stars, 8k this week) composable "skills" framework for coding agents. Works with Claude Code + Cursor. Automated TDD, spec-driven development, subagent orchestration.
+**Why it helps:** When building DealSource or other projects, this gives Claude Code a methodology that reduces hallucination/deviation. Lets me work autonomously for hours without going off-plan.
+**Next step:** Install as Claude Code plugin: `/plugin marketplace add obra/superpowers-marketplace` then `/plugin install superpowers@superpowers-marketplace`
+
+## 3. muratcankoylan/Agent-Skills-for-Context-Engineering (Medium, free)
+**What it is:** GitHub trending (12k stars) — comprehensive collection of agent skills for multi-agent architectures, context management, and production systems.
+**Why it helps:** Better Jarvis skills = better performance. Context engineering is exactly what makes agents like me smarter and less likely to drop context on long tasks.
+**Next step:** Review repo for any skills that map to Matt's workflows (lead gen, scheduling, research).
+
+## 4. Minara Skills v2 for OpenClaw — Trading + Prediction Markets (Easy, ClawHub)
+**What it is:** New OpenClaw skill on ClawHub (launched Feb 26, 2026). Built-in crypto wallet, intent-to-swap, Hyperliquid perps, Polymarket analysis, stock market insights.
+**Why it helps Matt:** Direct Polymarket/prediction market analysis from within Jarvis. Kalshi/Polymarket arb bot concept (already in ideas list) is much easier to bootstrap with this skill as a base.
+**Next step:** Install from ClawHub. Evaluate Polymarket analysis feature for the arb bot idea.
+
+## 5. Claude Opus 4.6 + B2B Lead Research Workflow (Easy, use now)
+**What it is:** Pattern spotted on X — advisors using Claude Opus 4.6 to automate lead research, filtering, and personalized outreach for financial sales (26k views, 340 likes).
+**Why it helps Matt:** Right now I'm doing lead research manually on request. Could build a scheduled workflow: pull leads → Claude Opus does research → generates personalized outreach → logs to CRM/sheet. 
+**Next step:** Build a cron-triggered lead enrichment script that takes names from Matt's leads CSV, enriches with Google/LinkedIn data, and outputs a prioritized outreach list.
+

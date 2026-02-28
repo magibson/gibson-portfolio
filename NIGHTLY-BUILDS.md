@@ -1205,3 +1205,59 @@ Full-stack Flask web app — unified lead pipeline dashboard for New York Life p
 - Propwire: 369 (Annuity Owner: 184, Propwire: 185)
 
 **Tech Stack:** Flask + SQLite, dark theme HTML/CSS, port 8094, auto-starts via LaunchAgent
+
+---
+
+## 2026-02-28 — Golden Hour Location Scout 📸🚁
+
+**Location:** `~/clawd/projects/golden-hour-scout/app.py`
+**Port:** 8106 (Tailscale: http://100.82.133.57:8106)
+**Service:** `com.jarvis.golden-hour-scout` (LaunchAgent, auto-starts)
+
+A photography + drone shoot planning tool. Answers: "Where should I shoot in NJ this week, and is it safe to fly?"
+
+### What It Does
+
+**4 pages:**
+
+1. **📅 This Week (`/`)** — 7-day dashboard for Monmouth County:
+   - Morning + evening golden/blue hour windows for each day (exact times via sunrise-sunset.org)
+   - Weather quality score ⭐1–5 based on cloud cover, wind, visibility, rain probability
+   - 🟢🟡🔴 Drone safety status (based on wind + precip)
+   - Top 3 recommended shooting locations per day
+   - Live weather emoji per day (☀️⛅🌥️☁️🌧️)
+
+2. **📍 All Spots (`/locations`)** — Grid cards for all 12 locations:
+   - 3-day forecast score badges per location
+   - Drone class (Class G = go, Restricted = no fly)
+   - Tags, best light indicator, drive time
+   - "Plan Shoot" button → goes to planner pre-filled
+
+3. **🌄 Location Detail (`/location/<slug>`)** — Per-location 7-day forecast:
+   - Exact golden hour windows using that location's exact lat/lng
+   - Instagram tip for each location
+   - "Plan this day" links that pre-fill the planner
+
+4. **🗓️ Plan a Shoot (`/plan`)** — Pick location + date + morning/evening:
+   - Full timeline: arrive → blue hour → sunrise/sunset peak → pack up
+   - Hourly weather at exact shoot time
+   - Drone GO/CAUTION/NO-GO with reason
+   - ✨ AI caption concept via Gemini (2-sentence poetic Instagram caption for @mattgibsonpics)
+   - Gear checklist: auto-adds drone if Class G, film camera if film tag, warm layers if <45°F, ND filters if bright
+   - Phone alarm reminder time
+
+### 12 Curated NJ Locations
+Barnegat Lighthouse · Sandy Hook · Twin Lights (Navesink) · Hartshorne Woods · Asbury Park Boardwalk · Gateway NRA Keansburg · Island Beach State Park · Sea Girt Lighthouse · Raritan Bay Union Beach · Princeton Campus · Delaware Water Gap · Long Branch Pier
+
+### Tech
+- Flask single-file + Open-Meteo (weather) + sunrise-sunset.org (solar times)
+- 30-min in-memory cache so API calls don't spam
+- Gemini AI captions (graceful fallback if unavailable)
+- LaunchAgent: `/Users/jarvis/clawd/launchagents/com.jarvis.golden-hour-scout.plist`
+
+### Usage
+```
+http://100.82.133.57:8106            # This Week
+http://100.82.133.57:8106/locations  # All Spots
+http://100.82.133.57:8106/plan       # Plan a Shoot
+```

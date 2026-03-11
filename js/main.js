@@ -681,3 +681,34 @@ navLinks.querySelectorAll('a').forEach(link => {
         navLinks.classList.remove('active');
     });
 });
+
+// Preset signup form → Beehiiv
+const presetsForm = document.getElementById('presetsSignupForm');
+if (presetsForm) {
+    presetsForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = this.querySelector('input[type="email"]').value;
+        const btn = this.querySelector('button');
+        btn.textContent = 'Sending...';
+        btn.disabled = true;
+
+        try {
+            const res = await fetch('https://api.beehiiv.com/v2/publications/pub_6c5cd907-99da-4959-961b-cc08bdecdd0b/subscriptions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, reactivate_existing: false, send_welcome_email: true })
+            });
+
+            if (res.ok || res.status === 201) {
+                presetsForm.style.display = 'none';
+                document.getElementById('presetsSignupConfirm').style.display = 'block';
+            } else {
+                btn.textContent = 'Try Again';
+                btn.disabled = false;
+            }
+        } catch(err) {
+            btn.textContent = 'Try Again';
+            btn.disabled = false;
+        }
+    });
+}

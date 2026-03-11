@@ -919,3 +919,89 @@ main {
         max-width: 400px;
     }
 }
+
+/* Custom preset email signup */
+.presets-signup-wrap {
+    margin-top: 3rem;
+    text-align: center;
+}
+
+.presets-signup-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+.presets-signup-form {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    max-width: 460px;
+    margin: 0 auto;
+}
+
+.presets-signup-input {
+    flex: 1;
+    padding: 0.85rem 1.2rem;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-right: none;
+    border-radius: 4px 0 0 4px;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.presets-signup-input::placeholder {
+    color: rgba(255,255,255,0.3);
+}
+
+.presets-signup-input:focus {
+    border-color: rgba(255,255,255,0.4);
+}
+
+.presets-signup-btn {
+    padding: 0.85rem 1.5rem;
+    background: rgba(255,255,255,0.9);
+    color: #111;
+    border: none;
+    border-radius: 0 4px 4px 0;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.presets-signup-btn:hover {
+    background: #fff;
+}
+
+.presets-signup-confirm {
+    margin-top: 1rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 0.05em;
+}
+
+@media (max-width: 480px) {
+    .presets-signup-form {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .presets-signup-input {
+        border-right: 1px solid rgba(255,255,255,0.15);
+        border-radius: 4px;
+    }
+    .presets-signup-btn {
+        border-radius: 4px;
+    }
+}

@@ -1005,3 +1005,19 @@ main {
         border-radius: 4px;
     }
 }
+
+/* Coming soon placeholder button */
+.preset-coming-soon-btn {
+    display: inline-block;
+    padding: 0.6rem 1.4rem;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 4px;
+    color: rgba(255,255,255,0.35);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: default;
+}

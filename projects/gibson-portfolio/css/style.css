@@ -724,3 +724,198 @@ main {
     opacity: 0;
     transform: translateY(30px);
 }
+
+/* ========================
+   PRESETS SECTION
+   ======================== */
+#presets {
+    position: relative;
+    padding: 3rem;
+    max-width: 1400px;
+    margin: 0 2rem 4rem 2rem;
+    background: rgba(10, 10, 10, 0.7);
+    border-radius: 24px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    opacity: 0;
+    transform: translateY(50px);
+}
+
+@media (min-width: 1450px) {
+    #presets {
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+#presets .presets-title {
+    font-size: 2rem;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+    text-align: center;
+    color: var(--color-text);
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+#presets .presets-subtitle {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+/* Presets grid */
+.presets-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+    width: 100%;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+/* Individual preset card */
+.preset-card {
+    width: calc(50% - 1rem);
+    min-width: 280px;
+    max-width: 420px;
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.preset-card:hover {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    transform: translateY(-4px);
+}
+
+/* Dimmed / coming-soon placeholder card */
+.preset-card--dim {
+    opacity: 0.45;
+    pointer-events: none;
+}
+
+.preset-card--dim:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* "Coming Soon" badge */
+.preset-card-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(99, 102, 241, 0.85);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.75rem;
+    border-radius: 20px;
+    z-index: 2;
+}
+
+/* Card body */
+.preset-card-body {
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.preset-card-title {
+    font-size: 1.4rem;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+    color: var(--color-text);
+}
+
+.preset-card-desc {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.7;
+    flex: 1;
+    margin-bottom: 1.5rem;
+}
+
+/* Price + button row */
+.preset-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.preset-card-price {
+    font-size: 1.6rem;
+    font-weight: 300;
+    color: var(--color-text);
+    letter-spacing: 0.05em;
+}
+
+/* Buy Now button — styled like nav links but filled */
+.preset-buy-btn {
+    display: inline-block;
+    padding: 0.55rem 1.4rem;
+    border-radius: 8px;
+    background: rgba(99, 102, 241, 0.2);
+    border: 1px solid rgba(99, 102, 241, 0.5);
+    color: var(--color-text);
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.preset-buy-btn:hover {
+    background: rgba(99, 102, 241, 0.4);
+    box-shadow: 0 6px 18px rgba(99, 102, 241, 0.3);
+}
+
+/* Free preset signup note */
+.presets-signup-note {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+.presets-signup-link {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.2s ease;
+}
+
+.presets-signup-link:hover {
+    color: var(--color-text);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #presets {
+        padding: 2rem 1.5rem;
+        margin-left: 1rem;
+        margin-right: 1rem;
+    }
+
+    .preset-card {
+        width: 100%;
+        max-width: 400px;
+    }
+}

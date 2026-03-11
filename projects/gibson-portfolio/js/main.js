@@ -135,6 +135,53 @@ gsap.to('.hero-name', {
     ease: 'none'
 });
 
+// Presets section scroll animation
+gsap.set('#presets', { opacity: 0, y: 50 });
+gsap.set('#presets .presets-title', { opacity: 0, y: 20 });
+gsap.set('#presets .presets-subtitle', { opacity: 0, y: 20 });
+gsap.set('#presets .presets-grid', { opacity: 0, y: 20 });
+gsap.set('#presets .presets-signup-note', { opacity: 0, y: 10 });
+
+ScrollTrigger.create({
+    trigger: '#presets',
+    start: 'top 85%',
+    onEnter: () => {
+        const presetsTimeline = gsap.timeline();
+
+        presetsTimeline.to('#presets', {
+            duration: 0.8,
+            opacity: 1,
+            y: 0,
+            ease: 'power2.out'
+        })
+        .to('#presets .presets-title', {
+            duration: 0.6,
+            opacity: 1,
+            y: 0,
+            ease: 'power2.out'
+        }, '-=0.4')
+        .to('#presets .presets-subtitle', {
+            duration: 0.5,
+            opacity: 1,
+            y: 0,
+            ease: 'power2.out'
+        }, '-=0.3')
+        .to('#presets .presets-grid', {
+            duration: 0.6,
+            opacity: 1,
+            y: 0,
+            ease: 'power2.out'
+        }, '-=0.2')
+        .to('#presets .presets-signup-note', {
+            duration: 0.5,
+            opacity: 1,
+            y: 0,
+            ease: 'power2.out'
+        }, '-=0.2');
+    },
+    once: true
+});
+
 // About Me section scroll animation
 ScrollTrigger.create({
     trigger: '#about-me',

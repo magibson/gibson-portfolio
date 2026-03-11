@@ -192,7 +192,9 @@
             <!-- Custom Email Signup -->
             <div class="presets-signup-wrap">
                 <p class="presets-signup-label">Get a free preset — drop your email below</p>
-                <form class="presets-signup-form" id="presetsSignupForm" action="https://subscribe-forms.beehiiv.com/6c5cd907-99da-4959-961b-cc08bdecdd0b" method="POST" target="_blank">
+                <form class="presets-signup-form" name="preset-signup" method="POST" data-netlify="true" data-netlify-honeypot="bot-field">
+                    <input type="hidden" name="form-name" value="preset-signup" />
+                    <input type="hidden" name="bot-field" style="display:none" />
                     <input type="email" name="email" class="presets-signup-input" placeholder="your@email.com" required />
                     <button type="submit" class="presets-signup-btn">Get Free Preset</button>
                 </form>
@@ -240,5 +242,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script src="js/main.js"></script>
+    <script>
+        const form = document.querySelector('form[name="preset-signup"]');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const data = new FormData(form);
+                fetch('/', { method: 'POST', body: data })
+                    .then(() => {
+                        form.style.display = 'none';
+                        document.getElementById('presetsSignupConfirm').style.display = 'block';
+                    })
+                    .catch(() => alert('Something went wrong. Please try again.'));
+            });
+        }
+    </script>
 </body>
 </html>

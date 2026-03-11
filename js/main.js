@@ -135,6 +135,53 @@ gsap.to('.hero-name', {
     ease: 'none'
 });
 
+// Presets section scroll animation
+gsap.set('#presets', { opacity: 0, y: 50 });
+gsap.set('#presets .presets-title', { opacity: 0, y: 20 });
+gsap.set('#presets .presets-subtitle', { opacity: 0, y: 20 });
+gsap.set('#presets .presets-grid', { opacity: 0, y: 20 });
+gsap.set('#presets .presets-signup-note', { opacity: 0, y: 10 });
+
+ScrollTrigger.create({
+    trigger: '#presets',
+    start: 'top 85%',
+    onEnter: () => {
+        const presetsTimeline = gsap.timeline();
+
+        presetsTimeline.to('#presets', {
+            duration: 0.8,
+            opacity: 1,
+            y: 0,
+            ease: 'power2.out'
+        })
+        .to('#presets .presets-title', {
+            duration: 0.6,
+            opacity: 1,
+            y: 0,
+            ease: 'power2.out'
+        }, '-=0.4')
+        .to('#presets .presets-subtitle', {
+            duration: 0.5,
+            opacity: 1,
+            y: 0,
+            ease: 'power2.out'
+        }, '-=0.3')
+        .to('#presets .presets-grid', {
+            duration: 0.6,
+            opacity: 1,
+            y: 0,
+            ease: 'power2.out'
+        }, '-=0.2')
+        .to('#presets .presets-signup-note', {
+            duration: 0.5,
+            opacity: 1,
+            y: 0,
+            ease: 'power2.out'
+        }, '-=0.2');
+    },
+    once: true
+});
+
 // About Me section scroll animation
 ScrollTrigger.create({
     trigger: '#about-me',
@@ -634,58 +681,3 @@ navLinks.querySelectorAll('a').forEach(link => {
         navLinks.classList.remove('active');
     });
 });
-
-// ===================
-// FORM SUBMISSION (AJAX)
-// ===================
-const contactForm = document.getElementById('contact-form');
-if (contactForm) {
-    contactForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const form = e.target;
-        const submitBtn = form.querySelector('.submit-btn');
-        const originalText = submitBtn.textContent;
-        
-        // Show loading state
-        submitBtn.textContent = 'Sending...';
-        submitBtn.disabled = true;
-        
-        try {
-            const formData = new FormData(form);
-            await fetch('/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams(formData).toString()
-            });
-            
-            // Get the contact section
-            const contactSection = document.getElementById('contact');
-            
-            // Fade out everything in contact section
-            gsap.to(contactSection.children, {
-                opacity: 0,
-                y: -20,
-                duration: 0.3,
-                onComplete: () => {
-                    // Replace all content with success message
-                    contactSection.innerHTML = '<div class="form-success"><h3>Message Sent!</h3><p>Thanks for reaching out. I\'ll get back to you soon.</p></div>';
-                    
-                    // Animate in success message
-                    gsap.from('.form-success', {
-                        opacity: 0,
-                        y: 20,
-                        duration: 0.5,
-                        ease: 'power2.out'
-                    });
-                }
-            });
-        } catch (error) {
-            submitBtn.textContent = 'Error - Try Again';
-            submitBtn.disabled = false;
-            setTimeout(() => {
-                submitBtn.textContent = originalText;
-            }, 2000);
-        }
-    });
-}

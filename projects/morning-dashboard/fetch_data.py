@@ -470,98 +470,123 @@ def load_packages():
     return {"packages": [], "count": 0}
 
 def load_api_status():
-    """Load API status data"""
+    """Load API status data with real usage from tracking DB."""
+    # Pull real monthly stats from the usage tracker
+    try:
+        import sys as _sys
+        _sys.path.insert(0, '/Users/jarvis/clawd/scripts')
+        from log_api_call import get_all_monthly_stats
+        usage = get_all_monthly_stats()
+    except Exception:
+        usage = {}
+
+    def _stats(service_id):
+        s = usage.get(service_id, {})
+        return s.get("cost", 0.0), s.get("calls", 0)
+
+    c_anthropic, r_anthropic = _stats("anthropic")
+    c_xai, r_xai = _stats("xai")
+    c_whoop, r_whoop = _stats("whoop")
+    c_withings, r_withings = _stats("withings")
+    c_telegram, r_telegram = _stats("telegram")
+    c_ticktick, r_ticktick = _stats("ticktick")
+    c_gmail, r_gmail = _stats("gmail")
+    c_github, r_github = _stats("github")
+    c_brave, r_brave = _stats("brave")
+    c_tracerfy, r_tracerfy = _stats("tracerfy")
+    c_retell, r_retell = _stats("retell")
+
     apis = [
         {
             "id": "anthropic",
             "name": "Claude",
             "purpose": "Primary AI brain",
             "status": "connected",
-            "cost": 22.00,
-            "requests": 1847
+            "cost": c_anthropic,
+            "requests": r_anthropic
         },
         {
             "id": "xai",
             "name": "Grok",
             "purpose": "X search & research",
             "status": "connected" if Path("/Users/jarvis/clawd/integrations/xai/.env").exists() else "error",
-            "cost": 4.50,
-            "requests": 245
+            "cost": c_xai,
+            "requests": r_xai
         },
         {
             "id": "whoop",
             "name": "Whoop",
             "purpose": "Fitness tracking",
             "status": "connected" if Path("/Users/jarvis/clawd/.whoop_tokens.json").exists() else "error",
-            "cost": 0,
-            "requests": 62
+            "cost": c_whoop,
+            "requests": r_whoop
         },
         {
             "id": "withings",
             "name": "Withings",
             "purpose": "Body composition",
             "status": "connected" if Path("/Users/jarvis/clawd/.withings_tokens.json").exists() else "error",
-            "cost": 0,
-            "requests": 8
+            "cost": c_withings,
+            "requests": r_withings
         },
         {
             "id": "telegram",
             "name": "Telegram",
             "purpose": "Communication",
             "status": "connected",
-            "cost": 0,
-            "requests": 523
+            "cost": c_telegram,
+            "requests": r_telegram
         },
         {
             "id": "ticktick",
             "name": "TickTick",
             "purpose": "Task management",
             "status": "connected" if Path("/Users/jarvis/clawd/integrations/.personal-config.json").exists() else "error",
-            "cost": 0,
-            "requests": 31
+            "cost": c_ticktick,
+            "requests": r_ticktick
         },
         {
             "id": "gmail",
             "name": "Gmail",
             "purpose": "Email alerts",
             "status": "connected",
-            "cost": 0,
-            "requests": 186
+            "cost": c_gmail,
+            "requests": r_gmail
         },
         {
             "id": "github",
             "name": "GitHub",
             "purpose": "Code deploys",
             "status": "connected",
-            "cost": 0,
-            "requests": 14
+            "cost": c_github,
+            "requests": r_github
         },
         {
             "id": "brave",
             "name": "Brave",
             "purpose": "Web search",
             "status": "connected",
-            "cost": 0,
-            "requests": 89
+            "cost": c_brave,
+            "requests": r_brave
         },
         {
             "id": "tracerfy",
             "name": "Tracerfy",
             "purpose": "Skip tracing contacts",
             "status": "connected",
-            "cost": 0,
-            "requests": 0
+            "cost": c_tracerfy,
+            "requests": r_tracerfy
         },
         {
             "id": "retell",
             "name": "Retell",
             "purpose": "Voice AI agent",
             "status": "connected",
-            "cost": 0,
-            "requests": 0
+            "cost": c_retell,
+            "requests": r_retell
         }
     ]
-    
+
     total_cost = sum(a["cost"] for a in apis)
     connected = len([a for a in apis if a["status"] == "connected"])
     
